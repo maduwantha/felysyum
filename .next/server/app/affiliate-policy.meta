@@ -1,0 +1,15 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/affiliate-policy/layout,_N_T_/affiliate-policy/page,_N_T_/affiliate-policy"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/affiliate-policy/__PAGE__",
+    "/affiliate-policy",
+    "/_index",
+    "/_head"
+  ]
+}

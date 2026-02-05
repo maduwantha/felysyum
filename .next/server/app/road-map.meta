@@ -1,0 +1,15 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/road-map/layout,_N_T_/road-map/page,_N_T_/road-map"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/road-map/__PAGE__",
+    "/road-map",
+    "/_index",
+    "/_head"
+  ]
+}

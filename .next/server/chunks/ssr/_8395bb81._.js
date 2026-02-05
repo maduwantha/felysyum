@@ -1,0 +1,3 @@
+module.exports=[43187,a=>{"use strict";var b=a.i(87924),c=a.i(77845),d=a.i(38246);let e=({children:a,href:e,className:f,insideSpan:g=!0,...h})=>(0,b.jsx)(d.default,{href:e,className:(0,c.cn)("btn btn-md",f),...h,children:g?(0,b.jsx)("span",{children:a}):a});e.displayName="LinkButton",a.s(["default",0,e])},56505,a=>{a.v("/_next/static/media/cyberscope_audit.6495545d.jpg")}];
+
+//# sourceMappingURL=_8395bb81._.js.map
