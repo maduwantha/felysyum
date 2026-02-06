@@ -1,5 +1,6 @@
 import { cn } from '@/utils/cn';
 import RevealAnimation from '../animation/RevealAnimation';
+import Link from 'next/link';
 
 interface ProcessStep {
   id: string;
@@ -7,63 +8,52 @@ interface ProcessStep {
   title: string;
   description: string;
   icon: string;
-  features: string[];
+  actionText: string;
+  actionLink: string;
 }
+
 const ProcessStep = () => {
   const processSteps: ProcessStep[] = [
     {
-      id: 'create-account',
-      stepNumber: 'Step 1',
-      title: 'Create your account',
-      description: 'Choose a plan that fits your needs and start exploring the platform with a free trial.',
-      icon: 'ns-shape-36',
-      features: ['Quick signup process', 'No setup fees', 'Instant access to your dashboard'],
+      id: 'create-wallet',
+      stepNumber: 'Step- 01',
+      title: 'Create a wallet',
+      description: 'At this moment, there are numerous DeFi crypto wallets available globally. You can select and create your preferred crypto wallet from the options.',
+      icon: 'ns-shape-36', // Changed to a wallet-like icon if available, otherwise default
+      actionText: 'Learn more',
+      actionLink: '/wallets',
     },
     {
-      id: 'customize-workspace',
-      stepNumber: 'Step 2',
-      title: 'Customize your workspace',
-      description: 'Use templates to set up your team, workflows, integrations, and brand.',
-      icon: 'ns-shape-8',
-      features: ['Choose what to track', 'Add users and set permissions', 'Connect your favorite tools'],
+      id: 'connect-wallet',
+      stepNumber: 'Step- 02',
+      title: 'Connect your wallet',
+      description: 'Establish a connection between your cryptocurrency wallet and the Uniswap decentralized exchange platform.',
+      icon: 'ns-shape-8', // iconic representation
+      actionText: 'How to connect',
+      actionLink: '/connect-your-wallet',
     },
     {
-      id: 'automate-collaborate',
-      stepNumber: 'Step 3',
-      title: 'Automate & collaborate',
-      description: 'Choose a plan that fits your needs and start exploring the platform with a free trial.',
+      id: 'get-felysyum',
+      stepNumber: 'Step- 03',
+      title: 'Get Felysyum',
+      description: 'Convert any of your current cryptocurrencies into Felysyum tokens through the exchange process available on the platform',
       icon: 'ns-shape-2',
-      features: ['Drag-and-drop automation', 'Task routing & approvals', 'Notifications & real-time sync'],
-    },
-    {
-      id: 'create-account-2',
-      stepNumber: 'Step 4',
-      title: 'Create your account',
-      description: 'Choose a plan that fits your needs and start exploring the platform with a free trial.',
-      icon: 'ns-shape-36',
-      features: ['Quick signup process', 'No setup fees', 'Instant access to your dashboard'],
-    },
-    {
-      id: 'customize-workspace-2',
-      stepNumber: 'Step 5',
-      title: 'Customize your workspace',
-      description: 'Use templates or build your own dashboards, workflows, and integrations that reflect',
-      icon: 'ns-shape-8',
-      features: ['Choose what to track', 'Add users and set permissions', 'Connect your favorite tools'],
+      actionText: 'Get Now',
+      actionLink: '/get-felysium',
     },
   ];
 
   return (
-    <section className="pt-32 pb-[100px] sm:pt-36 md:pt-42 xl:pt-[180px]">
+    <section className="pt-10 pb-[80px] sm:pt-10 md:pt-10 ">
       <div className="main-container">
-        <div className="mb-[72px] space-y-3 text-center">
-          <RevealAnimation delay={0.3}>
-            <h2 className="mx-auto max-w-[552px]">From sign-up to success in just a few steps</h2>
-          </RevealAnimation>
+        <div className="mb-[60px] space-y-4 text-center">
+
           <RevealAnimation delay={0.4}>
-            <p className="mx-auto max-w-[692px]">
-              We make it easy to Get started, simple to scale, and seamless to succeed. Whether you&apos;re using one
-              feature or the full suite, NextSaaS is built to support you every step of the way.
+            <h2 className="mx-auto max-w-[800px] text-4xl md:text-5xl ">Reserve Your Share of <span className="text-primary-500">Felysyum</span></h2>
+          </RevealAnimation>
+          <RevealAnimation delay={0.5}>
+            <p className="mx-auto max-w-[692px] text-lg text-gray-400">
+              Join the Felysyum Revolution. Follow these simple 3 steps to acquire your FELY Token. Build your future today.
             </p>
           </RevealAnimation>
         </div>
@@ -72,7 +62,7 @@ const ProcessStep = () => {
             return (
               <div
                 key={step.id}
-                className={cn('col-span-12 md:col-span-6 lg:col-span-4', index === 3 && 'lg:col-start-3')}>
+                className={cn('col-span-12 md:col-span-6 lg:col-span-4')}>
                 <RevealAnimation delay={0.3 + index * 0.1}>
                   <div className="bg-background-1 dark:bg-background-6 flex h-full flex-col space-y-8 rounded-[20px] p-5 sm:p-8">
                     <div className="flex items-center justify-between">
@@ -82,11 +72,14 @@ const ProcessStep = () => {
                     <div className="flex-1 space-y-4">
                       <h3 className="sm:text-heading-5 text-heading-6 font-normal">{step.title}</h3>
                       <p>{step.description}</p>
-                      <ul className="text-tagline-1 text-secondary/60 dark:text-accent/60 list-inside list-disc space-y-2 font-normal">
-                        {step.features.map((feature, featureIndex: number) => (
-                          <li key={featureIndex + 1}>{feature}</li>
-                        ))}
-                      </ul>
+
+                      {/* Action Link added here */}
+                      <div className="pt-2">
+                        <Link href={step.actionLink} className="inline-flex items-center text-primary-500 hover:text-secondary dark:hover:text-white font-medium transition-colors gap-2 group/link">
+                          {step.actionText}
+                          <span className="group-hover/link:translate-x-1 transition-transform">→</span>
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </RevealAnimation>

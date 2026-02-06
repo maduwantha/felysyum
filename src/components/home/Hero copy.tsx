@@ -1,4 +1,4 @@
-import heroImg01Image from '@public/images/felysyum-home.png';
+import heroImg01Image from '@public/images/slider-1.png';
 import heroImg02Image from '@public/images/ns-img-87.png';
 import heroImg03Image from '@public/images/ns-img-88.png';
 import heroImg04Image from '@public/images/ns-img-89.png';
@@ -17,7 +17,7 @@ const Hero = () => {
       className="bg-[url('/images/ns-img-85.png')] bg-left bg-no-repeat pt-[140px] pb-[120px] md:pt-[160px] lg:bg-top-right lg:pt-[200px] lg:pb-[150px] xl:pt-[230px] xl:pb-[200px]"
       aria-label="Hero section">
       <div className="main-container">
-        <div className="flex flex-col gap-10 sm:flex-row 2xl:gap-[100px]">
+        <div className="flex h-[396px] flex-col sm:flex-row 2xl:gap-[100px]">
           {/* hero text  */}
           <div className="text-center md:w-full lg:max-w-[570px] lg:text-left xl:max-w-[595px]">
 
@@ -65,29 +65,29 @@ const Hero = () => {
           </div>
 
           {/* hero image  */}
-          <div className="relative flex-1 w-full flex justify-center items-center" aria-hidden="true">
+          <div className="relative" aria-hidden="true">
             <RevealAnimation delay={0.3} useSpring={true} duration={2}>
-              <figure className="relative z-[1] w-full max-w-[450px] h-auto overflow-hidden rounded-[20px]">
+              <figure className="absolute top-0 left-0 z-[1] hidden w-[408px] overflow-hidden rounded-[20px] lg:block">
                 <Image
                   src={heroImg01Image}
                   alt="Hero img 1"
-                  className="w-full h-auto object-contain dark:hidden"
-                  width={600}
-                  height={600}
+                  className="size-full object-cover dark:hidden"
+                  width={408}
+                  height={408}
                   priority
                 />
                 <Image
                   src={heroImg01DarkImage}
                   alt="Hero img 1"
-                  className="hidden w-full h-auto object-contain dark:inline-block"
-                  width={600}
-                  height={600}
+                  className="hidden size-full object-cover dark:inline-block"
+                  width={408}
+                  height={408}
                   priority
                 />
               </figure>
             </RevealAnimation>
 
-            {/* <RevealAnimation delay={0.4} useSpring={true} duration={2}>
+            <RevealAnimation delay={0.4} useSpring={true} duration={2}>
               <figure className="absolute top-[275px] left-0 z-[2] hidden w-[408px] overflow-hidden rounded-[20px] lg:block">
                 <Image
                   src={heroImg02Image}
@@ -169,7 +169,7 @@ const Hero = () => {
                   priority
                 />
               </figure>
-            </RevealAnimation> */}
+            </RevealAnimation>
           </div>
         </div>
 

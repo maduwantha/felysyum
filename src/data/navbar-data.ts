@@ -8,20 +8,20 @@ export const mobileMenuData: MobileMenuGroup[] = [
     href: '/',
   },
   {
+    id: 'fely',
+    title: 'FELY',
+    submenu: [
+      { id: 'buy-fely', label: 'Buy Fely', href: '/buy' },
+      { id: 'stake-fely', label: 'Stake Fely', href: '/stake' },
+    ],
+  },
+  {
     id: 'about',
     title: 'About',
     submenu: [
       { id: 'behind-the-story', label: 'Behind the Story', href: '/about' },
       { id: 'white-paper', label: 'White Paper', href: '/whitepaper' },
       { id: 'team', label: 'Team', href: '/team' },
-    ],
-  },
-  {
-    id: 'fely',
-    title: 'FELY',
-    submenu: [
-      { id: 'buy-fely', label: 'Buy Fely', href: '/buy' },
-      { id: 'stake-fely', label: 'Stake Fely', href: '/stake' },
     ],
   },
   {
@@ -50,11 +50,7 @@ export const mobileMenuData: MobileMenuGroup[] = [
     title: 'Announcements',
     href: '/announcement',
   },
-  {
-    id: 'blog',
-    title: 'Blog',
-    href: '/blog',
-  },
+
   {
     id: 'contact',
     title: 'Contact',

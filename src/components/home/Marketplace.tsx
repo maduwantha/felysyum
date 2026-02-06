@@ -6,21 +6,28 @@ import gradient43 from '@public/images/ns-img-531.png';
 import LinkButton from '../ui/button/LinkButton';
 
 // Logo Imports
+import coinmarketcapLogo from '@public/images/marketplace/coinmarketcap.png';
 import felyLogo from '@public/images/marketplace/fely.png';
-import coinGeckoLogo from '@public/images/marketplace/coingecko.png';
-import geckoTerminalLogo from '@public/images/marketplace/geckoterminal.jpg';
-import dexToolsLogo from '@public/images/marketplace/dextools.jpg';
+import coinGeckoLogo from '@public/images/marketplace/coingko.svg';
+import geckoTerminalLogo from '@public/images/marketplace/gkoterminal.png';
+import livecoinwatchLogo from '@public/images/marketplace/livecoinwatchlogo.png';
+import dexToolsLogo from '@public/images/marketplace/dextool.png';
+import paprikaLogo from '@public/images/marketplace/paprika.png';
+import dexscreenerLogo from '@public/images/marketplace/ds.webp';
+import avaiLogo from '@public/images/marketplace/avai.png';
 
 // Placeholder data
 const marketplaceData = [
-    { name: 'Buy FELY', url: '#', iconClass: 'ns-filter', image: felyLogo },
-    { name: 'CoinGecko', url: '#', iconClass: 'ns-monitor', image: coinGeckoLogo },
-    { name: 'Gecko Terminal', url: '#', iconClass: 'ns-code', image: geckoTerminalLogo },
-    { name: 'Live Coin Watch', url: '#', iconClass: 'ns-clock' }, // No image provided yet
-    { name: 'DEXTools', url: '#', iconClass: 'ns-layout', image: dexToolsLogo },
-    { name: 'Coin Paprika', url: '#', iconClass: 'ns-fire' },
-    { name: 'Coinranking', url: '#', iconClass: 'ns-chart' },
-    { name: 'Coming Soon', url: '#', iconClass: 'ns-plus' },
+    { name: 'CoinMarketCap', url: 'https://coinmarketcap.com/currencies/felysyum/', iconClass: 'ns-filter', image: coinmarketcapLogo },
+    { name: 'CoinGecko', url: 'https://www.coingecko.com/en/coins/felysyum', iconClass: 'ns-monitor', image: coinGeckoLogo },
+    { name: 'Gecko Terminal', url: 'https://www.geckoterminal.com/polygon_pos/pools/0xc810868393de87e0daa3b1f4e90c6738192d2a06', iconClass: 'ns-code', image: geckoTerminalLogo },
+    { name: 'Live Coin Watch', url: 'https://www.livecoinwatch.com/price/Felysyum-FELY', iconClass: 'ns-code', image: livecoinwatchLogo },
+
+    { name: 'DEXTools', url: 'https://www.dextools.io/app/token/felysyum', iconClass: 'ns-layout', image: dexToolsLogo },
+    { name: 'Coin Paprika', url: 'https://coinpaprika.com/coin/fely-felysyum/', iconClass: 'ns-fire', image: paprikaLogo },
+    { name: 'DexScreener', url: 'https://dexscreener.com/polygon/0xc810868393de87e0daa3b1f4e90c6738192d2a06', iconClass: 'ns-fire', image: dexscreenerLogo },
+    { name: 'Ave ai', url: 'https://ave.ai/token/0xee997788f625809332baabb3110bcf1ba7400824-polygon', iconClass: 'ns-fire', image: avaiLogo },
+
 ];
 
 const Marketplace = () => {
@@ -39,38 +46,25 @@ const Marketplace = () => {
 
                         {/* Content */}
                         <div className="relative z-10 mx-auto max-w-[700px]">
-                            <RevealAnimation delay={0.2}>
-                                <span className="badge badge-blur mb-5">
-                                    Marketplace
-                                </span>
-                            </RevealAnimation>
+
                             <RevealAnimation delay={0.3}>
                                 <h2 className="mx-auto mb-4 text-3xl md:text-4xl font-bold text-white leading-tight">
-                                    Buy now & get live coin data instantly!
+                                    Track Us Across Leading Platforms
                                 </h2>
                             </RevealAnimation>
                             <RevealAnimation delay={0.4}>
                                 <p className="text-accent/80 text-base md:text-lg mb-8">
-                                    Instant access to live cryptocurrency data for your workflow.
+                                    Real-Time Insights Across Crypto Trackers
                                 </p>
                             </RevealAnimation>
-                            <RevealAnimation delay={0.5}>
-                                <div className="text-center">
-                                    <LinkButton
-                                        href="#"
-                                        className="btn btn-primary btn-md hover:btn-white dark:hover:btn-accent w-full sm:w-auto border-0"
-                                        aria-label="Get started">
-                                        Get Started
-                                    </LinkButton>
-                                </div>
-                            </RevealAnimation>
+
                         </div>
                         {/* Grid */}
                         <div className="grid grid-cols-12 gap-y-4 sm:gap-5 md:gap-8 mt-10 text-left">
                             {marketplaceData.map((item, index) => (
                                 <RevealAnimation delay={0.4 + index * 0.1} key={item.name}>
                                     <div className="col-span-12 sm:col-span-6 lg:col-span-3">
-                                        <Link href={item.url} className="group block h-full">
+                                        <Link href={item.url} target="_blank" className="group block h-full">
                                             <div className="group relative h-full flex flex-col justify-between overflow-hidden rounded-[20px] bg-[#13171E] px-5 py-6 md:px-6 md:py-8 border border-[#2a333e] hover:border-primary-500/50 transition-all duration-300">
 
                                                 {/* Primary Glow Effect */}
@@ -79,7 +73,7 @@ const Marketplace = () => {
                                                 {/* Icons Area */}
                                                 <div className="mb-5 flex items-center">
                                                     {/* Main Icon (Brand) */}
-                                                    <div className="relative z-10 size-[80px] rounded-full bg-white flex items-center justify-center overflow-hidden">
+                                                    <div className="relative z-10 p-2 size-[80px] rounded-full bg-white flex items-center justify-center overflow-hidden">
                                                         {item.image ? (
                                                             <Image
                                                                 src={item.image}

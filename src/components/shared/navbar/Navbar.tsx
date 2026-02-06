@@ -57,29 +57,6 @@ const Navbar = () => {
                     </Link>
                   </li>
                   <li
-                    onMouseEnter={() => handleMenuHover('explore-mega-menu')}
-                    data-menu="explore-mega-menu"
-                    className="group/nav-item relative cursor-pointer py-2.5">
-                    <Link
-                      href="#"
-                      onClick={(event) => event.preventDefault()}
-                      className="hover:border-stroke-2 dark:hover:border-stroke-7 text-tagline-1 text-secondary/60 hover:text-secondary dark:text-accent/60 dark:hover:text-accent flex items-center gap-1 rounded-full border border-transparent px-4 py-2 font-normal transition-all duration-200">
-                      <span>About</span>
-                      <span className="block origin-center translate-y-px transition-all duration-300 group-hover/nav-item:rotate-180">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth="1.5"
-                          stroke="currentColor"
-                          className="size-4">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                        </svg>
-                      </span>
-                    </Link>
-                    <ExploreMenu menuDropdownId={menuDropdownId} setMenuDropdownId={setMenuDropdownId} />
-                  </li>
-                  <li
                     onMouseEnter={() => handleMenuHover('fely-mega-menu')}
                     data-menu="fely-mega-menu"
                     className="group/nav-item relative cursor-pointer py-2.5">
@@ -102,6 +79,30 @@ const Navbar = () => {
                     </Link>
                     <FelyMenu menuDropdownId={menuDropdownId} setMenuDropdownId={setMenuDropdownId} />
                   </li>
+                  <li
+                    onMouseEnter={() => handleMenuHover('explore-mega-menu')}
+                    data-menu="explore-mega-menu"
+                    className="group/nav-item relative cursor-pointer py-2.5">
+                    <Link
+                      href="#"
+                      onClick={(event) => event.preventDefault()}
+                      className="hover:border-stroke-2 dark:hover:border-stroke-7 text-tagline-1 text-secondary/60 hover:text-secondary dark:text-accent/60 dark:hover:text-accent flex items-center gap-1 rounded-full border border-transparent px-4 py-2 font-normal transition-all duration-200">
+                      <span>About</span>
+                      <span className="block origin-center translate-y-px transition-all duration-300 group-hover/nav-item:rotate-180">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth="1.5"
+                          stroke="currentColor"
+                          className="size-4">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                        </svg>
+                      </span>
+                    </Link>
+                    <ExploreMenu menuDropdownId={menuDropdownId} setMenuDropdownId={setMenuDropdownId} />
+                  </li>
+
                   <li
                     onMouseEnter={() => handleMenuHover('insights-mega-menu')}
                     data-menu="insights-mega-menu"
@@ -155,13 +156,7 @@ const Navbar = () => {
                       Announcements
                     </Link>
                   </li>
-                  <li className="py-2.5">
-                    <Link
-                      href="/blog"
-                      className="hover:border-stroke-2 dark:hover:border-stroke-7 text-tagline-1 text-secondary/60 hover:text-secondary dark:text-accent/60 dark:hover:text-accent flex items-center gap-1 rounded-full border border-transparent px-4 py-2 font-normal transition-all duration-200">
-                      Blog
-                    </Link>
-                  </li>
+
                   <li className="py-2.5">
                     <Link
                       href="/contact-us"
@@ -173,7 +168,7 @@ const Navbar = () => {
               </nav>
               <div className="hidden items-center justify-center xl:flex">
                 <Link href="/signup" className="btn btn-md btn-primary hover:btn-white-dark dark:hover:btn-white">
-                  <span>Get started</span>
+                  <span>Connect</span>
                 </Link>
               </div>
               <MobileMenuButton />

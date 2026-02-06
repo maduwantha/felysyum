@@ -5,20 +5,20 @@ import RevealAnimation from '../animation/RevealAnimation';
 const stepItems = [
   {
     stepNumber: '01',
-    title: 'Select a template or create new',
-    description: 'Start fast with a template —or build it your way.',
+    title: 'Learn & Master',
+    description: 'Gain essential crypto knowledge through SkillfullHub to start your journey right.',
     progressWidth: '25%',
   },
   {
     stepNumber: '02',
-    title: 'Customize with visual blocks',
-    description: 'Mix and match visual blocks for your perfect design.',
+    title: 'Innovate & Build',
+    description: 'Turn your unique concepts into reality with FelyNova’s powerful tools.',
     progressWidth: '0%',
   },
   {
     stepNumber: '03',
-    title: 'Deploy & share with one click',
-    description: 'Launch and share your app instantly with one click.',
+    title: 'Trade & Prosper',
+    description: 'Monetize on FelyZone and connect with the Aidora community to grow.',
     progressWidth: '0%',
   },
 ];

@@ -8,6 +8,7 @@ import Hero from '@/components/home/Hero';
 import Marketplace from '@/components/home/Marketplace';
 import MeetOurTeam from '@/components/home/MeetOurTeam';
 import Solutions from '@/components/home/Solutions';
+import ProcessStep from '@/components/process/ProcessStep';
 import Steps from '@/components/home/Steps';
 import Tools from '@/components/home/Tools';
 import { defaultMetadata } from '@/utils/generateMetaData';
@@ -27,11 +28,13 @@ const page = () => {
       <Solutions />
       <Clients />
       <Tools />
+      <ProcessStep />
       <GetStarted />
       {/* <DownloadApp /> */}
       <Steps />
-      <Blog />
+      {/* <Blog /> */}
       <Marketplace />
+
       {/* <CTA /> */}
     </main>
   );

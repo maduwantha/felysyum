@@ -46,7 +46,7 @@ const Clients = () => {
         <div className="space-y-14">
           <RevealAnimation delay={0.2}>
             <h2 id="trusted-businesses-heading" className="text-center text-heading-5 md:text-heading-3">
-              Trusted by 10k+ fast-growing businesses
+              Featured on Top Crypto Platforms
             </h2>
           </RevealAnimation>
           {/* clients marquee  */}

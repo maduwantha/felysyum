@@ -1,4 +1,4 @@
-import stepImg01 from '@public/images/ns-img-192.png';
+import stepImg01 from '@public/images/skillfullhub.png';
 import stepImg02 from '@public/images/ns-img-193.png';
 import stepImg03 from '@public/images/ns-img-194.png';
 import stepImg04 from '@public/images/ns-img-195.png';
@@ -24,24 +24,15 @@ const GetStarted = () => {
             <div className="space-y-7 text-center xl:text-left">
               <div className="space-y-3">
                 <RevealAnimation delay={0.2}>
-                  <h2 className="mx-auto w-full xl:mx-0 xl:max-w-[629px]">What makes us stand out</h2>
+                  <h2 className="mx-auto w-full xl:mx-0 xl:max-w-[629px]">What’s Next: Exciting Developments Ahead</h2>
                 </RevealAnimation>
                 <RevealAnimation delay={0.3}>
                   <p className="xl:max-w-[544px]">
-                    What distinguishes us is our commitment to empowering bold founders, dynamic teams, and innovative
-                    entrepreneurs.
+                    On the Horizon: SkillfullHub, FelyZone, FelyNova, FelyWallet, Aidora — Building the Future Together.
                   </p>
                 </RevealAnimation>
               </div>
-              <RevealAnimation delay={0.4}>
-                <div className="w-full">
-                  <LinkButton
-                    href="/pricing"
-                    className="btn btn-primary btn-md hover:btn-secondary dark:hover:btn-accent w-[85%] md:w-auto">
-                    Get started now
-                  </LinkButton>
-                </div>
-              </RevealAnimation>
+
             </div>
           </div>
           <div className="col-span-12 xl:col-span-6">
@@ -59,8 +50,8 @@ const GetStarted = () => {
                   </figure>
                   <figure className="space-y-6 rounded-xl bg-white p-8 dark:bg-black">
                     <figcaption className="space-y-2">
-                      <h5 className="text-heading-5 text-secondary dark:text-accent">Innovative ideas</h5>
-                      <p className="max-w-[250px]">Built with modern business challenges in mind</p>
+                      <h5 className="text-heading-5 text-secondary dark:text-accent">SkillfullHub</h5>
+                      <p className="max-w-[250px]">Learn Today, Lead Tomorrow in Crypto</p>
                     </figcaption>
                     <figure className="w-full max-w-[385px]">
                       <Image src={stepImg01} alt="step" className="w-full md:max-h-[300px] md:min-h-[300px]" />
@@ -78,8 +69,8 @@ const GetStarted = () => {
                   </figure>
                   <figure className="space-y-6 rounded-xl bg-white p-8 dark:bg-black">
                     <figcaption className="space-y-2">
-                      <h5 className="text-heading-5 text-secondary dark:text-accent">Top-rated features</h5>
-                      <p className="max-w-[250px]">Only what you need, nothing you don&apos;t</p>
+                      <h5 className="text-heading-5 text-secondary dark:text-accent">FelyZone</h5>
+                      <p className="max-w-[250px]">Your Marketplace Powered by FELY</p>
                     </figcaption>
                     <div className="w-full max-w-[400px] overflow-hidden rounded-2xl">
                       <Image
@@ -106,8 +97,8 @@ const GetStarted = () => {
                   </figure>
                   <figure className="space-y-6 rounded-xl bg-white p-8 dark:bg-black">
                     <figcaption className="space-y-2">
-                      <h5 className="text-heading-5 text-secondary dark:text-accent">Beautiful interface</h5>
-                      <p className="max-w-[250px]">Designed to impress, built to perform</p>
+                      <h5 className="text-heading-5 text-secondary dark:text-accent">FelyNova</h5>
+                      <p className="max-w-[250px]">Where New Ideas Come Alive</p>
                     </figcaption>
                     <div className="w-full max-w-[400px] overflow-hidden rounded-2xl">
                       <Image
@@ -134,8 +125,36 @@ const GetStarted = () => {
                   </figure>
                   <figure className="space-y-6 rounded-xl bg-white p-8 dark:bg-black">
                     <figcaption className="space-y-2">
-                      <h5 className="text-heading-5 text-secondary dark:text-accent">Simple solutions</h5>
-                      <p className="max-w-[250px]">No fluff, just functionality</p>
+                      <h5 className="text-heading-5 text-secondary dark:text-accent">FelyWallet</h5>
+                      <p className="max-w-[250px]">Safe, Simple, Secure FELY Storage</p>
+                    </figcaption>
+                    <div className="w-full max-w-[400px] overflow-hidden rounded-2xl">
+                      <Image
+                        src={stepImg04}
+                        alt="step"
+                        className="w-full md:max-h-[300px] md:min-h-[300px] dark:hidden"
+                      />
+                      <Image
+                        src={stepImg04Dark}
+                        alt="step"
+                        className="hidden w-full md:max-h-[300px] md:min-h-[300px] dark:block"
+                      />
+                    </div>
+                  </figure>
+                </div>
+              </StackCardItem>
+
+
+              <StackCardItem>
+                <div className="relative z-20 flex w-full max-w-full items-center justify-center overflow-hidden rounded-[20px] p-2 sm:max-w-[465px]">
+                  {/* gradient border img */}
+                  <figure className="pointer-events-none absolute top-[-66%] left-[-30%] z-[-1] w-[600px] rotate-[245deg] select-none max-[376px]:left-[-40%] md:top-[-97%] md:left-[-60%] md:w-[900px] lg:left-[-48%] xl:w-[1050px]">
+                    <Image src={gradient9} alt="gradient-border" className="h-full w-full object-cover" />
+                  </figure>
+                  <figure className="space-y-6 rounded-xl bg-white p-8 dark:bg-black">
+                    <figcaption className="space-y-2">
+                      <h5 className="text-heading-5 text-secondary dark:text-accent">Aidora</h5>
+                      <p className="max-w-[250px]">Empowering Communities, Building a Better Tomorrow</p>
                     </figcaption>
                     <div className="w-full max-w-[400px] overflow-hidden rounded-2xl">
                       <Image

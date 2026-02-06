@@ -22,18 +22,6 @@ const toolsData = [
     image: toolsImg04,
     imageDark: toolsImg04Dark,
   },
-  {
-    title: 'Advanced user permissions',
-    description: 'Easily monitor activities with intuitive dashboards.',
-    image: toolsImg02,
-    imageDark: toolsImg02Dark,
-  },
-  {
-    title: 'Real-time notifications',
-    description: 'Stay updated with real-time notifications on what matters most.',
-    image: toolsImg03,
-    imageDark: toolsImg03Dark,
-  },
 ];
 
 const Tools = () => {
@@ -44,10 +32,10 @@ const Tools = () => {
           {/* heading */}
           <div className="space-y-3 text-center">
             <RevealAnimation delay={0.2}>
-              <h2 id="tools-heading">Smart features. smarter growth.</h2>
+              <h2 id="tools-heading">Monitor the Market Pulse</h2>
             </RevealAnimation>
             <RevealAnimation delay={0.3}>
-              <p>Visualized in a sleek, easy-to-understand layout.</p>
+              <p>See the Token’s Market Movement</p>
             </RevealAnimation>
           </div>
 
@@ -56,25 +44,39 @@ const Tools = () => {
               {toolsData.map((tool, index) => (
                 <RevealAnimation key={tool.title} delay={0.4 + index * 0.1}>
                   <div
-                    className={`${index === 0 || index === 3 ? 'col-span-12 xl:col-span-8' : 'col-span-12 md:col-span-6 xl:col-span-4'} bg-background-2 dark:bg-background-5 w-full space-y-6 rounded-[20px] p-8`}>
+                    className={`${index === 0 ? 'col-span-12 xl:col-span-8' : 'col-span-12 md:col-span-6 xl:col-span-4'} bg-background-2 dark:bg-background-5 w-full space-y-6 rounded-[20px] p-8`}>
                     {/* card text */}
                     <div className="space-y-2">
                       <h3 className="text-heading-5">{tool.title}</h3>
                       <p className="w-full max-w-[352px]">{tool.description}</p>
                     </div>
-                    {/* card image */}
-                    <figure className="overflow-hidden rounded-2xl">
-                      <Image
-                        src={tool.image}
-                        alt={`${tool.title} interface`}
-                        className="size-full object-cover dark:hidden"
-                      />
-                      <Image
-                        src={tool.imageDark}
-                        alt={`${tool.title} interface`}
-                        className="hidden size-full object-cover dark:block"
-                      />
-                    </figure>
+                    {/* card content */}
+                    <div className={tool.title === 'Creative automation' ? 'h-[400px]' : ''}>
+                      {tool.title === 'Creative automation' ? (
+                        <iframe
+                          id="geckoterminal-embed"
+                          title="GeckoTerminal Embed"
+                          src="https://www.geckoterminal.com/polygon_pos/pools/0xc810868393de87e0daa3b1f4e90c6738192d2a06?embed=1&info=0&swaps=0&light_chart=0&chart_type=price&resolution=1d&bg_color=111827"
+                          frameBorder="0"
+                          allow="clipboard-write"
+                          allowFullScreen
+                          style={{ width: '100%', height: '100%' }}
+                        />
+                      ) : (
+                        <figure className="overflow-hidden rounded-2xl">
+                          <Image
+                            src={tool.image}
+                            alt={`${tool.title} interface`}
+                            className="size-full object-cover dark:hidden"
+                          />
+                          <Image
+                            src={tool.imageDark}
+                            alt={`${tool.title} interface`}
+                            className="hidden size-full object-cover dark:block"
+                          />
+                        </figure>
+                      )}
+                    </div>
                   </div>
                 </RevealAnimation>
               ))}

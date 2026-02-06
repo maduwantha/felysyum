@@ -179,9 +179,9 @@ const Footer = () => {
                       {title}
                     </p>
                     <ul className="space-y-5">
-                      {links.map(({ label, href }) => (
+                      {links.map(({ label, href, target }) => (
                         <li key={label}>
-                          <Link href={href} className="footer-link-v2">
+                          <Link href={href} target={target} className="footer-link-v2">
                             {label}
                           </Link>
                         </li>
