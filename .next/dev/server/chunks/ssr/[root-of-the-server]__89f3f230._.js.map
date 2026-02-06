@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 22, "column": 0}, "map": {"version":3,"sources":["file:///Applications/XAMPP/xamppfiles/htdocs/fely/src/app/tokonomics/page.tsx"],"sourcesContent":["import { Metadata } from 'next';\n\nexport const metadata: Metadata = {\n    title: 'Tokonomics - Felysyum',\n    description: 'Felysyum Tokenomics and Distribution Details',\n};\n\nconst TokonomicsPage = () => {\n    return (\n        <main className=\"bg-background-3 dark:bg-background-5 min-h-screen pt-[180px] pb-20\">\n            <div className=\"container mx-auto px-4 text-center\">\n                <h1 className=\"text-4xl md:text-5xl font-bold text-white mb-6\">Tokonomics</h1>\n                <p className=\"text-lg text-gray-400\">Understanding our value distribution.</p>\n            </div>\n            <TokenSales />\n        </main>\n    );\n};\n\nexport default TokonomicsPage;\n"],"names":[],"mappings":";;;;;;;;AAEO,MAAM,WAAqB;IAC9B,OAAO;IACP,aAAa;AACjB;AAEA,MAAM,iBAAiB;IACnB,qBACI,8OAAC;QAAK,WAAU;;0BACZ,8OAAC;gBAAI,WAAU;;kCACX,8OAAC;wBAAG,WAAU;kCAAiD;;;;;;kCAC/D,8OAAC;wBAAE,WAAU;kCAAwB;;;;;;;;;;;;0BAEzC,8OAAC;;;;;;;;;;;AAGb;uCAEe"}}]
-}

@@ -14,11 +14,12 @@ import { parse } from "path";
 
 const BuyFelySection = () => {
   const buyingFellyValue = useRef<HTMLInputElement>(null);
+  const buyingUsdtValue = useRef<HTMLInputElement>(null); // Added missing ref
   const POLYGON_CHAIN_ID = "0x89"; // 137 in decimal (Polygon Mainnet)
   const [isConnected, setIsConnected] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [yourWalletAddress, setWalletAddress] = useState<string | null>(null);
-  const [yourWalletBalance, setYourWalletBalance] = useState("0");
+  const [fellyPrice, setYourFellyPalance] = useState("0");
   const [yourUsdttBalance, setYourUsdttBalance] = useState("0");
   const [transactionStatus, setTransactionStatus] = useState<string | null>(
     null,
@@ -32,6 +33,36 @@ const BuyFelySection = () => {
     navigator.clipboard.writeText("0xEe997788f625809332BaABB3110BCf1BA7400824");
     setIsCopied(true);
     setTimeout(() => setIsCopied(false), 2000);
+  };
+
+  // Handle USDT input change - calculate FELY
+  const handleUsdtChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const usdtValue = e.target.value;
+
+    if (buyingUsdtValue.current && fellyPrice !== "0") {
+      if (usdtValue === "" || parseFloat(usdtValue) === 0) {
+        buyingUsdtValue.current.value = "";
+        return;
+      }
+
+      const felyAmount = parseFloat(usdtValue) / parseFloat(fellyPrice);
+      buyingUsdtValue.current.value = felyAmount.toFixed(6);
+    }
+  };
+
+  // Handle FELY input change - calculate USDT
+  const handleFelyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const felyValue = e.target.value;
+
+    if (buyingFellyValue.current && fellyPrice !== "0") {
+      if (felyValue === "" || parseFloat(felyValue) === 0) {
+        buyingFellyValue.current.value = "";
+        return;
+      }
+
+      const usdtAmount = parseFloat(felyValue) * parseFloat(fellyPrice);
+      buyingFellyValue.current.value = usdtAmount.toFixed(6);
+    }
   };
 
   // Check and switch to Polygon network
@@ -152,6 +183,7 @@ const BuyFelySection = () => {
         return;
       }
       setTransactionStatus("Fetching USDT balance...");
+      console.log("Fetching USDT balance...");
       const provider = new ethers.BrowserProvider((window as any).ethereum);
       const contract = new ethers.Contract(
         USDT_CONTRACT_ADDRESS,
@@ -160,45 +192,31 @@ const BuyFelySection = () => {
       );
 
       const balance = await contract.balanceOf(walletAddress);
-      const formattedBalance = ethers.formatUnits(balance, 18);
+      const formattedBalance = ethers.formatUnits(balance, 6);
 
       console.log("Raw balance:", balance.toString());
-      console.log("Formatted balance:", formattedBalance);
 
-      setYourWalletBalance(formattedBalance);
+      setYourUsdttBalance(formattedBalance);
       setTransactionStatus(null);
     } catch (error) {
       console.error("Error fetching balance:", error);
       setTransactionStatus("Failed to fetch balance");
       setTimeout(() => setTransactionStatus(null), 3000);
     }
+    getFelyPrice();
   };
 
-  //get fely balance
-  const getFelyBalance = async (walletAddress?: string) => {
+  //get fely Price
+  const getFelyPrice = async (walletAddress?: string) => {
     try {
-      // Check if address is valid
-      if (!walletAddress) {
-        console.log("No wallet address provided");
-        return;
-      }
-
-      setTransactionStatus("Fetching balance...");
+      setTransactionStatus("Fetching Price...");
 
       const provider = new ethers.BrowserProvider((window as any).ethereum);
-      const contract = new ethers.Contract(
-        FELY_CONTRACT_ADDRESS,
-        FELY_ABI,
-        provider,
-      );
-
-      const balance = await contract.balanceOf(walletAddress);
-      const formattedBalance = ethers.formatUnits(balance, 18);
-
-      console.log("Raw balance:", balance.toString());
-      console.log("Formatted balance:", formattedBalance);
-
-      setYourWalletBalance(formattedBalance);
+      const contract = new ethers.Contract(ICO_CONTRACT, ICO_ABI, provider);
+      const felyPrice = await contract.pricePerToken();
+      const formattedfelyPrice = ethers.formatUnits(felyPrice, 6);
+      console.error("Felly Price:" + formattedfelyPrice);
+      setYourFellyPalance(formattedfelyPrice);
       setTransactionStatus(null);
     } catch (error) {
       console.error("Error fetching balance:", error);
@@ -215,15 +233,15 @@ const BuyFelySection = () => {
       const felyValue = buyingFellyValue.current.value;
       if (!felyValue) {
         console.log("felly value canot be zero or null");
-        setTransactionStatus("Felly Value canot bezero or null");
+        setTransactionStatus("Felly Value canot be zero or null");
         return;
       }
 
-      if (parseInt(felyValue) < 111) {
-        console.log("Minimum Value is 111");
-        setTransactionStatus("Felly Minimum Value is 111");
-        return;
-      }
+      // if (parseInt(felyValue) < 111) {
+      //   console.log("Minimum Value is 111");
+      //   setTransactionStatus("Felly Minimum Value is 111");
+      //   return;
+      // }
 
       approveAndBuyTokens(felyValue);
     }
@@ -287,9 +305,19 @@ const BuyFelySection = () => {
       console.log("✅ Purchase confirmed:", transferTx.hash);
       setTransactionStatus("FELY tokens purchased successfully! 🎉");
 
-      // Refresh balances
+      // Refresh balances and reset input fields
       setTimeout(() => {
-        getUsdtBalance();
+        // Reset input fields
+        if (buyingFellyValue.current) {
+          buyingFellyValue.current.value = "";
+        }
+        if (buyingUsdtValue.current) {
+          buyingUsdtValue.current.value = "";
+        }
+
+        // Refresh USDT balance
+        getUsdtBalance(yourWalletAddress);
+
         setTransactionStatus(null);
       }, 3000);
 
@@ -322,11 +350,11 @@ const BuyFelySection = () => {
       (window as any).ethereum.on("accountsChanged", (accounts: string[]) => {
         if (accounts.length > 0) {
           setWalletAddress(accounts[0]);
-          getFelyBalance(accounts[0]);
+          setYourUsdttBalance(accounts[0]);
         } else {
           setIsConnected(false);
           setWalletAddress(null);
-          setYourWalletBalance("0");
+          setYourUsdttBalance("0");
         }
       });
     }
@@ -386,10 +414,18 @@ const BuyFelySection = () => {
                   <p className="text-xs text-center text-gray-500">
                     Note: Uses Polygon network — POL is required for gas.
                   </p>
-                  <div className="flex justify-between items-center text-xs">
+
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-400">Price :</span>
+                    <span className="text-white font-medium">
+                      {fellyPrice} USDT
+                    </span>
+                  </div>
+
+                  {/* <div className="flex justify-between items-center text-xs">
                     <span className="text-gray-400">Minimum Purchase:</span>
                     <span className="text-white font-medium">111 USDT</span>
-                  </div>
+                  </div> */}
                 </div>
 
                 {!isConnected ? (
@@ -428,11 +464,30 @@ const BuyFelySection = () => {
                         <input
                           type="number"
                           ref={buyingFellyValue}
+                          onChange={handleUsdtChange}
                           placeholder="Enter amount"
                           className="w-full bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 placeholder:text-sm"
                         />
                         <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-xs">
                           USDT
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-xs text-gray-300">
+                        Enter FELLY Amount
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="number"
+                          ref={buyingUsdtValue}
+                          onChange={handleFelyChange}
+                          placeholder="Enter amount"
+                          className="w-full bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 placeholder:text-sm"
+                        />
+                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-xs">
+                          FELLY
                         </span>
                       </div>
                     </div>
@@ -451,11 +506,6 @@ const BuyFelySection = () => {
                       <span className="text-yellow-500 font-medium">
                         {transactionStatus}
                       </span>
-                    </div>
-
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-gray-400">Price :</span>
-                      <span className="text-white font-medium">0.3600 USD</span>
                     </div>
 
                     <div className="pt-3 border-t border-[#2a333e]">
