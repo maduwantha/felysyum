@@ -4,23 +4,7 @@ import gradient27 from '@public/images/ns-img-515.png';
 import Image from 'next/image';
 import RevealAnimation from '../animation/RevealAnimation';
 import LinkButton from '../ui/button/LinkButton';
-
-// Consolidating icons here
-const EduIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-secondary dark:text-accent"><path d="M22 10v6M2 10l10-5 10 5-10 5z" /><path d="M6 12v5c3 3 9 3 12 0v-5" /></svg>
-);
-const MarketIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-secondary dark:text-accent"><circle cx="10" cy="20.5" r="1" /><circle cx="19" cy="20.5" r="1" /><path d="M2.5 2.5h3l2.7 12.4a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.6l1.6-8.4H7.1" /></svg>
-);
-const IdeaIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-secondary dark:text-accent"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-2.246-5.318-2.5-7a2.5 2.5 0 1 1 5 0C14.5 4.5 18 10 18 10" /><path d="M15.5 14.5a2.5 2.5 0 0 1-2.5-2.5c0-1.38.5-2 1-3 .429-.858.916-1.83 1.341-2.822" /><path d="M18 19h2.5" /><path d="M20 22h.5" /><path d="M3.5 22H4" /><path d="M3.5 19H6" /><path d="M18 15h.5" /><path d="M6 15H5.5" /></svg>
-);
-const WalletIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-secondary dark:text-accent"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" /><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4" /></svg>
-);
-const HeartIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-secondary dark:text-accent"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" /></svg>
-);
+import { LuGraduationCap, LuStore, LuSettings, LuBanknote, LuWallet } from 'react-icons/lu';
 const CommunityIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-secondary dark:text-accent"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
 );
@@ -31,7 +15,7 @@ const Innovation = () => {
       title: "SkillFullHub",
       subtitle: "BLOCKCHAIN EDUCATION",
       description: "SkillFullHub will be our educational platform designed to guide people into the digital future. It will help users learn about cryptocurrency, blockchain, and digital safety—equipping them to avoid scams, fake tokens, and common crypto mistakes. We believe that education is the first step toward freedom and success in the new digital era.",
-      icon: <EduIcon />,
+      icon: <LuGraduationCap size={52} strokeWidth={1.5} className="text-secondary dark:text-accent" />,
       gradient: gradient3,
       rotation: "rotate-[304deg]",
       pos: "-top-[66%] -left-[60%]",
@@ -44,7 +28,7 @@ const Innovation = () => {
       title: "Felyzone",
       subtitle: "CRYPTO MARKETPLACE",
       description: "Felyzone will be a marketplace where people will be able to buy and sell products using the FELY token. This will allow everyday use of cryptocurrency in real-life scenarios, with special discounts and unique product offerings for our community members.",
-      icon: <MarketIcon />,
+      icon: <LuStore size={52} strokeWidth={1.5} className="text-secondary dark:text-accent" />,
       gradient: gradient27,
       rotation: "rotate-[175deg]",
       pos: "-top-[74%] -right-[70%]",
@@ -57,7 +41,7 @@ const Innovation = () => {
       title: "Felynova",
       subtitle: "INNOVATION LAUNCHPAD",
       description: "Felynova will offer individuals the chance to present innovative ideas, raise funds with the help of the community and project team, and bring their creations to life. These innovations could later be sold on Felyzone—making the marketplace truly unique and community-driven.",
-      icon: <IdeaIcon />,
+      icon: <LuSettings size={52} strokeWidth={1.5} className="text-secondary dark:text-accent" />,
       gradient: gradient16,
       rotation: "rotate-[175deg]",
       pos: "-top-[74%] -right-[35%]",
@@ -70,7 +54,7 @@ const Innovation = () => {
       title: "FelyWallet",
       subtitle: "A SAFE & EFFICIENT WALLET",
       description: "To power our future digital ecosystem, FelyWallet is planned as a secure, fast, and low-cost wallet solution. It will be designed to make holding and transacting with FELY and other assets simple and safe.",
-      icon: <WalletIcon />,
+      icon: <LuWallet size={52} strokeWidth={1.5} className="text-secondary dark:text-accent" />,
       gradient: gradient3,
       rotation: "rotate-[304deg]",
       pos: "-top-[66%] -left-[60%]",
@@ -83,7 +67,7 @@ const Innovation = () => {
       title: "Aidora",
       subtitle: "GIVING BACK THROUGH CHARITY",
       description: "Aidora, our future charitable arm, will focus on providing free education, professional development, and startup support for underprivileged individuals. The goal is to uplift people through knowledge, entrepreneurship, and opportunity.",
-      icon: <HeartIcon />,
+      icon: <LuBanknote size={52} strokeWidth={1.5} className="text-secondary dark:text-accent" />,
       gradient: gradient27,
       rotation: "rotate-[175deg]",
       pos: "-top-[74%] -right-[70%]",

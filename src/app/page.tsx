@@ -31,7 +31,7 @@ const page = () => {
       <ProcessStep />
       <GetStarted />
       {/* <DownloadApp /> */}
-      <Steps />
+      {/* <Steps /> */}
       {/* <Blog /> */}
       <Marketplace />
 

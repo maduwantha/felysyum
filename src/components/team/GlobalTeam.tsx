@@ -21,7 +21,7 @@ const GlobalTeam = () => {
 
                             <RevealAnimation delay={0.2}>
                                 <p>
-                                    But we don&apos;t stop there! We also collaborate with seasoned professionals and industry veterans worldwide, ensuring we bring you the best in innovation, security, and development.
+                                    We don&apos;t stop there! We also collaborate with seasoned professionals and industry veterans worldwide, ensuring  you the best in innovation, security, and development.
                                 </p>
                             </RevealAnimation>
 
@@ -33,7 +33,7 @@ const GlobalTeam = () => {
 
                             <RevealAnimation delay={0.4}>
                                 <p>
-                                    And no need to worry—we are fully audited by the globally recognized <strong className="text-ns-green">CyberScope</strong>. Trust and transparency are at the core of what we do, and we are committed to seeing this project through to its final success.
+                                    And no need to worry—we are fully audited by the globally recognized <Link href="https://www.coinscope.co/coin/1-fely/kyc" target="_blank" className="text-ns-green font-bold hover:underline">CyberScope</Link>. Trust and transparency are the foundation of our work, and we are dedicated to ensuring the success of this project from start to finish.
                                 </p>
                             </RevealAnimation>
 
@@ -52,7 +52,7 @@ const GlobalTeam = () => {
                                     className="inline-flex items-center gap-3 rounded-full bg-cyan-500 px-8 py-4 text-base font-bold text-white transition-all hover:scale-105 hover:bg-cyan-400 hover:shadow-[0_0_20px_rgba(6,182,212,0.4)]"
                                 >
                                     <FaTelegram className="text-2xl" />
-                                    JOIN US ON TELEGRAM
+                                    Contact Us on Telegram
                                 </Link>
                             </div>
                         </RevealAnimation>

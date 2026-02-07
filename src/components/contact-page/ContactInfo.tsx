@@ -1,25 +1,15 @@
-import homeIcon from '@/../public/images/icons/home.svg';
-import mailIcon from '@/../public/images/icons/mail-open.svg';
-import phoneIcon from '@/../public/images/icons/phone-right.svg';
 import gradientThree from '@/../public/images/ns-img-498.png';
 import gradientTwo from '@/../public/images/ns-img-509.png';
 import gradientOne from '@/../public/images/ns-img-510.png';
 import Image from 'next/image';
 import Link from 'next/link';
 import RevealAnimation from '../animation/RevealAnimation';
+import { LuHeadset, LuMail, LuSend } from 'react-icons/lu';
 
 const contactInfoItems = [
   {
     id: 1,
-    icon: homeIcon,
-    title: 'Our Address',
-    content: '123 Felysyum Blvd, Crypto Valley',
-    gradient: gradientOne,
-    gradientClass: 'top-[-187px] left-[174px] -rotate-[78deg]',
-  },
-  {
-    id: 2,
-    icon: mailIcon,
+    icon: <LuMail className="size-full text-white" />,
     title: 'Email Us',
     content: 'support@felysyum.com',
     link: 'mailto:support@felysyum.com',
@@ -27,11 +17,22 @@ const contactInfoItems = [
     gradientClass: 'top-[-206px] left-[-36px] rotate-[62deg]',
   },
   {
+    id: 2,
+    icon: <LuHeadset className="size-full text-white" />,
+    title: 'Customer Care',
+    content: 'Contact Support',
+    link: 'https://t.me/Felysyum_Customer_Care',
+    target: '_blank',
+    gradient: gradientOne,
+    gradientClass: 'top-[-187px] left-[174px] -rotate-[78deg]',
+  },
+  {
     id: 3,
-    icon: phoneIcon,
-    title: 'Call Us',
-    content: '+1 (555) 123-4567',
-    link: 'tel:+15551234567',
+    icon: <LuSend className="size-full text-white -mt-1 -ml-1" />, // Adjusted for visual centering if needed, or just size-full
+    title: 'Join Us',
+    content: 'Join Community',
+    link: 'https://t.me/felysyum',
+    target: '_blank',
     gradient: gradientThree,
     gradientClass: 'top-[-184px] left-[-185px]',
   },
@@ -67,14 +68,14 @@ const ContactInfo = () => {
                       className={`pointer-events-none absolute size-[350px] overflow-hidden select-none ${item.gradientClass}`}>
                       <Image src={item.gradient} alt="Decorative gradient overlay" className="size-full object-cover" />
                     </figure>
-                    <figure className="mx-auto size-10 overflow-hidden">
-                      <Image src={item.icon} alt={`${item.title} icon`} className="size-full object-cover" />
+                    <figure className="mx-auto size-10 overflow-hidden flex items-center justify-center p-0.5">
+                      {item.icon}
                     </figure>
                     <div className="space-y-2.5">
                       <p className="text-heading-6 text-accent">{item.title}</p>
                       {item.link ? (
                         <p className="text-accent/60">
-                          <Link href={item.link}>{item.content}</Link>
+                          <Link href={item.link} target={item.target || '_self'}>{item.content}</Link>
                         </p>
                       ) : (
                         <p className="text-accent/60">{item.content}</p>
@@ -90,41 +91,22 @@ const ContactInfo = () => {
               className="dark:bg-background-6 mx-auto w-full max-w-[847px] rounded-4xl bg-white p-6 md:p-8 lg:p-11">
               <form action="#" method="POST" className="space-y-8">
                 {/* name and phone number  */}
-                <div className="flex flex-col items-center justify-between gap-8 md:flex-row">
-                  {/*  name */}
-                  <div className="w-full space-y-2 lg:max-w-[364px]">
-                    <label
-                      htmlFor="fullname"
-                      className="text-tagline-2 text-secondary dark:text-accent block font-medium">
-                      Your name
-                    </label>
-                    <input
-                      type="text"
-                      id="fullname"
-                      name="fullname"
-                      placeholder="Enter your name"
-                      required={true}
-                      autoComplete="name"
-                      className="dark:focus-visible:border-stroke-4/20 dark:border-stroke-7 dark:bg-background-6 border-stroke-3 bg-background-1 text-tagline-2 placeholder:text-secondary/60 focus:border-secondary placeholder:text-tagline-2 dark:placeholder:text-accent/60 dark:text-accent h-[48px] w-full rounded-full border px-[18px] py-3 font-normal placeholder:font-normal focus:outline-none xl:h-[41px]"
-                    />
-                  </div>
-                  {/* number */}
-                  <div className="w-full max-w-[364px] space-y-2">
-                    <label
-                      htmlFor="number"
-                      className="text-tagline-2 text-secondary dark:text-accent block font-medium">
-                      Your number
-                    </label>
-                    <input
-                      type="text"
-                      id="number"
-                      name="number"
-                      placeholder="Enter your number"
-                      required={true}
-                      autoComplete="tel"
-                      className="dark:focus-visible:border-stroke-4/20 dark:border-stroke-7 dark:bg-background-6 border-stroke-3 bg-background-1 text-tagline-2 placeholder:text-secondary/60 focus:border-secondary placeholder:text-tagline-2 dark:placeholder:text-accent/60 dark:text-accent h-[48px] w-full rounded-full border px-[18px] py-3 font-normal placeholder:font-normal focus:outline-none xl:h-[41px]"
-                    />
-                  </div>
+                {/*  name */}
+                <div className="w-full space-y-2">
+                  <label
+                    htmlFor="fullname"
+                    className="text-tagline-2 text-secondary dark:text-accent block font-medium">
+                    Your name
+                  </label>
+                  <input
+                    type="text"
+                    id="fullname"
+                    name="fullname"
+                    placeholder="Enter your name"
+                    required={true}
+                    autoComplete="name"
+                    className="dark:focus-visible:border-stroke-4/20 dark:border-stroke-7 dark:bg-background-6 border-stroke-3 bg-background-1 text-tagline-2 placeholder:text-secondary/60 focus:border-secondary placeholder:text-tagline-2 dark:placeholder:text-accent/60 dark:text-accent h-[48px] w-full rounded-full border px-[18px] py-3 font-normal placeholder:font-normal focus:outline-none xl:h-[41px]"
+                  />
                 </div>
                 {/* email  */}
                 <div className="space-y-2">

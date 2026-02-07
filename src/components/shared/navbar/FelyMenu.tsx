@@ -1,5 +1,6 @@
 'use client';
-import { AboutIcon, TeamIcon } from '@/icons/menu-icon';
+'use client';
+import { LuBanknote, LuTurtle } from 'react-icons/lu';
 import { cn } from '@/utils/cn';
 import Link from 'next/link';
 import type { ComponentType } from 'react';
@@ -17,13 +18,13 @@ const felyLinks: FelyLink[] = [
         title: 'Buy Fely',
         description: 'Purchase FELY tokens',
         href: '/buy',
-        icon: AboutIcon, // Placeholder icon
+        icon: () => <LuBanknote strokeWidth={1.25} className="size-6" />,
     },
     {
         title: 'Stake Fely',
         description: 'Earn rewards by staking',
         href: '/stake',
-        icon: TeamIcon, // Placeholder icon
+        icon: () => <LuTurtle strokeWidth={1.25} className="size-6" />,
     },
 ];
 
@@ -59,7 +60,7 @@ const FelyMenu = ({
                             onClick={() => setMenuDropdownId(null)}
                             className="group relative flex items-start gap-3 rounded-[10px] p-3 transition-all duration-300">
                             <HoverBgTransform className="group-hover:opacity-100" />
-                            <div className="relative z-10 mt-1">
+                            <div className="dark:bg-background-6 shadow-14 border-stroke-1 dark:border-background-7 relative z-10 flex size-11 items-center justify-center rounded-[10px] border bg-white p-3">
                                 <Icon />
                             </div>
                             <div className="relative z-10">

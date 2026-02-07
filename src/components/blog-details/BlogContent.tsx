@@ -3,7 +3,7 @@ import Image, { StaticImageData } from 'next/image';
 import ReactMarkdown from 'react-markdown';
 import rehypeSlug from 'rehype-slug';
 import RevealAnimation from '../animation/RevealAnimation';
-import Comment from './Comment';
+
 import ShareLink from './ShareLink';
 
 const BlogContent = ({ blog }: { blog: matter.GrayMatterFile<string> }) => {
@@ -61,7 +61,7 @@ const BlogContent = ({ blog }: { blog: matter.GrayMatterFile<string> }) => {
         </RevealAnimation>
         {/* details-footer */}
         <ShareLink />
-        <Comment />
+
       </div>
     </section>
   );

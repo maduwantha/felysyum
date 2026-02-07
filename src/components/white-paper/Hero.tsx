@@ -7,21 +7,18 @@ const Hero = () => {
       <div className="main-container">
         <div className="space-y-6 text-center">
           <RevealAnimation delay={0.1}>
-            <span className="badge badge-green-v2">Whitepapers &amp; Insights</span>
+            <span className="badge badge-green-v2">Whitepapers</span>
           </RevealAnimation>
           <div className="space-y-4">
             <RevealAnimation delay={0.2}>
               <h1 className="font-normal">
-                Deep research. real data.
-                <br />
-                actionable SaaS strategies.
+                Explore  whitepaper. <br></br>Discover our full vision
+
               </h1>
             </RevealAnimation>
             <RevealAnimation delay={0.3}>
               <p>
-                Explore our exclusive whitepapers packed with expert insights, case studies, and growth playbooks for{' '}
-                <br />
-                modern SaaS businesses. Stay ahead with knowledge that drives performance.
+                Explore our whitepaper for a complete view of the project—tokenomics, distribution, milestones, ecosystem products, and future vision.
               </p>
             </RevealAnimation>
           </div>

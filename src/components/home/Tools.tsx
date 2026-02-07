@@ -11,8 +11,8 @@ import RevealAnimation from '../animation/RevealAnimation';
 
 const toolsData = [
   {
-    title: 'Creative automation',
-    description: 'Get instant insights with integrated analytics for better decision-making.',
+    title: 'FELY Growth',
+    description: 'From past to present, FELY’s growth tells a powerful story. Explore the milestones that shaped our rise.',
     image: toolsImg01,
     imageDark: toolsImg01Dark,
   },
@@ -51,8 +51,8 @@ const Tools = () => {
                       <p className="w-full max-w-[352px]">{tool.description}</p>
                     </div>
                     {/* card content */}
-                    <div className={tool.title === 'Creative automation' ? 'h-[400px]' : ''}>
-                      {tool.title === 'Creative automation' ? (
+                    <div className={tool.title === 'FELY Growth' ? 'h-[400px]' : ''}>
+                      {tool.title === 'FELY Growth' ? (
                         <iframe
                           id="geckoterminal-embed"
                           title="GeckoTerminal Embed"

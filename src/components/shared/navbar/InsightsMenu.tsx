@@ -7,6 +7,7 @@ import {
   GlossaryIcon,
   WhitePaperIcon,
 } from '@/icons/menu-icon';
+import { LuRoute, LuChartPie, LuHandCoins } from 'react-icons/lu';
 import { cn } from '@/utils/cn';
 import Link from 'next/link';
 import type { ComponentType } from 'react';
@@ -30,20 +31,20 @@ const insightLinks: InsightsLink[] = [
     title: 'Road Map',
     description: 'View our journey',
     href: '/road-map',
-    icon: ChangeLogIcon,
+    icon: () => <LuRoute strokeWidth={1.25} className="size-6" />,
   },
   {
-    title: 'Tokonomics',
+    title: 'Tokenomics',
     description: 'Understand value distribution',
-    href: '/tokonomics',
-    icon: AnalyticsIcon,
+    href: '/tokenomics',
+    icon: () => <LuChartPie strokeWidth={1.25} className="size-6" />,
   },
 
   {
     title: 'Token Distribution',
     description: 'See allocation details',
     href: '/token-distribution',
-    icon: AffiliateIcon,
+    icon: () => <LuHandCoins strokeWidth={1.25} className="size-6" />,
   },
 ];
 

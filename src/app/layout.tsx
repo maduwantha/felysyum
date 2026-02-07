@@ -11,7 +11,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: "Felysyum : Elysium's Digital Gold",
-  description: "Felysyum is Elysium's Digital Gold.",
+  description: "Discover your digital elysium at The Oasis of Legends, a vibrant ecosystem fueled by Felysyum (FELY) cryptocurrency.",
   icons: {
     icon: '/favicon.png',
   },

@@ -1,5 +1,6 @@
 import RevealAnimation from '../animation/RevealAnimation';
 import LinkButton from '../ui/button/LinkButton';
+import { LuRoute, LuChartPie, LuHandCoins } from 'react-icons/lu';
 
 const Solutions = () => {
   return (
@@ -21,7 +22,7 @@ const Solutions = () => {
             <div className="grid grid-cols-1 gap-9 md:grid-cols-2 lg:grid-cols-3">
               <RevealAnimation delay={0.4}>
                 <div className="dark:bg-background-8 w-full max-w-[405px] space-y-6 rounded-[20px] bg-white p-8">
-                  <span className="ns-shape-2 text-secondary dark:text-accent inline-block text-[52px]" />
+                  <LuRoute strokeWidth={0.75} className="text-secondary dark:text-accent inline-block text-[52px]" />
                   <div className="space-y-2">
                     <h3 className="text-heading-5">Road Map</h3>
                     <p className="line-clamp-3 w-full max-w-[275px]">
@@ -40,16 +41,16 @@ const Solutions = () => {
 
               <RevealAnimation delay={0.5}>
                 <div className="dark:bg-background-8 w-full max-w-[405px] space-y-6 rounded-[20px] bg-white p-8">
-                  <span className="ns-shape-8 text-secondary dark:text-accent inline-block text-[52px]" />
+                  <LuChartPie strokeWidth={0.75} className="text-secondary dark:text-accent inline-block text-[52px]" />
                   <div className="space-y-2">
-                    <h3 className="text-heading-5">Tokonomics</h3>
+                    <h3 className="text-heading-5">Tokenomics</h3>
                     <p className="line-clamp-3 w-full max-w-[275px]">
                       Check tokenomics to understand fairness, rewards, and long-term sustainability.
                     </p>
                   </div>
                   <div>
                     <LinkButton
-                      href="/tokonomics"
+                      href="/tokenomics"
                       className="btn btn-white hover:btn-primary btn-md dark:btn-transparent">
                       View more
                     </LinkButton>
@@ -59,7 +60,7 @@ const Solutions = () => {
 
               <RevealAnimation delay={0.6}>
                 <div className="dark:bg-background-8 w-full max-w-[405px] space-y-6 rounded-[20px] bg-white p-8">
-                  <span className="ns-shape-36 text-secondary dark:text-accent inline-block text-[52px]" />
+                  <LuHandCoins strokeWidth={0.75} className="text-secondary dark:text-accent inline-block text-[52px]" />
                   <div className="space-y-2">
                     <h3 className="text-heading-5">Token Distribution</h3>
                     <p className="line-clamp-3 w-full max-w-[275px]">

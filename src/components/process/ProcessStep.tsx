@@ -1,13 +1,14 @@
 import { cn } from '@/utils/cn';
 import RevealAnimation from '../animation/RevealAnimation';
 import Link from 'next/link';
+import { LuWallet, LuLink, LuCoins } from 'react-icons/lu';
 
 interface ProcessStep {
   id: string;
   stepNumber: string;
   title: string;
   description: string;
-  icon: string;
+  icon: React.ReactNode;
   actionText: string;
   actionLink: string;
 }
@@ -19,7 +20,7 @@ const ProcessStep = () => {
       stepNumber: 'Step- 01',
       title: 'Create a wallet',
       description: 'At this moment, there are numerous DeFi crypto wallets available globally. You can select and create your preferred crypto wallet from the options.',
-      icon: 'ns-shape-36', // Changed to a wallet-like icon if available, otherwise default
+      icon: <LuWallet strokeWidth={0.75} className="text-secondary dark:text-accent inline-block text-[52px]" />,
       actionText: 'Learn more',
       actionLink: '/wallets',
     },
@@ -28,7 +29,7 @@ const ProcessStep = () => {
       stepNumber: 'Step- 02',
       title: 'Connect your wallet',
       description: 'Establish a connection between your cryptocurrency wallet and the Uniswap decentralized exchange platform.',
-      icon: 'ns-shape-8', // iconic representation
+      icon: <LuLink strokeWidth={0.75} className="text-secondary dark:text-accent inline-block text-[52px]" />,
       actionText: 'How to connect',
       actionLink: '/connect-your-wallet',
     },
@@ -37,7 +38,7 @@ const ProcessStep = () => {
       stepNumber: 'Step- 03',
       title: 'Get Felysyum',
       description: 'Convert any of your current cryptocurrencies into Felysyum tokens through the exchange process available on the platform',
-      icon: 'ns-shape-2',
+      icon: <LuCoins strokeWidth={0.75} className="text-secondary dark:text-accent inline-block text-[52px]" />,
       actionText: 'Get Now',
       actionLink: '/get-felysium',
     },
@@ -67,7 +68,7 @@ const ProcessStep = () => {
                   <div className="bg-background-1 dark:bg-background-6 flex h-full flex-col space-y-8 rounded-[20px] p-5 sm:p-8">
                     <div className="flex items-center justify-between">
                       <p className="text-tagline-2 text-secondary dark:text-accent">{step.stepNumber}</p>
-                      <span className={`${step.icon} text-secondary dark:text-accent text-[52px]`} />
+                      {step.icon}
                     </div>
                     <div className="flex-1 space-y-4">
                       <h3 className="sm:text-heading-5 text-heading-6 font-normal">{step.title}</h3>

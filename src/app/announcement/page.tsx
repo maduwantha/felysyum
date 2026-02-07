@@ -1,7 +1,7 @@
 
 import BlogHeader from '@/components/blog/BlogHeader';
 import BlogList from '@/components/blog/BlogList';
-import CTA from '@/components/about/CTA';
+
 import { IBlogPost } from '@/interface';
 import getMarkDownData from '@/utils/getMarkDownData';
 import { Metadata } from 'next';
@@ -30,7 +30,6 @@ const AnnouncementPage = () => {
                 title="All Announcements"
                 baseUrl="/announcement"
             />
-            <CTA />
         </main>
     );
 };

@@ -12,6 +12,8 @@ const nextConfig: NextConfig = {
     unoptimized: true,
     qualities: [25, 50, 75, 100],
   },
+  // Added this line:
+  trailingSlash: true,
 };
 
 export default nextConfig;

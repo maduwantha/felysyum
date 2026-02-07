@@ -14,7 +14,7 @@ const ContactUs = () => {
   return (
     <main className="bg-background-3 dark:bg-background-5">
       <ContactInfo />
-      <CTA />
+      {/* <CTA /> */}
     </main>
   );
 };
