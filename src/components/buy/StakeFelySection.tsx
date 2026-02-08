@@ -3,7 +3,12 @@ import RevealAnimation from "../animation/RevealAnimation";
 import arrowUpRight from "@public/images/icons/arrow-up-right.svg"; // Assuming this exists, else will just use text or generic icon
 import Image from "next/image";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import {
+  STAKE12YEARS_CONTRACT,
+  STAKE12YEARS_ABI,
+} from "@/app/contracts/stake12years";
+import { ethers } from "ethers";
 
 const StakeFelySection = () => {
   const POLYGON_CHAIN_ID = "0x89";
@@ -12,6 +17,11 @@ const StakeFelySection = () => {
   const [transactionStatus, setTransactionStatus] = useState<string | null>(
     null,
   );
+  const [lockUpState, selLockUpState] = useState<string | null>(null);
+
+  const [StakePlanValue, setStakePlanValue] = useState("");
+  const [ClameInterstPlan, SetClameInterstPlan] = useState("");
+  const [WithDrwaCapitalPlan, SetWithdrawCapitalPlan] = useState("");
 
   // Mock Data for the Table
   const stakeData = [
@@ -46,6 +56,7 @@ const StakeFelySection = () => {
 
   useEffect(() => {
     checkIfWalletIsConnected();
+    selLockUpState(" No active stakes found");
   }, []);
 
   const checkIfWalletIsConnected = async () => {
@@ -157,6 +168,128 @@ const StakeFelySection = () => {
     }
   };
 
+  // Listen for network changes
+  useEffect(() => {
+    if ((window as any).ethereum) {
+      (window as any).ethereum.on("chainChanged", (chainId: string) => {
+        console.log("Network changed to:", chainId);
+        window.location.reload(); // Reload page on network change
+      });
+
+      (window as any).ethereum.on("accountsChanged", (accounts: string[]) => {
+        if (accounts.length > 0) {
+          setWalletAddress(accounts[0]);
+        } else {
+          setIsConnected(false);
+          setWalletAddress(null);
+        }
+      });
+    }
+
+    return () => {
+      if ((window as any).ethereum) {
+        (window as any).ethereum.removeAllListeners("chainChanged");
+        (window as any).ethereum.removeAllListeners("accountsChanged");
+      }
+    };
+  }, []);
+
+  const lockupStakes = async () => {
+    try {
+      // Check if address is valid
+      if (!yourWalletAddress) {
+        selLockUpState("No wallet address provided");
+        return;
+      }
+
+      if (!StakePlanValue) {
+        selLockUpState("No Plan Selected");
+        return;
+      }
+
+      selLockUpState("Locking for Stake ID's");
+
+      const contract = returnContract(parseInt(StakePlanValue));
+
+      const stakeIds = await contract.getStakeIdsByAccount(yourWalletAddress);
+      if (stakeIds == "" || stakeIds == null) {
+        selLockUpState("Stake ID not found");
+        return;
+      }
+      const formatted = stakeIds.map((id: bigint) => id.toString()).join(",");
+
+      console.log(formatted);
+      selLockUpState(formatted);
+    } catch (error) {
+      selLockUpState("No active stakes found");
+      setTimeout(() => setTransactionStatus(null), 3000);
+    }
+  };
+
+  const clamInterest = async () => {
+    if (!yourWalletAddress) {
+      selLockUpState("No wallet address provided");
+      return;
+    }
+
+    if (!ClameInterstPlan) {
+      selLockUpState("No Plan Selected");
+      return;
+    }
+  };
+
+  const WithDrwaCapital = async () => {
+    if (!yourWalletAddress) {
+      selLockUpState("No wallet address provided");
+      return;
+    }
+
+    if (!WithDrwaCapitalPlan) {
+      selLockUpState("No Plan Selected");
+      return;
+    }
+  };
+
+  const returnContract = (plan: number) => {
+    const provider = new ethers.BrowserProvider((window as any).ethereum);
+    if (plan == 3) {
+      return new ethers.Contract(
+        STAKE12YEARS_CONTRACT,
+        STAKE12YEARS_ABI,
+        provider,
+      );
+    } else if (plan == 6) {
+      return new ethers.Contract(
+        STAKE12YEARS_CONTRACT,
+        STAKE12YEARS_ABI,
+        provider,
+      );
+    } else {
+      return new ethers.Contract(
+        STAKE12YEARS_CONTRACT,
+        STAKE12YEARS_ABI,
+        provider,
+      );
+    }
+  };
+
+  const setPlanWhenChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setStakePlanValue(e.target.value);
+    console.log(e.target.value);
+  };
+
+  const setClamWhenChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    SetClameInterstPlan(e.target.value);
+    console.log(e.target.value);
+  };
+
+  const setWithdrawWhenChange = async (
+    e: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
+    SetWithdrawCapitalPlan(e.target.value);
+    console.log(e.target.value);
+  };
+
   return (
     <div className="space-y-10">
       {/* Header Section */}
@@ -237,12 +370,32 @@ const StakeFelySection = () => {
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs text-gray-300">Period</label>
-                      <select className="w-full bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 appearance-none">
-                        <option value="3">3 Months (2.5% APY)</option>
-                        <option value="6">6 Months (8% APY)</option>
-                        <option value="12">12 Months (12.5% APY)</option>
-                      </select>
+                      <label className="text-xs text-gray-300">Plan</label>
+                      <div className="relative">
+                        <select className="w-full bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 appearance-none pr-10">
+                          <option value="" disabled selected>
+                            Select Plan
+                          </option>
+                          <option value="3">3 Months - 2.5% APY</option>
+                          <option value="6">6 Months - 8% APY</option>
+                          <option value="12">12 Months - 12.5% APY</option>
+                        </select>
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
+                          <svg
+                            className="h-4 w-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M19 9l-7 7-7-7"
+                            />
+                          </svg>
+                        </div>
+                      </div>
                     </div>
                     <button className="btn btn-primary btn-lg w-full shadow-lg shadow-primary-500/20 mt-2">
                       STAKE
@@ -266,22 +419,67 @@ const StakeFelySection = () => {
                   <h3 className="text-xl font-bold text-white">
                     Lookup Stake IDs
                   </h3>
-                  <div className="flex gap-3">
-                    <input
-                      type="text"
-                      placeholder="Enter Wallet Address"
-                      className="flex-1 bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 min-w-0 placeholder:text-sm"
-                    />
-                    <button className="btn btn-primary btn-sm whitespace-nowrap min-w-[100px] px-6">
-                      SEARCH
-                    </button>
+                  <div className="flex flex-col md:flex-row gap-3 md:items-end">
+                    {/* <div className="flex-1 flex flex-col space-y-2 w-full">
+                      <label className="text-xs text-gray-300 ml-1">
+                        Wallet Address
+                      </label>
+                      <input
+                        type="text"
+                        ref={walletAd}
+                        placeholder="Enter Wallet Address"
+                        className="w-full bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 min-w-0 placeholder:text-sm"
+                      />
+                    </div> */}
+                    <div className="flex flex-col space-y-2 w-full md:w-auto">
+                      <label className="text-xs text-gray-300 ml-1">Plan</label>
+                      <div className="relative">
+                        <select
+                          onChange={setPlanWhenChange}
+                          className="bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 appearance-none min-w-[120px] w-full pr-10"
+                        >
+                          <option value="" disabled selected>
+                            Select Plan
+                          </option>
+                          <option value="3">Silver (3 Months)</option>
+                          <option value="6">Gold (6 Months)</option>
+                          <option value="12">Platinum (12 Months)</option>
+                        </select>
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
+                          <svg
+                            className="h-4 w-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M19 9l-7 7-7-7"
+                            />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex flex-col space-y-2 w-full md:w-auto">
+                      <label className="text-xs text-transparent select-none hidden md:block">
+                        Action
+                      </label>
+                      <button
+                        onClick={() => lockupStakes()}
+                        className="btn btn-primary btn-sm whitespace-nowrap min-w-[100px] w-full md:w-auto px-6 h-[46px]"
+                      >
+                        SEARCH
+                      </button>
+                    </div>
                   </div>
 
                   <div className="pl-1">
                     <p className="text-gray-400 text-sm">
                       Results:{" "}
                       <span className="text-gray-500 italic ml-2">
-                        No active stakes found
+                        {lockUpState}
                       </span>
                     </p>
                   </div>
@@ -295,15 +493,59 @@ const StakeFelySection = () => {
                 <h3 className="text-xl font-bold text-white mb-4">
                   % Claim Interest
                 </h3>
-                <div className="flex gap-3">
-                  <input
-                    type="text"
-                    placeholder="Enter Stake ID"
-                    className="flex-1 bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 min-w-0 placeholder:text-sm"
-                  />
-                  <button className="btn btn-primary btn-sm whitespace-nowrap min-w-[100px] px-6">
-                    CLAIM
-                  </button>
+                <div className="flex flex-col md:flex-row gap-3 md:items-end">
+                  <div className="flex-1 flex flex-col space-y-2 w-full">
+                    <label className="text-xs text-gray-300 ml-1">
+                      Stake ID
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Enter Stake ID"
+                      className="w-full bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 min-w-0 placeholder:text-sm"
+                    />
+                  </div>
+                  <div className="flex flex-col space-y-2 w-full md:w-auto">
+                    <label className="text-xs text-gray-300 ml-1">Plan</label>
+                    <div className="relative">
+                      <select
+                        onChange={setPlanWhenChange}
+                        className="bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 appearance-none min-w-[120px] w-full pr-10"
+                      >
+                        <option value="" disabled selected>
+                          Select Plan
+                        </option>
+                        <option value="3">Silver (3 Months)</option>
+                        <option value="6">Gold (6 Months)</option>
+                        <option value="12">Platinum (12 Months)</option>
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M19 9l-7 7-7-7"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col space-y-2 w-full md:w-auto">
+                    <label className="text-xs text-transparent select-none hidden md:block">
+                      Action
+                    </label>
+                    <button
+                      onClick={clamInterest}
+                      className="btn btn-primary btn-sm whitespace-nowrap min-w-[100px] w-full md:w-auto px-6 h-[46px]"
+                    >
+                      CLAIM
+                    </button>
+                  </div>
                 </div>
               </div>
             </RevealAnimation>
@@ -314,15 +556,59 @@ const StakeFelySection = () => {
                 <h3 className="text-xl font-bold text-white mb-4">
                   ⎋ Withdraw Capital
                 </h3>
-                <div className="flex gap-3">
-                  <input
-                    type="text"
-                    placeholder="Enter Stake ID"
-                    className="flex-1 bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 min-w-0 placeholder:text-sm"
-                  />
-                  <button className="btn btn-secondary text-white border border-[#2a333e] hover:bg-[#2a333e] btn-sm whitespace-nowrap min-w-[100px] px-6">
-                    WITHDRAW
-                  </button>
+                <div className="flex flex-col md:flex-row gap-3 md:items-end">
+                  <div className="flex-1 flex flex-col space-y-2 w-full">
+                    <label className="text-xs text-gray-300 ml-1">
+                      Stake ID
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Enter Stake ID"
+                      className="w-full bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 min-w-0 placeholder:text-sm"
+                    />
+                  </div>
+                  <div className="flex flex-col space-y-2 w-full md:w-auto">
+                    <label className="text-xs text-gray-300 ml-1">Plan</label>
+                    <div className="relative">
+                      <select
+                        onChange={setClamWhenChange}
+                        className="bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 appearance-none min-w-[120px] w-full pr-10"
+                      >
+                        <option value="" disabled selected>
+                          Select Plan
+                        </option>
+                        <option value="3">Silver (3 Months)</option>
+                        <option value="6">Gold (6 Months)</option>
+                        <option value="12">Platinum (12 Months)</option>
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M19 9l-7 7-7-7"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col space-y-2 w-full md:w-auto">
+                    <label className="text-xs text-transparent select-none hidden md:block">
+                      Action
+                    </label>
+                    <button
+                      onClick={WithDrwaCapital}
+                      className="btn btn-secondary text-white border border-[#2a333e] hover:bg-[#2a333e] btn-sm whitespace-nowrap min-w-[100px] w-full md:w-auto px-6 h-[46px]"
+                    >
+                      WITHDRAW
+                    </button>
+                  </div>
                 </div>
               </div>
             </RevealAnimation>
