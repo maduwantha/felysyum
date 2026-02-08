@@ -237,12 +237,29 @@ const StakeFelySection = () => {
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs text-gray-300">Period</label>
-                      <select className="w-full bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 appearance-none">
-                        <option value="3">3 Months (2.5% APY)</option>
-                        <option value="6">6 Months (8% APY)</option>
-                        <option value="12">12 Months (12.5% APY)</option>
-                      </select>
+                      <label className="text-xs text-gray-300">Plan</label>
+                      <div className="relative">
+                        <select className="w-full bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 appearance-none pr-10">
+                          <option value="3">3 Months - 2.5% APY</option>
+                          <option value="6">6 Months - 8% APY</option>
+                          <option value="12">12 Months - 12.5% APY</option>
+                        </select>
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
+                          <svg
+                            className="h-4 w-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M19 9l-7 7-7-7"
+                            />
+                          </svg>
+                        </div>
+                      </div>
                     </div>
                     <button className="btn btn-primary btn-lg w-full shadow-lg shadow-primary-500/20 mt-2">
                       STAKE
@@ -266,15 +283,51 @@ const StakeFelySection = () => {
                   <h3 className="text-xl font-bold text-white">
                     Lookup Stake IDs
                   </h3>
-                  <div className="flex gap-3">
-                    <input
-                      type="text"
-                      placeholder="Enter Wallet Address"
-                      className="flex-1 bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 min-w-0 placeholder:text-sm"
-                    />
-                    <button className="btn btn-primary btn-sm whitespace-nowrap min-w-[100px] px-6">
-                      SEARCH
-                    </button>
+                  <div className="flex flex-col md:flex-row gap-3 md:items-end">
+                    <div className="flex-1 flex flex-col space-y-2 w-full">
+                      <label className="text-xs text-gray-300 ml-1">Wallet Address</label>
+                      <input
+                        type="text"
+                        placeholder="Enter Wallet Address"
+                        className="w-full bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 min-w-0 placeholder:text-sm"
+                      />
+                    </div>
+                    <div className="flex flex-col space-y-2 w-full md:w-auto">
+                      <label className="text-xs text-gray-300 ml-1">Plan</label>
+                      <div className="relative">
+                        <select className="bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 appearance-none min-w-[120px] w-full pr-10">
+                          <option value="" disabled selected>
+                            Select Plan
+                          </option>
+                          <option value="3">Silver (3 Months)</option>
+                          <option value="6">Gold (6 Months)</option>
+                          <option value="12">Platinum (12 Months)</option>
+                        </select>
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
+                          <svg
+                            className="h-4 w-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M19 9l-7 7-7-7"
+                            />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex flex-col space-y-2 w-full md:w-auto">
+                      <label className="text-xs text-transparent select-none hidden md:block">
+                        Action
+                      </label>
+                      <button className="btn btn-primary btn-sm whitespace-nowrap min-w-[100px] w-full md:w-auto px-6 h-[46px]">
+                        SEARCH
+                      </button>
+                    </div>
                   </div>
 
                   <div className="pl-1">
@@ -295,15 +348,51 @@ const StakeFelySection = () => {
                 <h3 className="text-xl font-bold text-white mb-4">
                   % Claim Interest
                 </h3>
-                <div className="flex gap-3">
-                  <input
-                    type="text"
-                    placeholder="Enter Stake ID"
-                    className="flex-1 bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 min-w-0 placeholder:text-sm"
-                  />
-                  <button className="btn btn-primary btn-sm whitespace-nowrap min-w-[100px] px-6">
-                    CLAIM
-                  </button>
+                <div className="flex flex-col md:flex-row gap-3 md:items-end">
+                  <div className="flex-1 flex flex-col space-y-2 w-full">
+                    <label className="text-xs text-gray-300 ml-1">Stake ID</label>
+                    <input
+                      type="text"
+                      placeholder="Enter Stake ID"
+                      className="w-full bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 min-w-0 placeholder:text-sm"
+                    />
+                  </div>
+                  <div className="flex flex-col space-y-2 w-full md:w-auto">
+                    <label className="text-xs text-gray-300 ml-1">Plan</label>
+                    <div className="relative">
+                      <select className="bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 appearance-none min-w-[120px] w-full pr-10">
+                        <option value="" disabled selected>
+                          Select Plan
+                        </option>
+                        <option value="3">Silver (3 Months)</option>
+                        <option value="6">Gold (6 Months)</option>
+                        <option value="12">Platinum (12 Months)</option>
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M19 9l-7 7-7-7"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col space-y-2 w-full md:w-auto">
+                    <label className="text-xs text-transparent select-none hidden md:block">
+                      Action
+                    </label>
+                    <button className="btn btn-primary btn-sm whitespace-nowrap min-w-[100px] w-full md:w-auto px-6 h-[46px]">
+                      CLAIM
+                    </button>
+                  </div>
                 </div>
               </div>
             </RevealAnimation>
@@ -314,15 +403,51 @@ const StakeFelySection = () => {
                 <h3 className="text-xl font-bold text-white mb-4">
                   ⎋ Withdraw Capital
                 </h3>
-                <div className="flex gap-3">
-                  <input
-                    type="text"
-                    placeholder="Enter Stake ID"
-                    className="flex-1 bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 min-w-0 placeholder:text-sm"
-                  />
-                  <button className="btn btn-secondary text-white border border-[#2a333e] hover:bg-[#2a333e] btn-sm whitespace-nowrap min-w-[100px] px-6">
-                    WITHDRAW
-                  </button>
+                <div className="flex flex-col md:flex-row gap-3 md:items-end">
+                  <div className="flex-1 flex flex-col space-y-2 w-full">
+                    <label className="text-xs text-gray-300 ml-1">Stake ID</label>
+                    <input
+                      type="text"
+                      placeholder="Enter Stake ID"
+                      className="w-full bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 min-w-0 placeholder:text-sm"
+                    />
+                  </div>
+                  <div className="flex flex-col space-y-2 w-full md:w-auto">
+                    <label className="text-xs text-gray-300 ml-1">Plan</label>
+                    <div className="relative">
+                      <select className="bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 appearance-none min-w-[120px] w-full pr-10">
+                        <option value="" disabled selected>
+                          Select Plan
+                        </option>
+                        <option value="3">Silver (3 Months)</option>
+                        <option value="6">Gold (6 Months)</option>
+                        <option value="12">Platinum (12 Months)</option>
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M19 9l-7 7-7-7"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col space-y-2 w-full md:w-auto">
+                    <label className="text-xs text-transparent select-none hidden md:block">
+                      Action
+                    </label>
+                    <button className="btn btn-secondary text-white border border-[#2a333e] hover:bg-[#2a333e] btn-sm whitespace-nowrap min-w-[100px] w-full md:w-auto px-6 h-[46px]">
+                      WITHDRAW
+                    </button>
+                  </div>
                 </div>
               </div>
             </RevealAnimation>
