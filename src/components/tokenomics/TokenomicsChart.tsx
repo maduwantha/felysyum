@@ -34,8 +34,8 @@ const TokenomicsChart = () => {
                                             data={data}
                                             cx="50%"
                                             cy="50%"
-                                            innerRadius={100}
-                                            outerRadius={180}
+                                            innerRadius="50%"
+                                            outerRadius="80%"
                                             paddingAngle={2}
                                             dataKey="value"
                                             stroke="none"

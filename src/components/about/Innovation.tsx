@@ -21,8 +21,8 @@ const Innovation = () => {
       pos: "-top-[66%] -left-[60%]",
       btnText: "Learn More",
       href: "#",
-      tag: "COMING SOON",
-      tagColor: "bg-cyan-400 text-black"
+      tag: "LIVE",
+      tagColor: "bg-green-500 text-white"
     },
     {
       title: "Felyzone",

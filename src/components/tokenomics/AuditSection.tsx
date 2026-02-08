@@ -42,7 +42,11 @@ const AuditSection = () => {
 
 
                                         <div className="pt-2">
-                                            <LinkButton href="/pdf/audit.pdf" className="btn btn-primary" target="_blank">
+                                            <LinkButton
+                                                href="/pdf/audit-rep-9a2b.pdf"
+                                                className="btn btn-primary w-full sm:w-auto h-auto min-h-[50px] whitespace-normal py-4 px-6 leading-tight flex items-center justify-center text-center"
+                                                target="_blank"
+                                            >
                                                 View the full audit report on Cyberscope
                                             </LinkButton>
                                         </div>

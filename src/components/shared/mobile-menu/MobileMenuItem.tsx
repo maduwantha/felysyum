@@ -76,8 +76,8 @@ const MobileMenuItem = ({ id, title, children, hasSubmenu = false, href }: Mobil
         <div
           id={`submenu-${id}`}
           className={cn(
-            'dark:bg-background-7 ml-3.5 w-full overflow-y-hidden bg-white transition-[height,opacity] duration-300 ease-in-out',
-            isActive ? 'pointer-events-auto h-fit opacity-100' : 'pointer-events-none h-0 opacity-0',
+            'dark:bg-background-7 ml-3.5 overflow-hidden bg-white transition-all duration-300 ease-in-out',
+            isActive ? 'pointer-events-auto max-h-[1000px] opacity-100' : 'pointer-events-none max-h-0 opacity-0',
           )}>
           {/* render submenu  */}
           {children}

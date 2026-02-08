@@ -1,28 +1,22 @@
-import CTA from '@/components/shared/cta/CTA';
-import TermsConditionContent from '@/components/terms-conditions/TermsConditionContent';
 import { defaultMetadata } from '@/utils/generateMetaData';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   ...defaultMetadata,
-  title: 'Terms & Conditions - Smart Solutions || NextSaaS',
+  title: 'Terms & Conditions - Felysyum',
 };
 
-const page = () => {
+const Page = () => {
   return (
-    <main className="bg-background-3 dark:bg-background-7">
-      <TermsConditionContent />
-      <CTA
-        className="dark:bg-background-5 bg-white"
-        badgeClass="badge-yellow-v2"
-        badgeText="Get Started"
-        ctaHeading="Ready to start earning with NextSaaS?"
-        description="If you have any questions, feel free to reach out to our team."
-        btnClass="hover:btn-secondary dark:hover:btn-accent"
-        ctaBtnText="Get started"
-      />
+    <main className="bg-background-3 dark:bg-background-7 min-h-[60vh]">
+      <section className="pt-32 pb-14 sm:pt-36 md:pt-42 md:pb-16 lg:pb-[88px] xl:pt-[180px] xl:pb-[200px]">
+        <div className="main-container text-center">
+          <h2 className="text-secondary dark:text-accent mb-4 text-4xl font-bold">Terms & Conditions</h2>
+          <p className="text-secondary/60 dark:text-accent/60 text-lg">Coming Soon</p>
+        </div>
+      </section>
     </main>
   );
 };
 
-export default page;
+export default Page;

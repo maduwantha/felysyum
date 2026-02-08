@@ -12,10 +12,31 @@ export async function generateStaticParams() {
     }));
 }
 
-export const metadata: Metadata = {
-    ...defaultMetadata,
-    title: 'Announcement Details - Felysyum',
-};
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+    const slug = (await params).slug;
+    const blogContent = getMarkDownContent('src/data/announcements/', slug);
+
+    return {
+        ...defaultMetadata,
+        title: `${blogContent.data.title} - Felysyum`,
+        description: blogContent.data.description,
+        openGraph: {
+            ...defaultMetadata.openGraph,
+            title: `${blogContent.data.title} - Felysyum`,
+            description: blogContent.data.description,
+            url: `https://dv.felysyum.com/announcement/${slug}`,
+            images: [
+                {
+                    url: `https://dv.felysyum.com${blogContent.data.thumbnail}`,
+                    width: 1200,
+                    height: 600,
+                    alt: blogContent.data.title,
+                },
+            ],
+            type: 'article',
+        },
+    };
+}
 
 const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
     const slug = (await params).slug;

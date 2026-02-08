@@ -10,6 +10,7 @@ import { ReactNode, Suspense } from 'react';
 import './globals.css';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://dv.felysyum.com'),
   title: "Felysyum : Elysium's Digital Gold",
   description: "Discover your digital elysium at The Oasis of Legends, a vibrant ecosystem fueled by Felysyum (FELY) cryptocurrency.",
   icons: {
@@ -29,7 +30,7 @@ export default function RootLayout({
           <Suspense>
             <SmoothScrollProvider>
               <Navbar />
-              <DemoShowcase activeDemoId={22} />
+              {process.env.NODE_ENV === 'development' && <DemoShowcase activeDemoId={22} />}
               {children}
               <Footer />
             </SmoothScrollProvider>

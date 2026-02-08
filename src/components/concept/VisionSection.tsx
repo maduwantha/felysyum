@@ -51,7 +51,7 @@ const VisionSection = () => {
                                     </span>
                                     <br />
                                     <span className="text-white">
-                                        Building a New  Generation of    Digital Heroess
+                                        Building a New  Generation of Digital Heroes
                                     </span>
                                 </h2>
                             </RevealAnimation>

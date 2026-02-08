@@ -7,9 +7,10 @@ interface BlogListProps {
   title?: string;
   description?: string;
   baseUrl?: string;
+  cardType?: 'blog' | 'announcement';
 }
 
-const BlogList = ({ blogs, title, description, baseUrl = '/blog' }: BlogListProps) => {
+const BlogList = ({ blogs, title, description, baseUrl = '/blog', cardType = 'blog' }: BlogListProps) => {
   return (
     <section className="py-14 md:py-16 lg:py-[88px] xl:py-[100px]">
       <div className="main-container">
@@ -31,7 +32,7 @@ const BlogList = ({ blogs, title, description, baseUrl = '/blog' }: BlogListProp
         )}
 
         {/* Blog grid with pagination wrapper */}
-        <PaginationWrapper blogs={blogs} baseUrl={baseUrl} />
+        <PaginationWrapper blogs={blogs} baseUrl={baseUrl} cardType={cardType} />
       </div>
     </section>
   );

@@ -1,6 +1,6 @@
 'use client';
 'use client';
-import { LuBanknote, LuTurtle } from 'react-icons/lu';
+import { LuBanknote, LuLock } from 'react-icons/lu';
 import { cn } from '@/utils/cn';
 import Link from 'next/link';
 import type { ComponentType } from 'react';
@@ -24,7 +24,7 @@ const felyLinks: FelyLink[] = [
         title: 'Stake Fely',
         description: 'Earn rewards by staking',
         href: '/stake',
-        icon: () => <LuTurtle strokeWidth={1.25} className="size-6" />,
+        icon: () => <LuLock strokeWidth={1.25} className="size-6" />,
     },
 ];
 

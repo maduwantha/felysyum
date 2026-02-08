@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 const page = () => {
-  const pdfUrl = "/assets/pdf/felysyum-white-paper-v5.pdf";
+  const pdfUrl = "/assets/pdf/felysyum-white-paper-v5-sc-8x92.pdf";
 
   return (
     <main className="bg-background-3 dark:bg-background-5 min-h-screen pb-20">
@@ -21,7 +21,7 @@ const page = () => {
             <div className="h-3 w-3 rounded-full bg-red-500/80"></div>
             <div className="h-3 w-3 rounded-full bg-yellow-500/80"></div>
             <div className="h-3 w-3 rounded-full bg-green-500/80"></div>
-            <span className="ml-4 text-xs font-mono text-white/50 hidden md:inline-block">felysyum-white-paper-v5.pdf</span>
+            <span className="ml-4 text-xs font-mono text-white/50 hidden md:inline-block">felysyum-white-paper.pdf</span>
           </div>
           <Link
             href={pdfUrl}

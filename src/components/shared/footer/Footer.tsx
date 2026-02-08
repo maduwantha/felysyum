@@ -94,7 +94,7 @@ const Footer = () => {
           </RevealAnimation>
         </div>
       </div>
-      <ThemeToggle />
+      {process.env.NODE_ENV === 'development' && <ThemeToggle />}
     </footer>
   );
 };
