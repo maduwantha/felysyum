@@ -415,12 +415,14 @@ const BuyFelySection = () => {
                     Note: Uses Polygon network — POL is required for gas.
                   </p>
 
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-400">Price :</span>
-                    <span className="text-white font-medium">
-                      {fellyPrice} USDT
-                    </span>
-                  </div>
+                  {isConnected && (
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-400">Price :</span>
+                      <span className="text-white font-medium">
+                        {fellyPrice} USDT
+                      </span>
+                    </div>
+                  )}
 
                   {/* <div className="flex justify-between items-center text-xs">
                     <span className="text-gray-400">Minimum Purchase:</span>

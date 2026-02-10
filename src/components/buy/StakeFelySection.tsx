@@ -2,16 +2,56 @@
 import RevealAnimation from "../animation/RevealAnimation";
 import arrowUpRight from "@public/images/icons/arrow-up-right.svg"; // Assuming this exists, else will just use text or generic icon
 import Image from "next/image";
+import axios from "axios";
 
-import { useEffect, useState } from "react";
+import { BASE_URL } from "@/utils/generateMetaData";
+
+import { useEffect, useRef, useState } from "react";
+import {
+  STAKE12MONTH_CONTRACT,
+  STAKE12MONTH_ABI,
+} from "@/app/contracts/stake12months";
+
+import {
+  STAKE6MONTH_CONTRACT,
+  STAKE6MONTH_ABI,
+} from "@/app/contracts/stake6months";
+
+import {
+  STAKE3MONTH_CONTRACT,
+  STAKE3MONTH_ABI,
+} from "@/app/contracts/stake3months";
+
+import {
+  STAKE5DAYS_CONTRACT,
+  STAKE5DAYS_ABI,
+} from "@/app/contracts/stake5days";
+
+import { ethers } from "ethers";
 
 const StakeFelySection = () => {
+  const [SingnatureMessage, setSingnatureMessage] = useState("");
+  const [signature, setSinganture] = useState("");
+
+  const [stakeUsdtAmount, setStakeUsdtAmount] = useState("");
+  const [stakeIdForInterst, setStakeIdForInterst] = useState("");
+  const [stakeIdForWithdraw, setStakeIdForWithdraw] = useState("");
+
   const POLYGON_CHAIN_ID = "0x89";
   const [isConnected, setIsConnected] = useState(false);
   const [yourWalletAddress, setWalletAddress] = useState<string | null>(null);
   const [transactionStatus, setTransactionStatus] = useState<string | null>(
     null,
   );
+  const [stakeState, setStakeState] = useState<string | null>(null);
+  const [lockUpState, setLockUpState] = useState<string | null>(null);
+  const [ClameUpState, setClameUpState] = useState<string | null>(null);
+  const [WithdrawState, setWithdrawState] = useState<string | null>(null);
+
+  const [StakePlan, setStakePlan] = useState("");
+  const [loockUpStakePlan, setLoockUpStakePlan] = useState("");
+  const [ClameInterstPlan, SetClameInterstPlan] = useState("");
+  const [WithDrwaCapitalPlan, SetWithdrawCapitalPlan] = useState("");
 
   // Mock Data for the Table
   const stakeData = [
@@ -46,6 +86,7 @@ const StakeFelySection = () => {
 
   useEffect(() => {
     checkIfWalletIsConnected();
+    setLockUpState(" No active stakes found");
   }, []);
 
   const checkIfWalletIsConnected = async () => {
@@ -65,6 +106,15 @@ const StakeFelySection = () => {
       });
 
       if (accounts.length > 0) {
+        // // Create a message to sign
+        // const message = `Sign this message to authenticate with your wallet.\n\nWallet: ${accounts[0]}\nTimestamp: ${new Date().toISOString()}`;
+        // // Request signature
+        // const signature = await (window as any).ethereum.request({
+        //   method: "personal_sign",
+        //   params: [message, accounts[0]], // message first, then address
+        // });
+        // console.log("Signature:", signature);
+
         // Already connected!
         setWalletAddress(accounts[0]);
         setIsConnected(true);
@@ -91,7 +141,30 @@ const StakeFelySection = () => {
           method: "eth_requestAccounts",
         });
 
+        console.log(accounts);
+
+        // Create a message to sign
+        const message = `Sign this message to authenticate with your wallet. Wallet: ${accounts[0]}. Timestamp: ${new Date().toISOString()}`;
+        // Request signature
+        const signature = await (window as any).ethereum.request({
+          method: "personal_sign",
+          params: [message, accounts[0]], // message first, then address
+        });
+        console.log("Signature:", signature);
+        setSinganture(signature);
+        setSingnatureMessage(message);
         setWalletAddress(accounts[0]);
+
+        // const regdata = {
+        //   wallet_address: accounts[0],
+        //   sponsor_code: "LAUNCH2024",
+        //   signature: signature,
+        //   message: message,
+        // };
+        // await register(regdata);
+
+        getNonce(accounts[0], signature);
+
         setIsConnected(true);
         setTransactionStatus("connected");
       }
@@ -100,6 +173,118 @@ const StakeFelySection = () => {
       setTransactionStatus("Failed to connect wallet");
       setTimeout(() => setTransactionStatus(null), 3000);
     }
+  };
+
+  const loginWallet = async (json: any, wallet: any, signa: any) => {
+    try {
+      const data = {
+        wallet_address: wallet,
+        signature: signa,
+        nonce: json["data"]["nonce"],
+      };
+
+      let config = {
+        method: "post",
+        maxBodyLength: Infinity,
+        url: BASE_URL + "/auth/login",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: data,
+      };
+
+      axios
+        .request(config)
+        .then((response) => {
+          console.log(JSON.stringify(response.data));
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const getNonce = async (wallet: any, signature: any) => {
+    try {
+      const data = {
+        wallet_address: wallet,
+      };
+
+      let config = {
+        method: "post",
+        maxBodyLength: Infinity,
+        url: BASE_URL + "/auth/nonce",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: data,
+      };
+
+      axios
+        .request(config)
+        .then((response) => {
+          console.log(JSON.stringify(response.data));
+          //const data = {};
+          loginWallet(response.data, wallet, signature);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const register = async (jsonobj: any) => {
+    try {
+      const data = JSON.stringify(jsonobj);
+
+      let config = {
+        method: "post",
+        maxBodyLength: Infinity,
+        url: BASE_URL + "/auth/register",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: data,
+      };
+
+      axios
+        .request(config)
+        .then((response) => {
+          console.log(JSON.stringify(response.data));
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const getmyStaking = async (Bearer: any) => {
+    let data = "";
+
+    let config = {
+      method: "get",
+      maxBodyLength: Infinity,
+      url: BASE_URL + "/staking/my-stakings",
+      headers: {
+        Authorization: "Bearer ",
+      },
+      data: data,
+    };
+
+    axios
+      .request(config)
+      .then((response) => {
+        console.log(JSON.stringify(response.data));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   // Check and switch to Polygon network
@@ -157,6 +342,253 @@ const StakeFelySection = () => {
     }
   };
 
+  // Listen for network changes
+  useEffect(() => {
+    if ((window as any).ethereum) {
+      (window as any).ethereum.on("chainChanged", (chainId: string) => {
+        console.log("Network changed to:", chainId);
+        window.location.reload(); // Reload page on network change
+      });
+
+      (window as any).ethereum.on("accountsChanged", (accounts: string[]) => {
+        if (accounts.length > 0) {
+          setWalletAddress(accounts[0]);
+        } else {
+          setIsConnected(false);
+          setWalletAddress(null);
+        }
+      });
+    }
+
+    return () => {
+      if ((window as any).ethereum) {
+        (window as any).ethereum.removeAllListeners("chainChanged");
+        (window as any).ethereum.removeAllListeners("accountsChanged");
+      }
+    };
+  }, []);
+  ``;
+
+  const lockupStakes = async () => {
+    setLockUpState("Wait..");
+    try {
+      // Check if address is valid
+      if (!yourWalletAddress) {
+        setLockUpState("No wallet address provided");
+        return;
+      }
+      console.log(loockUpStakePlan);
+      if (!loockUpStakePlan) {
+        alert("No Plan Selected");
+        setLockUpState("No Plan Selected");
+        return;
+      }
+
+      // //check signature
+      // setLockUpState("Requesting signature...");
+      // const timestamp = Date.now();
+      // const message = `Verify stake IDs for plan ${loockUpStakePlan}\nAddress: ${yourWalletAddress}\nTimestamp: ${timestamp}`;
+      // // Sign using window.ethereum.request
+      // const signature = await (window as any).ethereum.request({
+      //   method: "personal_sign",
+      //   params: [SingnatureMessage, yourWalletAddress],
+      // });
+      // // Verify using ethers (no provider needed - it's client-side)
+      // const recoveredAddress = ethers.verifyMessage(message, signature);
+      // if (recoveredAddress.toLowerCase() !== yourWalletAddress.toLowerCase()) {
+      //   setLockUpState("Signature verification failed");
+      //   return;
+      // }
+      // // End the signer from the wallet
+
+      setLockUpState("Locking for Stake ID's");
+
+      const contract: ethers.Contract = await returnContract(
+        parseInt(loockUpStakePlan),
+      );
+
+      const stakeIds = await contract.getStakeIdsByAccount(yourWalletAddress);
+
+      if (stakeIds == "" || stakeIds == null) {
+        setLockUpState("Stake ID not found");
+        return;
+      }
+      const formatted = stakeIds.map((id: bigint) => id.toString()).join(",");
+
+      console.log(formatted);
+      setLockUpState(formatted);
+    } catch (error) {
+      setLockUpState("No active stakes found");
+      setTimeout(() => setTransactionStatus(null), 3000);
+    }
+  };
+
+  // Add proper return type annotation
+  const returnContract = async (plan: number): Promise<ethers.Contract> => {
+    const provider = new ethers.BrowserProvider((window as any).ethereum);
+    const signer = await provider.getSigner();
+
+    if (plan == 5) {
+      return new ethers.Contract(STAKE5DAYS_CONTRACT, STAKE5DAYS_ABI, signer);
+    } else if (plan == 3) {
+      return new ethers.Contract(STAKE3MONTH_CONTRACT, STAKE3MONTH_ABI, signer);
+    } else if (plan == 6) {
+      return new ethers.Contract(STAKE6MONTH_CONTRACT, STAKE6MONTH_ABI, signer);
+    } else {
+      return new ethers.Contract(
+        STAKE12MONTH_CONTRACT,
+        STAKE12MONTH_ABI,
+        signer,
+      );
+    }
+  };
+
+  const stakePlan = async () => {
+    setStakeState("Wait....");
+    if (!StakePlan) {
+      setStakeState("select USDT Stake Plan");
+      return;
+    }
+
+    if (!stakeUsdtAmount) {
+      setStakeState("Enter USDT Amoutn for Stake");
+      return;
+    }
+
+    try {
+      const response = await axios.post(BASE_URL, {
+        name: "Charlie",
+        age: 30,
+        email: "charlie@example.com",
+      });
+
+      console.log("Response:", response.data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const getStakeData = async () => {
+    try {
+      const response = await axios.get(BASE_URL + "/staking/my-stakings");
+
+      console.log("Response:", response.data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const claimInterest = async () => {
+    setClameUpState("Wait....");
+    if (!yourWalletAddress) {
+      setClameUpState("No wallet address provided");
+      return;
+    }
+
+    if (!ClameInterstPlan) {
+      setClameUpState("No Plan Selected");
+      alert("No Plan Selected");
+      return;
+    }
+
+    if (!stakeIdForInterst) {
+      setClameUpState("No Stake ID Inserted");
+      alert("No Stake ID Inserted");
+      return;
+    }
+
+    try {
+      setClameUpState("Preparing transaction...");
+
+      // Explicitly type the contract variable
+      const contract: ethers.Contract = await returnContract(
+        parseInt(ClameInterstPlan),
+      );
+
+      setClameUpState("Requesting signature...");
+      const tx = await contract.claimInterest(stakeIdForInterst);
+
+      setClameUpState("Transaction submitted. Waiting for confirmation...");
+      const receipt = await tx.wait();
+
+      setClameUpState("Success!");
+      alert("Interest claimed successfully!");
+      console.log("Transaction receipt:", receipt);
+    } catch (error: any) {
+      console.error("Error claiming interest:", error);
+      setClameUpState("Transaction failed");
+      //alert(error?.message || "Transaction failed");
+    }
+  };
+
+  const withdrawCapital = async () => {
+    setWithdrawState("Wait....");
+    if (!yourWalletAddress) {
+      setWithdrawState("No wallet address provided");
+      return;
+    }
+
+    if (!WithDrwaCapitalPlan) {
+      setWithdrawState("No Plan Selected");
+      alert("No Plan Selected");
+      return;
+    }
+
+    if (!stakeIdForWithdraw) {
+      setWithdrawState("No Stake ID Inserted");
+      alert("No Stake ID Inserted");
+      return;
+    }
+
+    try {
+      setWithdrawState("Preparing transaction...");
+
+      // Add await and explicit type
+      const contract: ethers.Contract = await returnContract(
+        parseInt(WithDrwaCapitalPlan),
+      );
+
+      setWithdrawState("Requesting signature...");
+      const tx = await contract.withdrawCapital(stakeIdForWithdraw);
+
+      setWithdrawState("Transaction submitted. Waiting for confirmation...");
+      const receipt = await tx.wait();
+
+      setWithdrawState("Success!");
+      alert("Capital withdrawn successfully!");
+      console.log("Transaction receipt:", receipt);
+    } catch (error: any) {
+      console.error("Error withdrawing capital:", error);
+      setWithdrawState("Transaction failed");
+      //alert(error?.message || "Transaction failed");
+      setTimeout(() => setWithdrawState(null), 3000);
+    }
+  };
+
+  const setStakePlanWhenChange = async (
+    e: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
+    setStakePlan(e.target.value);
+    console.log(e.target.value);
+  };
+
+  const setPlanWhenChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setLoockUpStakePlan(e.target.value);
+    console.log(e.target.value);
+  };
+
+  const setClamWhenChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    SetClameInterstPlan(e.target.value);
+    console.log(e.target.value);
+  };
+
+  const setWithdrawWhenChange = async (
+    e: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
+    SetWithdrawCapitalPlan(e.target.value);
+    console.log(e.target.value);
+  };
+
   return (
     <div className="space-y-10">
       {/* Header Section */}
@@ -189,6 +621,8 @@ const StakeFelySection = () => {
                   <h4 className="text-white text-sm font-medium">
                     Connection Status
                   </h4>
+                  <div>{signature}</div>
+
                   <button
                     className="btn btn-primary btn-sm w-auto px-6"
                     onClick={() => connectWallet()}
@@ -227,6 +661,8 @@ const StakeFelySection = () => {
                       </label>
                       <div className="relative">
                         <input
+                          value={stakeUsdtAmount}
+                          onChange={(e) => setStakeUsdtAmount(e.target.value)}
                           type="number"
                           placeholder="Enter amount"
                           className="w-full bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 placeholder:text-sm"
@@ -239,7 +675,14 @@ const StakeFelySection = () => {
                     <div className="space-y-2">
                       <label className="text-xs text-gray-300">Plan</label>
                       <div className="relative">
-                        <select defaultValue="3" className="w-full bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 appearance-none pr-10">
+                        <select
+                          className="w-full bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 appearance-none pr-10"
+                          onChange={setStakePlanWhenChange}
+                        >
+                          <option value="" disabled selected>
+                            Select Plan
+                          </option>
+                          <option value="5">5 Days - 1% APY</option>
                           <option value="3">3 Months - 2.5% APY</option>
                           <option value="6">6 Months - 8% APY</option>
                           <option value="12">12 Months - 12.5% APY</option>
@@ -259,9 +702,14 @@ const StakeFelySection = () => {
                             />
                           </svg>
                         </div>
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400"></div>
+                        <div>{stakeState}</div>
                       </div>
                     </div>
-                    <button className="btn btn-primary btn-lg w-full shadow-lg shadow-primary-500/20 mt-2">
+                    <button
+                      onClick={() => stakePlan()}
+                      className="btn btn-primary btn-lg w-full shadow-lg shadow-primary-500/20 mt-2"
+                    >
                       STAKE
                     </button>
                   </div>
@@ -284,21 +732,28 @@ const StakeFelySection = () => {
                     Lookup Stake IDs
                   </h3>
                   <div className="flex flex-col md:flex-row gap-3 md:items-end">
-                    <div className="flex-1 flex flex-col space-y-2 w-full">
-                      <label className="text-xs text-gray-300 ml-1">Wallet Address</label>
+                    {/* <div className="flex-1 flex flex-col space-y-2 w-full">
+                      <label className="text-xs text-gray-300 ml-1">
+                        Wallet Address
+                      </label>
                       <input
                         type="text"
+                        ref={walletAd}
                         placeholder="Enter Wallet Address"
                         className="w-full bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 min-w-0 placeholder:text-sm"
                       />
-                    </div>
+                    </div> */}
                     <div className="flex flex-col space-y-2 w-full md:w-auto">
                       <label className="text-xs text-gray-300 ml-1">Plan</label>
                       <div className="relative">
-                        <select className="bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 appearance-none min-w-[120px] w-full pr-10">
+                        <select
+                          onChange={setPlanWhenChange}
+                          className="bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 appearance-none min-w-[120px] w-full pr-10"
+                        >
                           <option value="" disabled selected>
                             Select Plan
                           </option>
+                          <option value="5">5 Days - 1% APY</option>
                           <option value="3">Silver (3 Months)</option>
                           <option value="6">Gold (6 Months)</option>
                           <option value="12">Platinum (12 Months)</option>
@@ -324,7 +779,10 @@ const StakeFelySection = () => {
                       <label className="text-xs text-transparent select-none hidden md:block">
                         Action
                       </label>
-                      <button className="btn btn-primary btn-sm whitespace-nowrap min-w-[100px] w-full md:w-auto px-6 h-[46px]">
+                      <button
+                        onClick={() => lockupStakes()}
+                        className="btn btn-primary btn-sm whitespace-nowrap min-w-[100px] w-full md:w-auto px-6 h-[46px]"
+                      >
                         SEARCH
                       </button>
                     </div>
@@ -334,7 +792,7 @@ const StakeFelySection = () => {
                     <p className="text-gray-400 text-sm">
                       Results:{" "}
                       <span className="text-gray-500 italic ml-2">
-                        No active stakes found
+                        {lockUpState}
                       </span>
                     </p>
                   </div>
@@ -348,11 +806,16 @@ const StakeFelySection = () => {
                 <h3 className="text-xl font-bold text-white mb-4">
                   % Claim Interest
                 </h3>
+                <h5>{ClameUpState}</h5>
                 <div className="flex flex-col md:flex-row gap-3 md:items-end">
                   <div className="flex-1 flex flex-col space-y-2 w-full">
-                    <label className="text-xs text-gray-300 ml-1">Stake ID</label>
+                    <label className="text-xs text-gray-300 ml-1">
+                      Stake ID
+                    </label>
                     <input
                       type="text"
+                      value={stakeIdForInterst}
+                      onChange={(e) => setStakeIdForInterst(e.target.value)}
                       placeholder="Enter Stake ID"
                       className="w-full bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 min-w-0 placeholder:text-sm"
                     />
@@ -360,10 +823,14 @@ const StakeFelySection = () => {
                   <div className="flex flex-col space-y-2 w-full md:w-auto">
                     <label className="text-xs text-gray-300 ml-1">Plan</label>
                     <div className="relative">
-                      <select defaultValue="" className="bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 appearance-none min-w-[120px] w-full pr-10">
-                        <option value="" disabled>
+                      <select
+                        onChange={setClamWhenChange}
+                        className="bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 appearance-none min-w-[120px] w-full pr-10"
+                      >
+                        <option value="" disabled selected>
                           Select Plan
                         </option>
+                        <option value="5">5 Days - 1% APY</option>
                         <option value="3">Silver (3 Months)</option>
                         <option value="6">Gold (6 Months)</option>
                         <option value="12">Platinum (12 Months)</option>
@@ -389,7 +856,10 @@ const StakeFelySection = () => {
                     <label className="text-xs text-transparent select-none hidden md:block">
                       Action
                     </label>
-                    <button className="btn btn-primary btn-sm whitespace-nowrap min-w-[100px] w-full md:w-auto px-6 h-[46px]">
+                    <button
+                      onClick={claimInterest}
+                      className="btn btn-primary btn-sm whitespace-nowrap min-w-[100px] w-full md:w-auto px-6 h-[46px]"
+                    >
                       CLAIM
                     </button>
                   </div>
@@ -403,11 +873,16 @@ const StakeFelySection = () => {
                 <h3 className="text-xl font-bold text-white mb-4">
                   ⎋ Withdraw Capital
                 </h3>
+                <h5>{WithdrawState}</h5>
                 <div className="flex flex-col md:flex-row gap-3 md:items-end">
                   <div className="flex-1 flex flex-col space-y-2 w-full">
-                    <label className="text-xs text-gray-300 ml-1">Stake ID</label>
+                    <label className="text-xs text-gray-300 ml-1">
+                      Stake ID
+                    </label>
                     <input
                       type="text"
+                      value={stakeIdForWithdraw}
+                      onChange={(e) => setStakeIdForWithdraw(e.target.value)}
                       placeholder="Enter Stake ID"
                       className="w-full bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 min-w-0 placeholder:text-sm"
                     />
@@ -415,10 +890,14 @@ const StakeFelySection = () => {
                   <div className="flex flex-col space-y-2 w-full md:w-auto">
                     <label className="text-xs text-gray-300 ml-1">Plan</label>
                     <div className="relative">
-                      <select defaultValue="" className="bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 appearance-none min-w-[120px] w-full pr-10">
-                        <option value="" disabled>
+                      <select
+                        onChange={setWithdrawWhenChange}
+                        className="bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 appearance-none min-w-[120px] w-full pr-10"
+                      >
+                        <option value="" disabled selected>
                           Select Plan
                         </option>
+                        <option value="5">5 Days - 1% APY</option>
                         <option value="3">Silver (3 Months)</option>
                         <option value="6">Gold (6 Months)</option>
                         <option value="12">Platinum (12 Months)</option>
@@ -444,7 +923,10 @@ const StakeFelySection = () => {
                     <label className="text-xs text-transparent select-none hidden md:block">
                       Action
                     </label>
-                    <button className="btn btn-secondary text-white border border-[#2a333e] hover:bg-[#2a333e] btn-sm whitespace-nowrap min-w-[100px] w-full md:w-auto px-6 h-[46px]">
+                    <button
+                      onClick={withdrawCapital}
+                      className="btn btn-secondary text-white border border-[#2a333e] hover:bg-[#2a333e] btn-sm whitespace-nowrap min-w-[100px] w-full md:w-auto px-6 h-[46px]"
+                    >
                       WITHDRAW
                     </button>
                   </div>
