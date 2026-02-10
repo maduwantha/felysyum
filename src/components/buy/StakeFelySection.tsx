@@ -4,7 +4,7 @@ import arrowUpRight from "@public/images/icons/arrow-up-right.svg"; // Assuming 
 import Image from "next/image";
 import axios from "axios";
 
-import { API_URL } from "@/utils/generateMetaData";
+import { BASE_URL } from "@/utils/generateMetaData";
 
 import { useEffect, useRef, useState } from "react";
 import {
@@ -30,6 +30,9 @@ import {
 import { ethers } from "ethers";
 
 const StakeFelySection = () => {
+  const [SingnatureMessage, setSingnatureMessage] = useState("");
+  const [signature, setSinganture] = useState("");
+
   const [stakeUsdtAmount, setStakeUsdtAmount] = useState("");
   const [stakeIdForInterst, setStakeIdForInterst] = useState("");
   const [stakeIdForWithdraw, setStakeIdForWithdraw] = useState("");
@@ -83,7 +86,6 @@ const StakeFelySection = () => {
 
   useEffect(() => {
     checkIfWalletIsConnected();
-    getStakeData();
     setLockUpState(" No active stakes found");
   }, []);
 
@@ -104,6 +106,15 @@ const StakeFelySection = () => {
       });
 
       if (accounts.length > 0) {
+        // // Create a message to sign
+        // const message = `Sign this message to authenticate with your wallet.\n\nWallet: ${accounts[0]}\nTimestamp: ${new Date().toISOString()}`;
+        // // Request signature
+        // const signature = await (window as any).ethereum.request({
+        //   method: "personal_sign",
+        //   params: [message, accounts[0]], // message first, then address
+        // });
+        // console.log("Signature:", signature);
+
         // Already connected!
         setWalletAddress(accounts[0]);
         setIsConnected(true);
@@ -130,7 +141,30 @@ const StakeFelySection = () => {
           method: "eth_requestAccounts",
         });
 
+        console.log(accounts);
+
+        // Create a message to sign
+        const message = `Sign this message to authenticate with your wallet. Wallet: ${accounts[0]}. Timestamp: ${new Date().toISOString()}`;
+        // Request signature
+        const signature = await (window as any).ethereum.request({
+          method: "personal_sign",
+          params: [message, accounts[0]], // message first, then address
+        });
+        console.log("Signature:", signature);
+        setSinganture(signature);
+        setSingnatureMessage(message);
         setWalletAddress(accounts[0]);
+
+        // const regdata = {
+        //   wallet_address: accounts[0],
+        //   sponsor_code: "LAUNCH2024",
+        //   signature: signature,
+        //   message: message,
+        // };
+        // await register(regdata);
+
+        getNonce(accounts[0], signature);
+
         setIsConnected(true);
         setTransactionStatus("connected");
       }
@@ -139,6 +173,118 @@ const StakeFelySection = () => {
       setTransactionStatus("Failed to connect wallet");
       setTimeout(() => setTransactionStatus(null), 3000);
     }
+  };
+
+  const loginWallet = async (json: any, wallet: any, signa: any) => {
+    try {
+      const data = {
+        wallet_address: wallet,
+        signature: signa,
+        nonce: json["data"]["nonce"],
+      };
+
+      let config = {
+        method: "post",
+        maxBodyLength: Infinity,
+        url: BASE_URL + "/auth/login",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: data,
+      };
+
+      axios
+        .request(config)
+        .then((response) => {
+          console.log(JSON.stringify(response.data));
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const getNonce = async (wallet: any, signature: any) => {
+    try {
+      const data = {
+        wallet_address: wallet,
+      };
+
+      let config = {
+        method: "post",
+        maxBodyLength: Infinity,
+        url: BASE_URL + "/auth/nonce",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: data,
+      };
+
+      axios
+        .request(config)
+        .then((response) => {
+          console.log(JSON.stringify(response.data));
+          //const data = {};
+          loginWallet(response.data, wallet, signature);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const register = async (jsonobj: any) => {
+    try {
+      const data = JSON.stringify(jsonobj);
+
+      let config = {
+        method: "post",
+        maxBodyLength: Infinity,
+        url: BASE_URL + "/auth/register",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: data,
+      };
+
+      axios
+        .request(config)
+        .then((response) => {
+          console.log(JSON.stringify(response.data));
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const getmyStaking = async (Bearer: any) => {
+    let data = "";
+
+    let config = {
+      method: "get",
+      maxBodyLength: Infinity,
+      url: BASE_URL + "/staking/my-stakings",
+      headers: {
+        Authorization: "Bearer ",
+      },
+      data: data,
+    };
+
+    axios
+      .request(config)
+      .then((response) => {
+        console.log(JSON.stringify(response.data));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   // Check and switch to Polygon network
@@ -224,7 +370,7 @@ const StakeFelySection = () => {
   ``;
 
   const lockupStakes = async () => {
-    setWithdrawState("Wait..");
+    setLockUpState("Wait..");
     try {
       // Check if address is valid
       if (!yourWalletAddress) {
@@ -237,6 +383,23 @@ const StakeFelySection = () => {
         setLockUpState("No Plan Selected");
         return;
       }
+
+      // //check signature
+      // setLockUpState("Requesting signature...");
+      // const timestamp = Date.now();
+      // const message = `Verify stake IDs for plan ${loockUpStakePlan}\nAddress: ${yourWalletAddress}\nTimestamp: ${timestamp}`;
+      // // Sign using window.ethereum.request
+      // const signature = await (window as any).ethereum.request({
+      //   method: "personal_sign",
+      //   params: [SingnatureMessage, yourWalletAddress],
+      // });
+      // // Verify using ethers (no provider needed - it's client-side)
+      // const recoveredAddress = ethers.verifyMessage(message, signature);
+      // if (recoveredAddress.toLowerCase() !== yourWalletAddress.toLowerCase()) {
+      //   setLockUpState("Signature verification failed");
+      //   return;
+      // }
+      // // End the signer from the wallet
 
       setLockUpState("Locking for Stake ID's");
 
@@ -293,7 +456,7 @@ const StakeFelySection = () => {
     }
 
     try {
-      const response = await axios.post(API_URL, {
+      const response = await axios.post(BASE_URL, {
         name: "Charlie",
         age: 30,
         email: "charlie@example.com",
@@ -307,7 +470,7 @@ const StakeFelySection = () => {
 
   const getStakeData = async () => {
     try {
-      const response = await axios.get(API_URL);
+      const response = await axios.get(BASE_URL + "/staking/my-stakings");
 
       console.log("Response:", response.data);
     } catch (error) {
@@ -458,6 +621,8 @@ const StakeFelySection = () => {
                   <h4 className="text-white text-sm font-medium">
                     Connection Status
                   </h4>
+                  <div>{signature}</div>
+
                   <button
                     className="btn btn-primary btn-sm w-auto px-6"
                     onClick={() => connectWallet()}

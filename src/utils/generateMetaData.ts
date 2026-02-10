@@ -7,7 +7,7 @@ export const DEFAULT_DESCRIPTION =
   "NextSaaS - the ultimate collection of 38+ premium HTML templates for SaaS businesses and startups. Built with Tailwind CSS, featuring responsive design, authentication flows, pricing pages, and modern UI components. Perfect for web applications and digital products.";
 export const DEFAULT_IMAGE_URL =
   "https://images.prismic.io/staticmania/aPD-K55xUNkB2D2X_og-image.jpg";
-export const API_URL = "https://jsonplaceholder.typicode.com/todos/1";
+export const BASE_URL = "https://felysyum.cloud/api";
 
 const defaultMetadata: Metadata = {
   metadataBase: new URL(DEFAULT_URL),
