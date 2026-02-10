@@ -72,6 +72,11 @@ const MobileMenu = ({ menuData }: { menuData: MobileMenuGroup[] }) => {
               </MobileMenuItem>
             ))}
           </ul>
+          <div className="mt-4 px-4">
+            <button className="btn btn-md btn-primary w-full hover:btn-white-dark dark:hover:btn-white">
+              <span>Connect</span>
+            </button>
+          </div>
         </div>
       </div>
     </aside>

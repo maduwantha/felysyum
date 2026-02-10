@@ -167,9 +167,9 @@ const Navbar = () => {
                 </ul>
               </nav>
               <div className="hidden items-center justify-center xl:flex">
-                <Link href="/signup" className="btn btn-md btn-primary hover:btn-white-dark dark:hover:btn-white">
+                <button className="btn btn-md btn-primary hover:btn-white-dark dark:hover:btn-white">
                   <span>Connect</span>
-                </Link>
+                </button>
               </div>
               <MobileMenuButton />
             </div>

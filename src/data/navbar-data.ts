@@ -56,11 +56,7 @@ export const mobileMenuData: MobileMenuGroup[] = [
     title: 'Contact',
     href: '/contact-us',
   },
-  {
-    id: 'connect',
-    title: 'Connect',
-    href: '/signup',
-  },
+
 ];
 
 export const footerData: FooterOneData[] = [

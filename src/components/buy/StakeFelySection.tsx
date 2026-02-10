@@ -239,7 +239,7 @@ const StakeFelySection = () => {
                     <div className="space-y-2">
                       <label className="text-xs text-gray-300">Plan</label>
                       <div className="relative">
-                        <select className="w-full bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 appearance-none pr-10">
+                        <select defaultValue="3" className="w-full bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 appearance-none pr-10">
                           <option value="3">3 Months - 2.5% APY</option>
                           <option value="6">6 Months - 8% APY</option>
                           <option value="12">12 Months - 12.5% APY</option>
@@ -360,8 +360,8 @@ const StakeFelySection = () => {
                   <div className="flex flex-col space-y-2 w-full md:w-auto">
                     <label className="text-xs text-gray-300 ml-1">Plan</label>
                     <div className="relative">
-                      <select className="bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 appearance-none min-w-[120px] w-full pr-10">
-                        <option value="" disabled selected>
+                      <select defaultValue="" className="bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 appearance-none min-w-[120px] w-full pr-10">
+                        <option value="" disabled>
                           Select Plan
                         </option>
                         <option value="3">Silver (3 Months)</option>
@@ -415,8 +415,8 @@ const StakeFelySection = () => {
                   <div className="flex flex-col space-y-2 w-full md:w-auto">
                     <label className="text-xs text-gray-300 ml-1">Plan</label>
                     <div className="relative">
-                      <select className="bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 appearance-none min-w-[120px] w-full pr-10">
-                        <option value="" disabled selected>
+                      <select defaultValue="" className="bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 appearance-none min-w-[120px] w-full pr-10">
+                        <option value="" disabled>
                           Select Plan
                         </option>
                         <option value="3">Silver (3 Months)</option>
