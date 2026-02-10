@@ -1,7 +1,6 @@
-export const STAKE12YEARS_CONTRACT =
-  "0x5EfF66487f9D33465BAf1eBd4Cfa991f0B8cd963";
+export const STAKE5DAYS_CONTRACT = "0xb0B62e987dA7a3CfBB7b0e92EcebcFF446b315d2";
 
-export const STAKE12YEARS_ABI = [
+export const STAKE5DAYS_ABI = [
   {
     inputs: [
       { internalType: "contract IERC20", name: "_token", type: "address" },

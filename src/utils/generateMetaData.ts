@@ -1,32 +1,40 @@
-import type { Metadata } from 'next';
+import type { Metadata } from "next";
 
-export const DEFAULT_URL = 'https://next-saas-next.vercel.app/';
-export const DEFAULT_TITLE = 'NextSaaS - Software, SaaS & Startup Tailwind Template';
+export const DEFAULT_URL = "https://next-saas-next.vercel.app/";
+export const DEFAULT_TITLE =
+  "NextSaaS - Software, SaaS & Startup Tailwind Template";
 export const DEFAULT_DESCRIPTION =
-  'NextSaaS - the ultimate collection of 38+ premium HTML templates for SaaS businesses and startups. Built with Tailwind CSS, featuring responsive design, authentication flows, pricing pages, and modern UI components. Perfect for web applications and digital products.';
-export const DEFAULT_IMAGE_URL = 'https://images.prismic.io/staticmania/aPD-K55xUNkB2D2X_og-image.jpg';
+  "NextSaaS - the ultimate collection of 38+ premium HTML templates for SaaS businesses and startups. Built with Tailwind CSS, featuring responsive design, authentication flows, pricing pages, and modern UI components. Perfect for web applications and digital products.";
+export const DEFAULT_IMAGE_URL =
+  "https://images.prismic.io/staticmania/aPD-K55xUNkB2D2X_og-image.jpg";
+export const API_URL = "https://jsonplaceholder.typicode.com/todos/1";
 
 const defaultMetadata: Metadata = {
   metadataBase: new URL(DEFAULT_URL),
   title: DEFAULT_TITLE,
   description: DEFAULT_DESCRIPTION,
   openGraph: {
-    type: 'website',
-    siteName: 'NextSaaS',
+    type: "website",
+    siteName: "NextSaaS",
     url: DEFAULT_URL,
     title: DEFAULT_TITLE,
     description: DEFAULT_DESCRIPTION,
     images: [{ url: DEFAULT_IMAGE_URL, width: 1200, height: 630 }],
   },
   twitter: {
-    card: 'summary_large_image',
+    card: "summary_large_image",
     title: DEFAULT_TITLE,
     description: DEFAULT_DESCRIPTION,
     images: [DEFAULT_IMAGE_URL],
   },
 };
 
-const generateMetadata = (title?: string, description?: string, canonicaUrl?: string, imageUrl?: string): Metadata => {
+const generateMetadata = (
+  title?: string,
+  description?: string,
+  canonicaUrl?: string,
+  imageUrl?: string,
+): Metadata => {
   return {
     ...defaultMetadata,
     title: title ?? defaultMetadata.title,
@@ -39,7 +47,9 @@ const generateMetadata = (title?: string, description?: string, canonicaUrl?: st
       title: title ?? defaultMetadata.openGraph?.title,
       description: description ?? defaultMetadata.openGraph?.description,
       url: canonicaUrl ?? defaultMetadata.openGraph?.url,
-      images: imageUrl ? [{ url: imageUrl, width: 1200, height: 630 }] : defaultMetadata.openGraph?.images,
+      images: imageUrl
+        ? [{ url: imageUrl, width: 1200, height: 630 }]
+        : defaultMetadata.openGraph?.images,
     },
     twitter: {
       ...defaultMetadata.twitter,
