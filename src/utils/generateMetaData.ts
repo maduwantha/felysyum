@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
 
-export const DEFAULT_URL = "https://next-saas-next.vercel.app/";
-export const DEFAULT_TITLE =
-  "NextSaaS - Software, SaaS & Startup Tailwind Template";
+export const DEFAULT_URL = 'https://dv.felysyum.com';
+export const DEFAULT_TITLE = "Felysyum : Elysium's Digital Gold";
 export const DEFAULT_DESCRIPTION =
-  "NextSaaS - the ultimate collection of 38+ premium HTML templates for SaaS businesses and startups. Built with Tailwind CSS, featuring responsive design, authentication flows, pricing pages, and modern UI components. Perfect for web applications and digital products.";
-export const DEFAULT_IMAGE_URL =
-  "https://images.prismic.io/staticmania/aPD-K55xUNkB2D2X_og-image.jpg";
+  'Discover your digital elysium at The Oasis of Legends, a vibrant ecosystem fueled by Felysyum (FELY) cryptocurrency.';
+export const DEFAULT_IMAGE_URL = '/images/shared/felysyum-logo.png';
 export const BASE_URL = "https://felysyum.cloud/api";
 
 const defaultMetadata: Metadata = {
@@ -15,7 +13,7 @@ const defaultMetadata: Metadata = {
   description: DEFAULT_DESCRIPTION,
   openGraph: {
     type: "website",
-    siteName: "NextSaaS",
+    siteName: 'Felysyum',
     url: DEFAULT_URL,
     title: DEFAULT_TITLE,
     description: DEFAULT_DESCRIPTION,
