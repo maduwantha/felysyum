@@ -2,9 +2,9 @@
 import RevealAnimation from "../animation/RevealAnimation";
 import arrowUpRight from "@public/images/icons/arrow-up-right.svg"; // Assuming this exists, else will just use text or generic icon
 import Image from "next/image";
-import axios from "axios";
-
-import { BASE_URL } from "@/utils/generateMetaData";
+import { format } from "date-fns";
+import { serverPostRequest } from "@/app/serverServices/serverCalls";
+import { serverGetWithBare } from "@/app/serverServices/serverCalls";
 
 import { useEffect, useRef, useState } from "react";
 import {
@@ -30,9 +30,6 @@ import {
 import { ethers } from "ethers";
 
 const StakeFelySection = () => {
-  const [SingnatureMessage, setSingnatureMessage] = useState("");
-  const [signature, setSinganture] = useState("");
-
   const [stakeUsdtAmount, setStakeUsdtAmount] = useState("");
   const [stakeIdForInterst, setStakeIdForInterst] = useState("");
   const [stakeIdForWithdraw, setStakeIdForWithdraw] = useState("");
@@ -53,36 +50,52 @@ const StakeFelySection = () => {
   const [ClameInterstPlan, SetClameInterstPlan] = useState("");
   const [WithDrwaCapitalPlan, SetWithdrawCapitalPlan] = useState("");
 
+  type StakeRow = {
+    id: number;
+    month: number;
+    usdt_amount: String;
+    fely_amount: String;
+    bonus_percentage: String;
+    fely_bonus_amount: String;
+    total_fely_amount: String;
+    staked_at: String;
+    maturity_date: String;
+    days_until_maturity: number;
+    is_matured: false;
+    status: String;
+  };
+  const [stakeData, setStakeData] = useState<StakeRow[]>([]);
+
   // Mock Data for the Table
-  const stakeData = [
-    {
-      orderNo: "7399",
-      capital: "2816.90",
-      interest: "422.54",
-      stakeId: "0",
-      tx: "",
-      status: "Locked",
-      date: "2025-12-08",
-    },
-    {
-      orderNo: "7429",
-      capital: "2817.00",
-      interest: "422.55",
-      stakeId: "0",
-      tx: "",
-      status: "Locked",
-      date: "2025-12-08",
-    },
-    {
-      orderNo: "8080",
-      capital: "68147.00",
-      interest: "23851.45",
-      stakeId: "279",
-      tx: "0xbf81dccedb345a6d8217c4c03beee6480cd5a2fd8f501010fd6fa2f12a6db86f",
-      status: "Locked",
-      date: "2025-12-30",
-    },
-  ];
+  // const stakeData = [
+  //   {
+  //     orderNo: "7399",
+  //     capital: "2816.90",
+  //     interest: "422.54",
+  //     stakeId: "0",
+  //     tx: "",
+  //     status: "Locked",
+  //     date: "2025-12-08",
+  //   },
+  //   {
+  //     orderNo: "7429",
+  //     capital: "2817.00",
+  //     interest: "422.55",
+  //     stakeId: "0",
+  //     tx: "",
+  //     status: "Locked",
+  //     date: "2025-12-08",
+  //   },
+  //   {
+  //     orderNo: "8080",
+  //     capital: "68147.00",
+  //     interest: "23851.45",
+  //     stakeId: "279",
+  //     tx: "0xbf81dccedb345a6d8217c4c03beee6480cd5a2fd8f501010fd6fa2f12a6db86f",
+  //     status: "Locked",
+  //     date: "2025-12-30",
+  //   },
+  // ];
 
   useEffect(() => {
     checkIfWalletIsConnected();
@@ -106,16 +119,8 @@ const StakeFelySection = () => {
       });
 
       if (accounts.length > 0) {
-        // // Create a message to sign
-        // const message = `Sign this message to authenticate with your wallet.\n\nWallet: ${accounts[0]}\nTimestamp: ${new Date().toISOString()}`;
-        // // Request signature
-        // const signature = await (window as any).ethereum.request({
-        //   method: "personal_sign",
-        //   params: [message, accounts[0]], // message first, then address
-        // });
-        // console.log("Signature:", signature);
-
         // Already connected!
+
         setWalletAddress(accounts[0]);
         setIsConnected(true);
         setTransactionStatus("connected");
@@ -140,33 +145,61 @@ const StakeFelySection = () => {
         const accounts = await (window as any).ethereum.request({
           method: "eth_requestAccounts",
         });
+        const nonce = await getNonce(accounts[0]);
 
-        console.log(accounts);
+        if (nonce.success) {
+          // Create a message to sign
+          const message = `Sign this message to authenticate with your wallet:  ${nonce.data.nonce}`;
+          // Request signature
+          const signature = await (window as any).ethereum.request({
+            method: "personal_sign",
+            params: [message, accounts[0]], // message first, then address
+          });
 
-        // Create a message to sign
-        const message = `Sign this message to authenticate with your wallet. Wallet: ${accounts[0]}. Timestamp: ${new Date().toISOString()}`;
-        // Request signature
-        const signature = await (window as any).ethereum.request({
-          method: "personal_sign",
-          params: [message, accounts[0]], // message first, then address
-        });
-        console.log("Signature:", signature);
-        setSinganture(signature);
-        setSingnatureMessage(message);
-        setWalletAddress(accounts[0]);
+          const loginRowData = {
+            wallet_address: accounts[0],
+            signature: signature,
+            nonce: nonce.data.nonce,
+          };
+          console.log(loginRowData);
+          const loginReturnData = await serverPostRequest(
+            loginRowData,
+            "/auth/login",
+          );
+          console.log("loginReturnData");
+          console.log(loginReturnData);
+          setIsConnected(true);
+          setTransactionStatus("connected");
+          getmyStaking(loginReturnData.data.token);
+        } else {
+          const tim = new Date().toISOString();
+          const message = `Sign this message to authenticate with your wallet. Wallet: ${accounts[0]}. Timestamp: ${tim}`;
+          // Request signature
+          const signature = await (window as any).ethereum.request({
+            method: "personal_sign",
+            params: [message, accounts[0]], // message first, then address
+          });
 
-        // const regdata = {
-        //   wallet_address: accounts[0],
-        //   sponsor_code: "LAUNCH2024",
-        //   signature: signature,
-        //   message: message,
-        // };
-        // await register(regdata);
-
-        getNonce(accounts[0], signature);
-
-        setIsConnected(true);
-        setTransactionStatus("connected");
+          const regdata = {
+            wallet_address: accounts[0],
+            sponsor_code: "LAUNCH2024",
+            signature: signature,
+            message: message,
+            timestamp: tim,
+          };
+          const regResoince = await serverPostRequest(
+            regdata,
+            "/auth/register",
+          );
+          console.log(regResoince);
+          if (regResoince.success) {
+            console.log("OK Registerd");
+            setIsConnected(true);
+            setTransactionStatus("connected");
+          } else {
+            console.log("NOT Registerd");
+          }
+        }
       }
     } catch (error) {
       console.error("Error connecting wallet:", error);
@@ -175,116 +208,31 @@ const StakeFelySection = () => {
     }
   };
 
-  const loginWallet = async (json: any, wallet: any, signa: any) => {
+  const getNonce = async (wallet: any) => {
     try {
-      const data = {
-        wallet_address: wallet,
-        signature: signa,
-        nonce: json["data"]["nonce"],
-      };
-
-      let config = {
-        method: "post",
-        maxBodyLength: Infinity,
-        url: BASE_URL + "/auth/login",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        data: data,
-      };
-
-      axios
-        .request(config)
-        .then((response) => {
-          console.log(JSON.stringify(response.data));
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-
-  const getNonce = async (wallet: any, signature: any) => {
-    try {
-      const data = {
+      const obj = {
         wallet_address: wallet,
       };
-
-      let config = {
-        method: "post",
-        maxBodyLength: Infinity,
-        url: BASE_URL + "/auth/nonce",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        data: data,
-      };
-
-      axios
-        .request(config)
-        .then((response) => {
-          console.log(JSON.stringify(response.data));
-          //const data = {};
-          loginWallet(response.data, wallet, signature);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      return await serverPostRequest(obj, "/auth/nonce");
     } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-
-  const register = async (jsonobj: any) => {
-    try {
-      const data = JSON.stringify(jsonobj);
-
-      let config = {
-        method: "post",
-        maxBodyLength: Infinity,
-        url: BASE_URL + "/auth/register",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        data: data,
-      };
-
-      axios
-        .request(config)
-        .then((response) => {
-          console.log(JSON.stringify(response.data));
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    } catch (error) {
-      console.error("Error:", error);
+      console.error("Failed to get nonce:", error);
     }
   };
 
   const getmyStaking = async (Bearer: any) => {
-    let data = "";
-
-    let config = {
-      method: "get",
-      maxBodyLength: Infinity,
-      url: BASE_URL + "/staking/my-stakings",
-      headers: {
-        Authorization: "Bearer ",
-      },
-      data: data,
-    };
-
-    axios
-      .request(config)
-      .then((response) => {
-        console.log(JSON.stringify(response.data));
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    try {
+      const MyStakingData = await serverGetWithBare(
+        "",
+        "/staking/my-stakings",
+        Bearer,
+      );
+      console.log(MyStakingData);
+      setStakeData(MyStakingData.data.stakings);
+    } catch (error) {
+      console.error("Error connecting wallet:", error);
+      setTransactionStatus("Failed to connect wallet");
+      setTimeout(() => setTransactionStatus(null), 3000);
+    }
   };
 
   // Check and switch to Polygon network
@@ -384,23 +332,6 @@ const StakeFelySection = () => {
         return;
       }
 
-      // //check signature
-      // setLockUpState("Requesting signature...");
-      // const timestamp = Date.now();
-      // const message = `Verify stake IDs for plan ${loockUpStakePlan}\nAddress: ${yourWalletAddress}\nTimestamp: ${timestamp}`;
-      // // Sign using window.ethereum.request
-      // const signature = await (window as any).ethereum.request({
-      //   method: "personal_sign",
-      //   params: [SingnatureMessage, yourWalletAddress],
-      // });
-      // // Verify using ethers (no provider needed - it's client-side)
-      // const recoveredAddress = ethers.verifyMessage(message, signature);
-      // if (recoveredAddress.toLowerCase() !== yourWalletAddress.toLowerCase()) {
-      //   setLockUpState("Signature verification failed");
-      //   return;
-      // }
-      // // End the signer from the wallet
-
       setLockUpState("Locking for Stake ID's");
 
       const contract: ethers.Contract = await returnContract(
@@ -453,28 +384,6 @@ const StakeFelySection = () => {
     if (!stakeUsdtAmount) {
       setStakeState("Enter USDT Amoutn for Stake");
       return;
-    }
-
-    try {
-      const response = await axios.post(BASE_URL, {
-        name: "Charlie",
-        age: 30,
-        email: "charlie@example.com",
-      });
-
-      console.log("Response:", response.data);
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-
-  const getStakeData = async () => {
-    try {
-      const response = await axios.get(BASE_URL + "/staking/my-stakings");
-
-      console.log("Response:", response.data);
-    } catch (error) {
-      console.error("Error:", error);
     }
   };
 
@@ -621,7 +530,6 @@ const StakeFelySection = () => {
                   <h4 className="text-white text-sm font-medium">
                     Connection Status
                   </h4>
-                  <div>{signature}</div>
 
                   <button
                     className="btn btn-primary btn-sm w-auto px-6"
@@ -950,22 +858,28 @@ const StakeFelySection = () => {
                     Order No
                   </th>
                   <th className="p-4 text-white font-semibold whitespace-nowrap">
-                    Capital
+                    Plan
                   </th>
                   <th className="p-4 text-white font-semibold whitespace-nowrap">
-                    Interest
+                    USDT
                   </th>
                   <th className="p-4 text-white font-semibold whitespace-nowrap">
-                    Stake ID
+                    Fely Amount
                   </th>
                   <th className="p-4 text-white font-semibold whitespace-nowrap">
-                    Transaction #
+                    Bonus %
                   </th>
                   <th className="p-4 text-white font-semibold whitespace-nowrap">
-                    Status
+                    Bonus Fely
                   </th>
                   <th className="p-4 text-white font-semibold whitespace-nowrap">
                     Date
+                  </th>
+                  <th className="p-4 text-white font-semibold whitespace-nowrap">
+                    End Date
+                  </th>
+                  <th className="p-4 text-white font-semibold whitespace-nowrap">
+                    Stauts
                   </th>
                 </tr>
               </thead>
@@ -975,22 +889,30 @@ const StakeFelySection = () => {
                     key={i}
                     className="border-b border-[#2a333e] last:border-0 hover:bg-[#13171E]/50 transition-colors"
                   >
-                    <td className="p-4 text-gray-300">{row.orderNo}</td>
-                    <td className="p-4 text-gray-300">{row.capital}</td>
-                    <td className="p-4 text-gray-300">{row.interest}</td>
-                    <td className="p-4 text-gray-300">{row.stakeId}</td>
-                    <td
-                      className="p-4 text-gray-300 truncate max-w-[200px]"
-                      title={row.tx}
-                    >
-                      {row.tx || "-"}
+                    <td className="p-4 text-gray-300">{row.id}</td>
+                    <td className="p-4 text-gray-300">{row.month}</td>
+                    <td className="p-4 text-gray-300">{row.usdt_amount}</td>
+                    <td className="p-4 text-gray-300">{row.fely_amount}</td>
+                    <td className="p-4 text-gray-300">
+                      {row.bonus_percentage}
+                    </td>
+                    <td className="p-4 text-gray-300">
+                      {row.fely_bonus_amount}
+                    </td>
+                    <td className="p-4 text-gray-300">
+                      {format(new Date(String(row.staked_at)), "dd/MM/yyyy")}
+                    </td>
+                    <td className="p-4 text-gray-300">
+                      {format(
+                        new Date(String(row.maturity_date)),
+                        "dd/MM/yyyy",
+                      )}
                     </td>
                     <td className="p-4">
                       <span className="inline-block px-2 py-1 bg-primary-500/20 text-primary-500 text-xs rounded-md">
                         {row.status}
                       </span>
                     </td>
-                    <td className="p-4 text-gray-300">{row.date}</td>
                   </tr>
                 ))}
               </tbody>
