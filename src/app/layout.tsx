@@ -27,7 +27,7 @@ export default function RootLayout({
       <head>
         <meta
           httpEquiv="Content-Security-Policy"
-          content="connect-src 'self' https://www.google-analytics.com https://gasstation.polygon.technology https://polygon-rpc.com"
+          content="connect-src 'self' https: wss:"
         />
       </head>
       <body className={`${interTight.variable} antialiased`}>
