@@ -14,7 +14,7 @@ import { parse } from "path";
 
 const BuyFelySection = () => {
   const buyingFellyValue = useRef<HTMLInputElement>(null);
-  const buyingUsdtValue = useRef<HTMLInputElement>(null); // Added missing ref
+  const buyingUsdtValue = useRef<HTMLInputElement>(null);
   const POLYGON_CHAIN_ID = "0x89"; // 137 in decimal (Polygon Mainnet)
   const [isConnected, setIsConnected] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
@@ -24,8 +24,18 @@ const BuyFelySection = () => {
   const [transactionStatus, setTransactionStatus] = useState<string | null>(
     null,
   );
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    // Detect if mobile
+    const checkMobile = () => {
+      setIsMobile(
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent,
+        ),
+      );
+    };
+    checkMobile();
     checkIfWalletIsConnected();
   }, []);
 
@@ -154,6 +164,16 @@ const BuyFelySection = () => {
 
   const connectWallet = async () => {
     try {
+      // Mobile detection and deep linking
+      if (isMobile && !(window as any).ethereum) {
+        const dappUrl = window.location.href.replace(/^https?:\/\//, "");
+        const metamaskDeepLink = `https://metamask.app.link/dapp/${dappUrl}`;
+
+        setTransactionStatus("Opening MetaMask app...");
+        window.open(metamaskDeepLink, "_blank");
+        return;
+      }
+
       if ((window as any).ethereum) {
         // First, check and switch to Polygon network
         await checkAndSwitchNetwork();
@@ -166,6 +186,11 @@ const BuyFelySection = () => {
         setWalletAddress(accounts[0]);
         setIsConnected(true);
         await getUsdtBalance(accounts[0]);
+      } else {
+        setTransactionStatus(
+          "Please install MetaMask or open this page in MetaMask browser",
+        );
+        setTimeout(() => setTransactionStatus(null), 4000);
       }
     } catch (error) {
       console.error("Error connecting wallet:", error);
@@ -234,14 +259,9 @@ const BuyFelySection = () => {
       if (!felyValue) {
         console.log("felly value canot be zero or null");
         setTransactionStatus("Felly Value canot be zero or null");
+        setTimeout(() => setTransactionStatus(null), 3000);
         return;
       }
-
-      // if (parseInt(felyValue) < 111) {
-      //   console.log("Minimum Value is 111");
-      //   setTransactionStatus("Felly Minimum Value is 111");
-      //   return;
-      // }
 
       approveAndBuyTokens(felyValue);
     }
@@ -253,6 +273,7 @@ const BuyFelySection = () => {
     try {
       if (!yourWalletAddress) {
         setTransactionStatus("Please connect your wallet first");
+        setTimeout(() => setTransactionStatus(null), 3000);
         return;
       }
 
@@ -350,7 +371,7 @@ const BuyFelySection = () => {
       (window as any).ethereum.on("accountsChanged", (accounts: string[]) => {
         if (accounts.length > 0) {
           setWalletAddress(accounts[0]);
-          setYourUsdttBalance(accounts[0]);
+          getUsdtBalance(accounts[0]);
         } else {
           setIsConnected(false);
           setWalletAddress(null);
@@ -408,8 +429,9 @@ const BuyFelySection = () => {
                 {/* Top Info Section - Always Visible */}
                 <div className="space-y-4 mb-6 pb-6 border-b border-[#2a333e]">
                   <p className="text-xs text-center text-gray-400">
-                    (Only MetaMask, Coinbase Wallet, and Trust Wallet are
-                    supported)
+                    {isMobile
+                      ? "(Please open in MetaMask browser or use the 'Connect Wallet' button to open MetaMask app)"
+                      : "(Only MetaMask, Coinbase Wallet, and Trust Wallet are supported)"}
                   </p>
                   <p className="text-xs text-center text-gray-500">
                     Note: Uses Polygon network — POL is required for gas.
@@ -423,17 +445,12 @@ const BuyFelySection = () => {
                       </span>
                     </div>
                   )}
-
-                  {/* <div className="flex justify-between items-center text-xs">
-                    <span className="text-gray-400">Minimum Purchase:</span>
-                    <span className="text-white font-medium">111 USDT</span>
-                  </div> */}
                 </div>
 
                 {!isConnected ? (
                   <button
                     onClick={() => connectWallet()}
-                    className="btn btn-primary btn-xl w-full"
+                    className="btn btn-primary btn-xl w-full touch-manipulation"
                   >
                     CONNECT YOUR WALLET
                   </button>
@@ -465,12 +482,13 @@ const BuyFelySection = () => {
                       <div className="relative">
                         <input
                           type="number"
+                          inputMode="decimal"
                           ref={buyingFellyValue}
                           onChange={handleUsdtChange}
                           placeholder="Enter amount"
-                          className="w-full bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 placeholder:text-sm"
+                          className="w-full bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 placeholder:text-sm touch-manipulation"
                         />
-                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-xs">
+                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-xs pointer-events-none">
                           USDT
                         </span>
                       </div>
@@ -483,32 +501,35 @@ const BuyFelySection = () => {
                       <div className="relative">
                         <input
                           type="number"
+                          inputMode="decimal"
                           ref={buyingUsdtValue}
                           onChange={handleFelyChange}
                           placeholder="Enter amount"
-                          className="w-full bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 placeholder:text-sm"
+                          className="w-full bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 placeholder:text-sm touch-manipulation"
                         />
-                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-xs">
+                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-xs pointer-events-none">
                           FELLY
                         </span>
                       </div>
                     </div>
 
                     <button
-                      className="btn btn-primary btn-lg w-full"
+                      className="btn btn-primary btn-lg w-full touch-manipulation"
                       onClick={() => buyFelyToken()}
                     >
                       BUY FELY TOKEN
                     </button>
 
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-gray-400">
-                        Progressing Status :
-                      </span>
-                      <span className="text-yellow-500 font-medium">
-                        {transactionStatus}
-                      </span>
-                    </div>
+                    {transactionStatus && (
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-gray-400">
+                          Progressing Status :
+                        </span>
+                        <span className="text-yellow-500 font-medium text-xs">
+                          {transactionStatus}
+                        </span>
+                      </div>
+                    )}
 
                     <div className="pt-3 border-t border-[#2a333e]">
                       <p className="text-xs text-gray-400 mb-2">
@@ -520,7 +541,7 @@ const BuyFelySection = () => {
                         </code>
                         <button
                           onClick={handleCopy}
-                          className="text-primary-500 text-xs hover:text-primary-400 flex items-center gap-1 transition-colors"
+                          className="text-primary-500 text-xs hover:text-primary-400 flex items-center gap-1 transition-colors touch-manipulation active:scale-95"
                         >
                           {isCopied ? (
                             <>
