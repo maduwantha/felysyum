@@ -4,7 +4,8 @@ import arrowUpRight from "@public/images/icons/arrow-up-right.svg"; // Assuming 
 import Image from "next/image";
 import { format } from "date-fns";
 import { serverPostRequest } from "@/app/serverServices/serverCalls";
-import { serverGetWithBare } from "@/app/serverServices/serverCalls";
+import { serverGetWithBareGet } from "@/app/serverServices/serverCalls";
+import { serverGetWithBarePost } from "@/app/serverServices/serverCalls";
 
 import { useEffect, useRef, useState } from "react";
 import {
@@ -28,6 +29,8 @@ import {
 } from "@/app/contracts/stake5days";
 
 import { ethers } from "ethers";
+import { log } from "console";
+import { Cossette_Texte } from "next/font/google";
 
 const StakeFelySection = () => {
   const [stakeUsdtAmount, setStakeUsdtAmount] = useState("");
@@ -49,6 +52,8 @@ const StakeFelySection = () => {
   const [loockUpStakePlan, setLoockUpStakePlan] = useState("");
   const [ClameInterstPlan, SetClameInterstPlan] = useState("");
   const [WithDrwaCapitalPlan, SetWithdrawCapitalPlan] = useState("");
+
+  const [bareToken, setBareToken] = useState("");
 
   type StakeRow = {
     id: number;
@@ -124,6 +129,7 @@ const StakeFelySection = () => {
         setWalletAddress(accounts[0]);
         setIsConnected(true);
         setTransactionStatus("connected");
+        regProgress();
       } else {
         // Not connected
         setIsConnected(false);
@@ -134,72 +140,74 @@ const StakeFelySection = () => {
     }
   };
 
+  const regProgress = async () => {
+    // Then request accounts
+    const accounts = await (window as any).ethereum.request({
+      method: "eth_requestAccounts",
+    });
+    const nonce = await getNonce(accounts[0]);
+
+    if (nonce.success) {
+      // Create a message to sign
+      const message = `Sign this message to authenticate with your wallet:  ${nonce.data.nonce}`;
+      // Request signature
+      const signature = await (window as any).ethereum.request({
+        method: "personal_sign",
+        params: [message, accounts[0]], // message first, then address
+      });
+
+      const loginRowData = {
+        wallet_address: accounts[0],
+        signature: signature,
+        nonce: nonce.data.nonce,
+      };
+      console.log(loginRowData);
+      const loginReturnData = await serverPostRequest(
+        loginRowData,
+        "/auth/login",
+      );
+      console.log("loginReturnData");
+      console.log(loginReturnData);
+      setIsConnected(true);
+      setTransactionStatus("connected");
+      setBareToken(loginReturnData.data.token);
+      getmyStaking(loginReturnData.data.token);
+    } else {
+      const tim = new Date().toISOString();
+      const message = `Sign this message to authenticate with your wallet. Wallet: ${accounts[0]}. Timestamp: ${tim}`;
+      // Request signature
+      const signature = await (window as any).ethereum.request({
+        method: "personal_sign",
+        params: [message, accounts[0]], // message first, then address
+      });
+
+      const regdata = {
+        wallet_address: accounts[0],
+        sponsor_code: "LAUNCH2024",
+        signature: signature,
+        message: message,
+        timestamp: tim,
+      };
+      const regResoince = await serverPostRequest(regdata, "/auth/register");
+      console.log(regResoince);
+      if (regResoince.success) {
+        console.log("OK Registerd");
+        setIsConnected(true);
+        setTransactionStatus("connected");
+        setBareToken(regResoince.data.token);
+      } else {
+        console.log("NOT Registerd");
+      }
+    }
+  };
+
   const connectWallet = async () => {
     try {
       if ((window as any).ethereum) {
         setTransactionStatus("Connecting Wallect");
         // First, check and switch to Polygon network
         await checkAndSwitchNetwork();
-
-        // Then request accounts
-        const accounts = await (window as any).ethereum.request({
-          method: "eth_requestAccounts",
-        });
-        const nonce = await getNonce(accounts[0]);
-
-        if (nonce.success) {
-          // Create a message to sign
-          const message = `Sign this message to authenticate with your wallet:  ${nonce.data.nonce}`;
-          // Request signature
-          const signature = await (window as any).ethereum.request({
-            method: "personal_sign",
-            params: [message, accounts[0]], // message first, then address
-          });
-
-          const loginRowData = {
-            wallet_address: accounts[0],
-            signature: signature,
-            nonce: nonce.data.nonce,
-          };
-          console.log(loginRowData);
-          const loginReturnData = await serverPostRequest(
-            loginRowData,
-            "/auth/login",
-          );
-          console.log("loginReturnData");
-          console.log(loginReturnData);
-          setIsConnected(true);
-          setTransactionStatus("connected");
-          getmyStaking(loginReturnData.data.token);
-        } else {
-          const tim = new Date().toISOString();
-          const message = `Sign this message to authenticate with your wallet. Wallet: ${accounts[0]}. Timestamp: ${tim}`;
-          // Request signature
-          const signature = await (window as any).ethereum.request({
-            method: "personal_sign",
-            params: [message, accounts[0]], // message first, then address
-          });
-
-          const regdata = {
-            wallet_address: accounts[0],
-            sponsor_code: "LAUNCH2024",
-            signature: signature,
-            message: message,
-            timestamp: tim,
-          };
-          const regResoince = await serverPostRequest(
-            regdata,
-            "/auth/register",
-          );
-          console.log(regResoince);
-          if (regResoince.success) {
-            console.log("OK Registerd");
-            setIsConnected(true);
-            setTransactionStatus("connected");
-          } else {
-            console.log("NOT Registerd");
-          }
-        }
+        regProgress();
       }
     } catch (error) {
       console.error("Error connecting wallet:", error);
@@ -221,7 +229,7 @@ const StakeFelySection = () => {
 
   const getmyStaking = async (Bearer: any) => {
     try {
-      const MyStakingData = await serverGetWithBare(
+      const MyStakingData = await serverGetWithBareGet(
         "",
         "/staking/my-stakings",
         Bearer,
@@ -384,6 +392,29 @@ const StakeFelySection = () => {
     if (!stakeUsdtAmount) {
       setStakeState("Enter USDT Amoutn for Stake");
       return;
+    }
+
+    try {
+      const obj = {
+        month: StakePlan,
+        usdt_amount: stakeUsdtAmount,
+      };
+
+      console.log(obj);
+      console.log(bareToken);
+
+      const returndata = await serverGetWithBarePost(
+        obj,
+        "/staking/create",
+        bareToken,
+      );
+
+      setStakeState(returndata.message);
+      await getmyStaking(bareToken);
+
+      console.log(returndata);
+    } catch (error) {
+      console.log(error);
     }
   };
 

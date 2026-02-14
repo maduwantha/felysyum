@@ -17,7 +17,7 @@ export const serverPostRequest = async (object: any, classPath: string) => {
   }
 };
 
-export const serverGetWithBare = async (
+export const serverGetWithBareGet = async (
   params: any,
   classPath: string,
   token: string,
@@ -33,6 +33,34 @@ export const serverGetWithBare = async (
 
     console.log("Response:", JSON.stringify(response.data));
     return response.data;
+  } catch (error) {
+    console.error("API Error:", error);
+    throw error;
+  }
+};
+
+export const serverGetWithBarePost = async (
+  params: any,
+  classPath: string,
+  token: string,
+) => {
+  try {
+    const response = await fetch(BASE_URL + classPath, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(params),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("Response:", JSON.stringify(data));
+    return data;
   } catch (error) {
     console.error("API Error:", error);
     throw error;
