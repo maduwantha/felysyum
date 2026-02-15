@@ -4,7 +4,8 @@ import arrowUpRight from "@public/images/icons/arrow-up-right.svg"; // Assuming 
 import Image from "next/image";
 import { format } from "date-fns";
 import { serverPostRequest } from "@/app/serverServices/serverCalls";
-import { serverGetWithBare } from "@/app/serverServices/serverCalls";
+import { serverGetWithBareGet } from "@/app/serverServices/serverCalls";
+import { serverGetWithBarePost } from "@/app/serverServices/serverCalls";
 
 import { useEffect, useRef, useState } from "react";
 import {
@@ -27,7 +28,11 @@ import {
   STAKE5DAYS_ABI,
 } from "@/app/contracts/stake5days";
 
+import { USDT_CONTRACT_ADDRESS, USDT_ABI } from "@/app/contracts/usdtContract";
+
 import { ethers } from "ethers";
+import { log } from "console";
+import { Cossette_Texte } from "next/font/google";
 
 const StakeFelySection = () => {
   const [stakeUsdtAmount, setStakeUsdtAmount] = useState("");
@@ -50,6 +55,9 @@ const StakeFelySection = () => {
   const [ClameInterstPlan, SetClameInterstPlan] = useState("");
   const [WithDrwaCapitalPlan, SetWithdrawCapitalPlan] = useState("");
 
+  const [bareToken, setBareToken] = useState("");
+  const [isMobile, setIsMobile] = useState(false);
+
   type StakeRow = {
     id: number;
     month: number;
@@ -66,38 +74,16 @@ const StakeFelySection = () => {
   };
   const [stakeData, setStakeData] = useState<StakeRow[]>([]);
 
-  // Mock Data for the Table
-  // const stakeData = [
-  //   {
-  //     orderNo: "7399",
-  //     capital: "2816.90",
-  //     interest: "422.54",
-  //     stakeId: "0",
-  //     tx: "",
-  //     status: "Locked",
-  //     date: "2025-12-08",
-  //   },
-  //   {
-  //     orderNo: "7429",
-  //     capital: "2817.00",
-  //     interest: "422.55",
-  //     stakeId: "0",
-  //     tx: "",
-  //     status: "Locked",
-  //     date: "2025-12-08",
-  //   },
-  //   {
-  //     orderNo: "8080",
-  //     capital: "68147.00",
-  //     interest: "23851.45",
-  //     stakeId: "279",
-  //     tx: "0xbf81dccedb345a6d8217c4c03beee6480cd5a2fd8f501010fd6fa2f12a6db86f",
-  //     status: "Locked",
-  //     date: "2025-12-30",
-  //   },
-  // ];
-
   useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent,
+        ),
+      );
+    };
+
+    checkMobile();
     checkIfWalletIsConnected();
     setLockUpState(" No active stakes found");
   }, []);
@@ -124,6 +110,7 @@ const StakeFelySection = () => {
         setWalletAddress(accounts[0]);
         setIsConnected(true);
         setTransactionStatus("connected");
+        regProgress();
       } else {
         // Not connected
         setIsConnected(false);
@@ -134,72 +121,84 @@ const StakeFelySection = () => {
     }
   };
 
+  const regProgress = async () => {
+    // Then request accounts
+    const accounts = await (window as any).ethereum.request({
+      method: "eth_requestAccounts",
+    });
+    const nonce = await getNonce(accounts[0]);
+
+    if (nonce.success) {
+      // Create a message to sign
+      const message = `Sign this message to authenticate with your wallet:  ${nonce.data.nonce}`;
+      // Request signature
+      const signature = await (window as any).ethereum.request({
+        method: "personal_sign",
+        params: [message, accounts[0]], // message first, then address
+      });
+
+      const loginRowData = {
+        wallet_address: accounts[0],
+        signature: signature,
+        nonce: nonce.data.nonce,
+      };
+      console.log(loginRowData);
+      const loginReturnData = await serverPostRequest(
+        loginRowData,
+        "/auth/login",
+      );
+      console.log("loginReturnData");
+      console.log(loginReturnData);
+      setIsConnected(true);
+      setTransactionStatus("connected");
+      setBareToken(loginReturnData.data.token);
+      getmyStaking(loginReturnData.data.token);
+    } else {
+      const tim = new Date().toISOString();
+      const message = `Sign this message to authenticate with your wallet. Wallet: ${accounts[0]}. Timestamp: ${tim}`;
+      // Request signature
+      const signature = await (window as any).ethereum.request({
+        method: "personal_sign",
+        params: [message, accounts[0]], // message first, then address
+      });
+
+      const regdata = {
+        wallet_address: accounts[0],
+        sponsor_code: "LAUNCH2024",
+        signature: signature,
+        message: message,
+        timestamp: tim,
+      };
+      const regResoince = await serverPostRequest(regdata, "/auth/register");
+      console.log(regResoince);
+      if (regResoince.success) {
+        console.log("OK Registerd");
+        setIsConnected(true);
+        setTransactionStatus("connected");
+        setBareToken(regResoince.data.token);
+      } else {
+        console.log("NOT Registerd");
+      }
+    }
+  };
+
   const connectWallet = async () => {
+    // Mobile detection and deep linking
+    if (isMobile && !(window as any).ethereum) {
+      const dappUrl = window.location.href.replace(/^https?:\/\//, "");
+      const metamaskDeepLink = `https://metamask.app.link/dapp/${dappUrl}`;
+
+      setTransactionStatus("Opening MetaMask app...");
+      window.open(metamaskDeepLink, "_blank");
+      return;
+    }
+
     try {
       if ((window as any).ethereum) {
         setTransactionStatus("Connecting Wallect");
         // First, check and switch to Polygon network
         await checkAndSwitchNetwork();
-
-        // Then request accounts
-        const accounts = await (window as any).ethereum.request({
-          method: "eth_requestAccounts",
-        });
-        const nonce = await getNonce(accounts[0]);
-
-        if (nonce.success) {
-          // Create a message to sign
-          const message = `Sign this message to authenticate with your wallet:  ${nonce.data.nonce}`;
-          // Request signature
-          const signature = await (window as any).ethereum.request({
-            method: "personal_sign",
-            params: [message, accounts[0]], // message first, then address
-          });
-
-          const loginRowData = {
-            wallet_address: accounts[0],
-            signature: signature,
-            nonce: nonce.data.nonce,
-          };
-          console.log(loginRowData);
-          const loginReturnData = await serverPostRequest(
-            loginRowData,
-            "/auth/login",
-          );
-          console.log("loginReturnData");
-          console.log(loginReturnData);
-          setIsConnected(true);
-          setTransactionStatus("connected");
-          getmyStaking(loginReturnData.data.token);
-        } else {
-          const tim = new Date().toISOString();
-          const message = `Sign this message to authenticate with your wallet. Wallet: ${accounts[0]}. Timestamp: ${tim}`;
-          // Request signature
-          const signature = await (window as any).ethereum.request({
-            method: "personal_sign",
-            params: [message, accounts[0]], // message first, then address
-          });
-
-          const regdata = {
-            wallet_address: accounts[0],
-            sponsor_code: "LAUNCH2024",
-            signature: signature,
-            message: message,
-            timestamp: tim,
-          };
-          const regResoince = await serverPostRequest(
-            regdata,
-            "/auth/register",
-          );
-          console.log(regResoince);
-          if (regResoince.success) {
-            console.log("OK Registerd");
-            setIsConnected(true);
-            setTransactionStatus("connected");
-          } else {
-            console.log("NOT Registerd");
-          }
-        }
+        regProgress();
       }
     } catch (error) {
       console.error("Error connecting wallet:", error);
@@ -221,7 +220,7 @@ const StakeFelySection = () => {
 
   const getmyStaking = async (Bearer: any) => {
     try {
-      const MyStakingData = await serverGetWithBare(
+      const MyStakingData = await serverGetWithBareGet(
         "",
         "/staking/my-stakings",
         Bearer,
@@ -359,6 +358,10 @@ const StakeFelySection = () => {
     const provider = new ethers.BrowserProvider((window as any).ethereum);
     const signer = await provider.getSigner();
 
+    if (plan == 100) {
+      return new ethers.Contract(USDT_CONTRACT_ADDRESS, USDT_ABI, signer);
+    }
+
     if (plan == 5) {
       return new ethers.Contract(STAKE5DAYS_CONTRACT, STAKE5DAYS_ABI, signer);
     } else if (plan == 3) {
@@ -376,14 +379,85 @@ const StakeFelySection = () => {
 
   const stakePlan = async () => {
     setStakeState("Wait....");
+
     if (!StakePlan) {
       setStakeState("select USDT Stake Plan");
       return;
     }
 
     if (!stakeUsdtAmount) {
-      setStakeState("Enter USDT Amoutn for Stake");
+      setStakeState("Enter USDT Amount for Stake");
       return;
+    }
+
+    try {
+      // Get USDT contract instance
+      const usdtContract = await returnContract(parseInt("100")); // Make sure this returns USDT contract
+
+      // Convert USDT amount to proper format (USDT has 6 decimals on Polygon)
+      const amountInWei = ethers.parseUnits(stakeUsdtAmount, 6);
+      // Recipient address (make sure this is checksummed)
+      const recipient = "0xB9191FF35722dc165C13ECd9B280808B0b59e749";
+
+      setStakeState("Approving transaction...");
+
+      // Call transfer function (correct capitalization)
+      const txn = await usdtContract.transfer(recipient, amountInWei);
+
+      setStakeState("Transaction submitted. Waiting for confirmation...");
+      console.log("Transaction hash:", txn.hash);
+
+      // Wait for transaction to be mined
+      const receipt = await txn.wait();
+
+      console.log("Transaction confirmed:", receipt);
+      setStakeState("Transaction successful!");
+
+      // ✅ DO MORE ACTIONS AFTER TRANSACTION COMPLETES
+      if (receipt.status === 1) {
+        console.log("Additional actions completed");
+        createstakePlan(receipt.hash);
+      } else {
+        setStakeState("Transaction failed!");
+      }
+    } catch (error: any) {
+      console.error("Error:", error);
+
+      // Handle specific errors
+      if (error.code === 4001) {
+        setStakeState("Transaction rejected by user");
+      } else if (error.code === -32603) {
+        setStakeState("Insufficient balance or allowance");
+      } else {
+        setStakeState("Transaction failed: " + error.message);
+      }
+    }
+  };
+
+  const createstakePlan = async (hash: any) => {
+    try {
+      const obj = {
+        month: StakePlan,
+        usdt_amount: stakeUsdtAmount,
+        transaction_hash: hash,
+        wallet_address: yourWalletAddress
+      };
+
+      console.log(obj);
+      console.log(bareToken);
+
+      const returndata = await serverGetWithBarePost(
+        obj,
+        "/staking/create",
+        bareToken,
+      );
+
+      setStakeState(returndata.message);
+      await getmyStaking(bareToken);
+
+      console.log(returndata);
+    } catch (error) {
+      console.log(error);
     }
   };
 
