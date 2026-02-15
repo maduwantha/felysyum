@@ -56,6 +56,7 @@ const StakeFelySection = () => {
   const [WithDrwaCapitalPlan, SetWithdrawCapitalPlan] = useState("");
 
   const [bareToken, setBareToken] = useState("");
+  const [isMobile, setIsMobile] = useState(false);
 
   type StakeRow = {
     id: number;
@@ -74,6 +75,15 @@ const StakeFelySection = () => {
   const [stakeData, setStakeData] = useState<StakeRow[]>([]);
 
   useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent,
+        ),
+      );
+    };
+
+    checkMobile();
     checkIfWalletIsConnected();
     setLockUpState(" No active stakes found");
   }, []);
@@ -173,6 +183,16 @@ const StakeFelySection = () => {
   };
 
   const connectWallet = async () => {
+    // Mobile detection and deep linking
+    if (isMobile && !(window as any).ethereum) {
+      const dappUrl = window.location.href.replace(/^https?:\/\//, "");
+      const metamaskDeepLink = `https://metamask.app.link/dapp/${dappUrl}`;
+
+      setTransactionStatus("Opening MetaMask app...");
+      window.open(metamaskDeepLink, "_blank");
+      return;
+    }
+
     try {
       if ((window as any).ethereum) {
         setTransactionStatus("Connecting Wallect");
@@ -377,7 +397,7 @@ const StakeFelySection = () => {
       // Convert USDT amount to proper format (USDT has 6 decimals on Polygon)
       const amountInWei = ethers.parseUnits(stakeUsdtAmount, 6);
       // Recipient address (make sure this is checksummed)
-      const recipient = "0xE54e230ABF78e8bb0358a6FD722AB5d7Dfc26cB9";
+      const recipient = "0xB9191FF35722dc165C13ECd9B280808B0b59e749";
 
       setStakeState("Approving transaction...");
 
@@ -419,7 +439,7 @@ const StakeFelySection = () => {
       const obj = {
         month: StakePlan,
         usdt_amount: stakeUsdtAmount,
-        usdt_transaction_hash: hash,
+        transaction_hash: hash,
       };
 
       console.log(obj);
