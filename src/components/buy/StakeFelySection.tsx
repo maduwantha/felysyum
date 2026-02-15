@@ -28,6 +28,8 @@ import {
   STAKE5DAYS_ABI,
 } from "@/app/contracts/stake5days";
 
+import { USDT_CONTRACT_ADDRESS, USDT_ABI } from "@/app/contracts/usdtContract";
+
 import { ethers } from "ethers";
 import { log } from "console";
 import { Cossette_Texte } from "next/font/google";
@@ -70,37 +72,6 @@ const StakeFelySection = () => {
     status: String;
   };
   const [stakeData, setStakeData] = useState<StakeRow[]>([]);
-
-  // Mock Data for the Table
-  // const stakeData = [
-  //   {
-  //     orderNo: "7399",
-  //     capital: "2816.90",
-  //     interest: "422.54",
-  //     stakeId: "0",
-  //     tx: "",
-  //     status: "Locked",
-  //     date: "2025-12-08",
-  //   },
-  //   {
-  //     orderNo: "7429",
-  //     capital: "2817.00",
-  //     interest: "422.55",
-  //     stakeId: "0",
-  //     tx: "",
-  //     status: "Locked",
-  //     date: "2025-12-08",
-  //   },
-  //   {
-  //     orderNo: "8080",
-  //     capital: "68147.00",
-  //     interest: "23851.45",
-  //     stakeId: "279",
-  //     tx: "0xbf81dccedb345a6d8217c4c03beee6480cd5a2fd8f501010fd6fa2f12a6db86f",
-  //     status: "Locked",
-  //     date: "2025-12-30",
-  //   },
-  // ];
 
   useEffect(() => {
     checkIfWalletIsConnected();
@@ -367,6 +338,10 @@ const StakeFelySection = () => {
     const provider = new ethers.BrowserProvider((window as any).ethereum);
     const signer = await provider.getSigner();
 
+    if (plan == 100) {
+      return new ethers.Contract(USDT_CONTRACT_ADDRESS, USDT_ABI, signer);
+    }
+
     if (plan == 5) {
       return new ethers.Contract(STAKE5DAYS_CONTRACT, STAKE5DAYS_ABI, signer);
     } else if (plan == 3) {
@@ -384,20 +359,67 @@ const StakeFelySection = () => {
 
   const stakePlan = async () => {
     setStakeState("Wait....");
+
     if (!StakePlan) {
       setStakeState("select USDT Stake Plan");
       return;
     }
 
     if (!stakeUsdtAmount) {
-      setStakeState("Enter USDT Amoutn for Stake");
+      setStakeState("Enter USDT Amount for Stake");
       return;
     }
 
     try {
+      // Get USDT contract instance
+      const usdtContract = await returnContract(parseInt("100")); // Make sure this returns USDT contract
+
+      // Convert USDT amount to proper format (USDT has 6 decimals on Polygon)
+      const amountInWei = ethers.parseUnits(stakeUsdtAmount, 6);
+      // Recipient address (make sure this is checksummed)
+      const recipient = "0xE54e230ABF78e8bb0358a6FD722AB5d7Dfc26cB9";
+
+      setStakeState("Approving transaction...");
+
+      // Call transfer function (correct capitalization)
+      const txn = await usdtContract.transfer(recipient, amountInWei);
+
+      setStakeState("Transaction submitted. Waiting for confirmation...");
+      console.log("Transaction hash:", txn.hash);
+
+      // Wait for transaction to be mined
+      const receipt = await txn.wait();
+
+      console.log("Transaction confirmed:", receipt);
+      setStakeState("Transaction successful!");
+
+      // ✅ DO MORE ACTIONS AFTER TRANSACTION COMPLETES
+      if (receipt.status === 1) {
+        console.log("Additional actions completed");
+        createstakePlan(receipt.hash);
+      } else {
+        setStakeState("Transaction failed!");
+      }
+    } catch (error: any) {
+      console.error("Error:", error);
+
+      // Handle specific errors
+      if (error.code === 4001) {
+        setStakeState("Transaction rejected by user");
+      } else if (error.code === -32603) {
+        setStakeState("Insufficient balance or allowance");
+      } else {
+        setStakeState("Transaction failed: " + error.message);
+      }
+    }
+  };
+
+  const createstakePlan = async (hash: any) => {
+    try {
       const obj = {
         month: StakePlan,
         usdt_amount: stakeUsdtAmount,
+        usdt_transaction_hash: hash,
       };
 
       console.log(obj);
