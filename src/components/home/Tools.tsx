@@ -1,11 +1,11 @@
 import toolsImg01 from '@public/images/ns-img-196.png';
 import toolsImg02 from '@public/images/ns-img-197.png';
 import toolsImg03 from '@public/images/ns-img-198.png';
-import toolsImg04 from '@public/images/ns-img-199.jpg';
+import toolsImg04 from '@public/images/growth.png';
 import toolsImg01Dark from '@public/images/ns-img-dark-134.png';
 import toolsImg02Dark from '@public/images/ns-img-dark-135.png';
 import toolsImg03Dark from '@public/images/ns-img-dark-136.png';
-import toolsImg04Dark from '@public/images/ns-img-dark-137.jpg';
+import toolsImg04Dark from '@public/images/growth.png';
 import Image from 'next/image';
 import RevealAnimation from '../animation/RevealAnimation';
 

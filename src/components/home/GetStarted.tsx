@@ -1,14 +1,16 @@
 import stepImg01 from '@public/images/skillfullhub.png';
-import stepImg02 from '@public/images/ns-img-193.png';
-import stepImg03 from '@public/images/ns-img-194.png';
-import stepImg04 from '@public/images/ns-img-195.png';
+import stepImg02 from '@public/images/felyzone.png';
+import stepImg03 from '@public/images/felynova.png';
+import stepImg04 from '@public/images/AIDORA-new.png';
+import stepImg05 from '@public/images/FELY-WALLET.png';
 import gradient9 from '@public/images/ns-img-501.png';
 import gradient32 from '@public/images/ns-img-520.png';
 import gradient33 from '@public/images/ns-img-521.png';
 import gradient34 from '@public/images/ns-img-522.png';
-import stepImg02Dark from '@public/images/ns-img-dark-131.png';
-import stepImg03Dark from '@public/images/ns-img-dark-132.png';
-import stepImg04Dark from '@public/images/ns-img-dark-133.png';
+import stepImg02Dark from '@public/images/felyzone.png';
+import stepImg03Dark from '@public/images/felynova.png';
+import stepImg04Dark from '@public/images/AIDORA-new.png';
+import stepImg05Dark from '@public/images/FELY-WALLET.png';
 import Image from 'next/image';
 import RevealAnimation from '../animation/RevealAnimation';
 import LinkButton from '../ui/button/LinkButton';
@@ -130,12 +132,12 @@ const GetStarted = () => {
                     </figcaption>
                     <div className="w-full max-w-[400px] overflow-hidden rounded-2xl">
                       <Image
-                        src={stepImg04}
+                        src={stepImg05}
                         alt="step"
                         className="w-full md:max-h-[300px] md:min-h-[300px] dark:hidden"
                       />
                       <Image
-                        src={stepImg04Dark}
+                        src={stepImg05Dark}
                         alt="step"
                         className="hidden w-full md:max-h-[300px] md:min-h-[300px] dark:block"
                       />
