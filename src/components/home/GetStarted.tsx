@@ -1,7 +1,7 @@
 import stepImg01 from '@public/images/skillfullhub.png';
 import stepImg02 from '@public/images/felyzone.png';
 import stepImg03 from '@public/images/felynova.png';
-import stepImg04 from '@public/images/AIDORA-new.png';
+import stepImg04 from '@public/images/aidora.png';
 import stepImg05 from '@public/images/FELY-WALLET.png';
 import gradient9 from '@public/images/ns-img-501.png';
 import gradient32 from '@public/images/ns-img-520.png';
@@ -9,7 +9,7 @@ import gradient33 from '@public/images/ns-img-521.png';
 import gradient34 from '@public/images/ns-img-522.png';
 import stepImg02Dark from '@public/images/felyzone.png';
 import stepImg03Dark from '@public/images/felynova.png';
-import stepImg04Dark from '@public/images/AIDORA-new.png';
+import stepImg04Dark from '@public/images/aidora.png';
 import stepImg05Dark from '@public/images/FELY-WALLET.png';
 import Image from 'next/image';
 import RevealAnimation from '../animation/RevealAnimation';

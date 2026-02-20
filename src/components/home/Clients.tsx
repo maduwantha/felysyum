@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import clientLogo01 from '@public/images/icons/01.svg';
 import clientLogo02 from '@public/images/icons/02.svg';
+import clientLogo03 from '@public/images/icons/03.svg';
 import clientLogo04 from '@public/images/icons/04.svg';
 import clientLogo05 from '@public/images/icons/05.svg';
 import clientLogo06 from '@public/images/icons/06.svg';
@@ -16,6 +17,7 @@ import RevealAnimation from '../animation/RevealAnimation';
 const clientLogos = [
   { image: clientLogo01, alt: 'Client logo 01' },
   { image: clientLogo02, alt: 'Client logo 02' },
+  { image: clientLogo03, alt: 'Client logo 03' },
   { image: clientLogo04, alt: 'Client logo 04' },
   { image: clientLogo05, alt: 'Client logo 05' },
   { image: clientLogo06, alt: 'Client logo 06' },
