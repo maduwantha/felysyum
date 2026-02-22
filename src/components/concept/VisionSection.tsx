@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import RevealAnimation from '../animation/RevealAnimation';
 import LinkButton from '../ui/button/LinkButton';
-import visionDashboard from '@public/images/vision_dashboard.png';
+import visionDashboard from '@public/images/team-2.png';
 import { CheckIcon } from '@/icons';
 
 const VisionSection = () => {

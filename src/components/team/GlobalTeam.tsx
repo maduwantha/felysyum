@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import RevealAnimation from '../animation/RevealAnimation';
 import { FaTelegram } from "react-icons/fa6";
-import teamVisual from '@public/images/felysyum_team_visual.jpg';
+import teamVisual from '@public/images/team-1.png';
 
 const GlobalTeam = () => {
     return (
