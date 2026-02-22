@@ -108,7 +108,7 @@ const StakeFelySection = () => {
         // Already connected!
 
         setWalletAddress(accounts[0]);
-        setIsConnected(true);
+
         setTransactionStatus("connected");
         regProgress();
       } else {
@@ -164,10 +164,10 @@ const StakeFelySection = () => {
 
       const regdata = {
         wallet_address: accounts[0],
-        sponsor_code: "LAUNCH2024",
         signature: signature,
         message: message,
         timestamp: tim,
+        sponsor_user_id: null,
       };
       const regResoince = await serverPostRequest(regdata, "/auth/register");
       console.log(regResoince);
@@ -178,6 +178,7 @@ const StakeFelySection = () => {
         setBareToken(regResoince.data.token);
       } else {
         console.log("NOT Registerd");
+        setIsConnected(false);
       }
     }
   };
@@ -440,7 +441,7 @@ const StakeFelySection = () => {
         month: StakePlan,
         usdt_amount: stakeUsdtAmount,
         transaction_hash: hash,
-        wallet_address: yourWalletAddress
+        wallet_address: yourWalletAddress,
       };
 
       console.log(obj);
@@ -582,9 +583,51 @@ const StakeFelySection = () => {
               Maximize your holdings by staking FELY. Earn rewards while
               contributing to the ecosystem stability.
             </p>
-            <div className="bg-primary-500/10 border border-primary-500/20 text-primary-500 px-6 py-2 rounded-full font-medium text-sm md:text-base inline-flex items-center shadow-[0_0_15px_rgba(228,145,39,0.15)]">
-              Create referral code and copy it
+
+
+            <div className="flex flex-col items-center gap-4 w-full max-w-md mt-2">
+              <button
+                className="bg-primary-500 hover:bg-primary-600 text-white px-6 py-2 rounded-full font-medium text-sm md:text-base transition-colors shadow-[0_0_15px_rgba(228,145,39,0.2)]"
+              >
+                Create Referral Link
+              </button>
+
+              <div className="flex items-center gap-2 w-full">
+                <input
+                  id="static-referral-input"
+                  type="text"
+                  readOnly
+                  value="ALEXSMITH20ALEXSMITH20ALEXSMITH20"
+                  className="w-full bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-gray-300 focus:outline-none focus:border-primary-500"
+                />
+                <button
+                  className="bg-secondary border border-stroke-2 p-3 rounded-xl hover:bg-[#2a333e] transition-colors flex-shrink-0"
+                  title="Copy Link"
+                  onClick={() => {
+                    const inputElement = document.getElementById('static-referral-input') as HTMLInputElement;
+                    if (inputElement) {
+                      navigator.clipboard.writeText(inputElement.value);
+                      const msgElement = document.getElementById('copy-msg');
+                      if (msgElement) {
+                        msgElement.style.display = 'block';
+                        setTimeout(() => {
+                          msgElement.style.display = 'none';
+                        }, 2000);
+                      }
+                    }
+                  }}
+                >
+                  <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                </button>
+              </div>
+              <p id="copy-msg" className="text-xs text-primary-500 mt-1" style={{ display: 'none' }}>
+                Copied to clipboard!
+              </p>
             </div>
+
+
           </div>
         </RevealAnimation>
       </div>
@@ -1002,7 +1045,9 @@ const StakeFelySection = () => {
 
             <div className="bg-secondary dark:bg-background-8 rounded-[30px] p-6 border border-stroke-2 dark:border-stroke-6 mt-8">
               <div className="flex flex-col gap-4 mb-6">
-                <h3 className="text-xl font-bold text-white">Total Bonus Balance</h3>
+                <h3 className="text-xl font-bold text-white">
+                  Total Bonus Balance
+                </h3>
 
                 <div className="flex flex-col sm:flex-row items-start gap-3 justify-start">
                   <div className="relative">
@@ -1038,7 +1083,11 @@ const StakeFelySection = () => {
                   </thead>
                   <tbody>
                     <tr className="border-b border-[#2a333e] last:border-0 hover:bg-[#13171E]/50 transition-colors">
-                      <td className="p-4 text-gray-300" colSpan={3} style={{ textAlign: 'center' }}>
+                      <td
+                        className="p-4 text-gray-300"
+                        colSpan={3}
+                        style={{ textAlign: "center" }}
+                      >
                         No withdrawals yet
                       </td>
                     </tr>
