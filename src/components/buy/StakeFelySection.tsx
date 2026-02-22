@@ -108,7 +108,7 @@ const StakeFelySection = () => {
         // Already connected!
 
         setWalletAddress(accounts[0]);
-        setIsConnected(true);
+
         setTransactionStatus("connected");
         regProgress();
       } else {
@@ -164,10 +164,10 @@ const StakeFelySection = () => {
 
       const regdata = {
         wallet_address: accounts[0],
-        sponsor_code: "LAUNCH2024",
         signature: signature,
         message: message,
         timestamp: tim,
+        sponsor_user_id: null,
       };
       const regResoince = await serverPostRequest(regdata, "/auth/register");
       console.log(regResoince);
@@ -178,6 +178,7 @@ const StakeFelySection = () => {
         setBareToken(regResoince.data.token);
       } else {
         console.log("NOT Registerd");
+        setIsConnected(false);
       }
     }
   };
@@ -440,7 +441,7 @@ const StakeFelySection = () => {
         month: StakePlan,
         usdt_amount: stakeUsdtAmount,
         transaction_hash: hash,
-        wallet_address: yourWalletAddress
+        wallet_address: yourWalletAddress,
       };
 
       console.log(obj);
@@ -1002,7 +1003,9 @@ const StakeFelySection = () => {
 
             <div className="bg-secondary dark:bg-background-8 rounded-[30px] p-6 border border-stroke-2 dark:border-stroke-6 mt-8">
               <div className="flex flex-col gap-4 mb-6">
-                <h3 className="text-xl font-bold text-white">Total Bonus Balance</h3>
+                <h3 className="text-xl font-bold text-white">
+                  Total Bonus Balance
+                </h3>
 
                 <div className="flex flex-col sm:flex-row items-start gap-3 justify-start">
                   <div className="relative">
@@ -1038,7 +1041,11 @@ const StakeFelySection = () => {
                   </thead>
                   <tbody>
                     <tr className="border-b border-[#2a333e] last:border-0 hover:bg-[#13171E]/50 transition-colors">
-                      <td className="p-4 text-gray-300" colSpan={3} style={{ textAlign: 'center' }}>
+                      <td
+                        className="p-4 text-gray-300"
+                        colSpan={3}
+                        style={{ textAlign: "center" }}
+                      >
                         No withdrawals yet
                       </td>
                     </tr>
