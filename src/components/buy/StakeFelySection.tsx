@@ -440,7 +440,7 @@ const StakeFelySection = () => {
         month: StakePlan,
         usdt_amount: stakeUsdtAmount,
         transaction_hash: hash,
-        wallet_address:yourWalletAddress
+        wallet_address: yourWalletAddress
       };
 
       console.log(obj);
@@ -577,10 +577,15 @@ const StakeFelySection = () => {
       {/* Header Section */}
       <div className="text-center space-y-4">
         <RevealAnimation delay={0.2}>
-          <p className="text-accent/80 text-base md:text-lg max-w-3xl mx-auto">
-            Maximize your holdings by staking FELY. Earn rewards while
-            contributing to the ecosystem stability.
-          </p>
+          <div className="flex flex-col items-center justify-center gap-4">
+            <p className="text-accent/80 text-base md:text-lg max-w-3xl mx-auto">
+              Maximize your holdings by staking FELY. Earn rewards while
+              contributing to the ecosystem stability.
+            </p>
+            <div className="bg-primary-500/10 border border-primary-500/20 text-primary-500 px-6 py-2 rounded-full font-medium text-sm md:text-base inline-flex items-center shadow-[0_0_15px_rgba(228,145,39,0.15)]">
+              Create referral code and copy it
+            </div>
+          </div>
         </RevealAnimation>
       </div>
 
@@ -924,73 +929,123 @@ const StakeFelySection = () => {
       {/* 5. Data Table (Full Width) */}
       {isConnected ? (
         <RevealAnimation delay={0.6}>
-          <div className="bg-secondary dark:bg-background-8 rounded-[30px] p-6 border border-stroke-2 dark:border-stroke-6 overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-[#2a333e]">
-                  <th className="p-4 text-white font-semibold whitespace-nowrap">
-                    Order No
-                  </th>
-                  <th className="p-4 text-white font-semibold whitespace-nowrap">
-                    Plan
-                  </th>
-                  <th className="p-4 text-white font-semibold whitespace-nowrap">
-                    USDT
-                  </th>
-                  <th className="p-4 text-white font-semibold whitespace-nowrap">
-                    Fely Amount
-                  </th>
-                  <th className="p-4 text-white font-semibold whitespace-nowrap">
-                    Bonus %
-                  </th>
-                  <th className="p-4 text-white font-semibold whitespace-nowrap">
-                    Bonus Fely
-                  </th>
-                  <th className="p-4 text-white font-semibold whitespace-nowrap">
-                    Date
-                  </th>
-                  <th className="p-4 text-white font-semibold whitespace-nowrap">
-                    End Date
-                  </th>
-                  <th className="p-4 text-white font-semibold whitespace-nowrap">
-                    Stauts
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {stakeData.map((row, i) => (
-                  <tr
-                    key={i}
-                    className="border-b border-[#2a333e] last:border-0 hover:bg-[#13171E]/50 transition-colors"
-                  >
-                    <td className="p-4 text-gray-300">{row.id}</td>
-                    <td className="p-4 text-gray-300">{row.month}</td>
-                    <td className="p-4 text-gray-300">{row.usdt_amount}</td>
-                    <td className="p-4 text-gray-300">{row.fely_amount}</td>
-                    <td className="p-4 text-gray-300">
-                      {row.bonus_percentage}
-                    </td>
-                    <td className="p-4 text-gray-300">
-                      {row.fely_bonus_amount}
-                    </td>
-                    <td className="p-4 text-gray-300">
-                      {format(new Date(String(row.staked_at)), "dd/MM/yyyy")}
-                    </td>
-                    <td className="p-4 text-gray-300">
-                      {format(
-                        new Date(String(row.maturity_date)),
-                        "dd/MM/yyyy",
-                      )}
-                    </td>
-                    <td className="p-4">
-                      <span className="inline-block px-2 py-1 bg-primary-500/20 text-primary-500 text-xs rounded-md">
-                        {row.status}
-                      </span>
-                    </td>
+          <div>
+            <div className="bg-secondary dark:bg-background-8 rounded-[30px] p-6 border border-stroke-2 dark:border-stroke-6 overflow-x-auto">
+              <h3 className="text-xl font-bold text-white mb-4">My Stakes</h3>
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-[#2a333e]">
+                    <th className="p-4 text-white font-semibold whitespace-nowrap">
+                      Order No
+                    </th>
+                    <th className="p-4 text-white font-semibold whitespace-nowrap">
+                      Plan
+                    </th>
+                    <th className="p-4 text-white font-semibold whitespace-nowrap">
+                      USDT
+                    </th>
+                    <th className="p-4 text-white font-semibold whitespace-nowrap">
+                      Fely Amount
+                    </th>
+                    <th className="p-4 text-white font-semibold whitespace-nowrap">
+                      Bonus %
+                    </th>
+                    <th className="p-4 text-white font-semibold whitespace-nowrap">
+                      Bonus Fely
+                    </th>
+                    <th className="p-4 text-white font-semibold whitespace-nowrap">
+                      Date
+                    </th>
+                    <th className="p-4 text-white font-semibold whitespace-nowrap">
+                      End Date
+                    </th>
+                    <th className="p-4 text-white font-semibold whitespace-nowrap">
+                      Status
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {stakeData.map((row, i) => (
+                    <tr
+                      key={i}
+                      className="border-b border-[#2a333e] last:border-0 hover:bg-[#13171E]/50 transition-colors"
+                    >
+                      <td className="p-4 text-gray-300">{row.id}</td>
+                      <td className="p-4 text-gray-300">{row.month}</td>
+                      <td className="p-4 text-gray-300">{row.usdt_amount}</td>
+                      <td className="p-4 text-gray-300">{row.fely_amount}</td>
+                      <td className="p-4 text-gray-300">
+                        {row.bonus_percentage}
+                      </td>
+                      <td className="p-4 text-gray-300">
+                        {row.fely_bonus_amount}
+                      </td>
+                      <td className="p-4 text-gray-300">
+                        {format(new Date(String(row.staked_at)), "dd/MM/yyyy")}
+                      </td>
+                      <td className="p-4 text-gray-300">
+                        {format(
+                          new Date(String(row.maturity_date)),
+                          "dd/MM/yyyy",
+                        )}
+                      </td>
+                      <td className="p-4">
+                        <span className="inline-block px-2 py-1 bg-primary-500/20 text-primary-500 text-xs rounded-md">
+                          {row.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="bg-secondary dark:bg-background-8 rounded-[30px] p-6 border border-stroke-2 dark:border-stroke-6 mt-8">
+              <div className="flex flex-col gap-4 mb-6">
+                <h3 className="text-xl font-bold text-white">Total Bonus Balance</h3>
+
+                <div className="flex flex-col sm:flex-row items-start gap-3 justify-start">
+                  <div className="relative">
+                    <input
+                      type="number"
+                      placeholder="Amount to withdraw"
+                      className="w-full sm:w-[250px] bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-primary-500 placeholder:text-sm"
+                    />
+                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-xs">
+                      FELY
+                    </span>
+                  </div>
+                  <button className="btn btn-primary btn-sm whitespace-nowrap px-6 h-[38px] min-w-[120px]">
+                    WITHDRAW
+                  </button>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto border-t border-[#2a333e] pt-6 mt-2">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-[#2a333e]">
+                      <th className="p-4 text-white font-semibold whitespace-nowrap">
+                        Date
+                      </th>
+                      <th className="p-4 text-white font-semibold whitespace-nowrap">
+                        Withdrawal Amount
+                      </th>
+                      <th className="p-4 text-white font-semibold whitespace-nowrap">
+                        Transaction #
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-[#2a333e] last:border-0 hover:bg-[#13171E]/50 transition-colors">
+                      <td className="p-4 text-gray-300" colSpan={3} style={{ textAlign: 'center' }}>
+                        No withdrawals yet
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </RevealAnimation>
       ) : (
