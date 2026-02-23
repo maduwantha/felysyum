@@ -33,8 +33,13 @@ import { USDT_CONTRACT_ADDRESS, USDT_ABI } from "@/app/contracts/usdtContract";
 import { ethers } from "ethers";
 import { log } from "console";
 import { Cossette_Texte } from "next/font/google";
+import { useSearchParams } from "next/navigation";
 
 const StakeFelySection = () => {
+  const searchParams = useSearchParams();
+  const ref = searchParams.get("ref"); // get param for new user
+  const [referalCode, setReferalCode] = useState<string | null>(null);
+
   const [stakeUsdtAmount, setStakeUsdtAmount] = useState("");
   const [stakeIdForInterst, setStakeIdForInterst] = useState("");
   const [stakeIdForWithdraw, setStakeIdForWithdraw] = useState("");
@@ -82,7 +87,7 @@ const StakeFelySection = () => {
         ),
       );
     };
-
+    console.log("ref" + ref);
     checkMobile();
     checkIfWalletIsConnected();
     setLockUpState(" No active stakes found");
@@ -153,6 +158,7 @@ const StakeFelySection = () => {
       setTransactionStatus("connected");
       setBareToken(loginReturnData.data.token);
       getmyStaking(loginReturnData.data.token);
+      setReferalCode(loginReturnData.data.referral.url);
     } else {
       const tim = new Date().toISOString();
       const message = `Sign this message to authenticate with your wallet. Wallet: ${accounts[0]}. Timestamp: ${tim}`;
@@ -162,12 +168,13 @@ const StakeFelySection = () => {
         params: [message, accounts[0]], // message first, then address
       });
 
+      console.log(ref);
       const regdata = {
         wallet_address: accounts[0],
         signature: signature,
         message: message,
         timestamp: tim,
-        sponsor_user_id: null,
+        referral_code: ref || null,
       };
       const regResoince = await serverPostRequest(regdata, "/auth/register");
       console.log(regResoince);
@@ -176,6 +183,7 @@ const StakeFelySection = () => {
         setIsConnected(true);
         setTransactionStatus("connected");
         setBareToken(regResoince.data.token);
+        setReferalCode(regResoince.data.referral.url);
       } else {
         console.log("NOT Registerd");
         setIsConnected(false);
@@ -584,50 +592,61 @@ const StakeFelySection = () => {
               contributing to the ecosystem stability.
             </p>
 
-
             <div className="flex flex-col items-center gap-4 w-full max-w-md mt-2">
-              <button
-                className="bg-primary-500 hover:bg-primary-600 text-white px-6 py-2 rounded-full font-medium text-sm md:text-base transition-colors shadow-[0_0_15px_rgba(228,145,39,0.2)]"
-              >
+              {/* <button className="bg-primary-500 hover:bg-primary-600 text-white px-6 py-2 rounded-full font-medium text-sm md:text-base transition-colors shadow-[0_0_15px_rgba(228,145,39,0.2)]">
                 Create Referral Link
-              </button>
+              </button> */}
 
               <div className="flex items-center gap-2 w-full">
                 <input
                   id="static-referral-input"
                   type="text"
                   readOnly
-                  value="ALEXSMITH20ALEXSMITH20ALEXSMITH20"
+                  value={referalCode || ""}
                   className="w-full bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-gray-300 focus:outline-none focus:border-primary-500"
                 />
                 <button
                   className="bg-secondary border border-stroke-2 p-3 rounded-xl hover:bg-[#2a333e] transition-colors flex-shrink-0"
                   title="Copy Link"
                   onClick={() => {
-                    const inputElement = document.getElementById('static-referral-input') as HTMLInputElement;
+                    const inputElement = document.getElementById(
+                      "static-referral-input",
+                    ) as HTMLInputElement;
                     if (inputElement) {
                       navigator.clipboard.writeText(inputElement.value);
-                      const msgElement = document.getElementById('copy-msg');
+                      const msgElement = document.getElementById("copy-msg");
                       if (msgElement) {
-                        msgElement.style.display = 'block';
+                        msgElement.style.display = "block";
                         setTimeout(() => {
-                          msgElement.style.display = 'none';
+                          msgElement.style.display = "none";
                         }, 2000);
                       }
                     }
                   }}
                 >
-                  <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  <svg
+                    className="w-5 h-5 text-gray-300"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                    />
                   </svg>
                 </button>
               </div>
-              <p id="copy-msg" className="text-xs text-primary-500 mt-1" style={{ display: 'none' }}>
+              <p
+                id="copy-msg"
+                className="text-xs text-primary-500 mt-1"
+                style={{ display: "none" }}
+              >
                 Copied to clipboard!
               </p>
             </div>
-
-
           </div>
         </RevealAnimation>
       </div>
