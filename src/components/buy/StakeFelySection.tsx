@@ -63,6 +63,11 @@ const StakeFelySection = () => {
   const [bareToken, setBareToken] = useState("");
   const [isMobile, setIsMobile] = useState(false);
 
+  const [withdrawableFely, setWithdrawableFely] = useState("");
+  const [withdrawableUsdt, setWithdrawableUsdt] = useState("");
+
+  const [usedSignature, setUsedSignature] = useState("");
+
   type StakeRow = {
     id: number;
     month: number;
@@ -78,6 +83,19 @@ const StakeFelySection = () => {
     status: String;
   };
   const [stakeData, setStakeData] = useState<StakeRow[]>([]);
+
+  type WithdrawHistory = {
+    id: number;
+    usdt_amount: string;
+    fely_amount: string;
+    withdrawal_date: string;
+    status: {
+      code: number;
+      text: string;
+    };
+    created_at: string;
+  };
+  const [withdrawData, setWithdrawData] = useState<WithdrawHistory[]>([]);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -141,6 +159,7 @@ const StakeFelySection = () => {
         method: "personal_sign",
         params: [message, accounts[0]], // message first, then address
       });
+      setUsedSignature(signature);
 
       const loginRowData = {
         wallet_address: accounts[0],
@@ -159,6 +178,8 @@ const StakeFelySection = () => {
       setBareToken(loginReturnData.data.token);
       getmyStaking(loginReturnData.data.token);
       setReferalCode(loginReturnData.data.referral.url);
+      UserWithdrawalsHistory(loginReturnData.data.token);
+      getWithdrwalBalance(loginReturnData.data.token);
     } else {
       const tim = new Date().toISOString();
       const message = `Sign this message to authenticate with your wallet. Wallet: ${accounts[0]}. Timestamp: ${tim}`;
@@ -167,6 +188,7 @@ const StakeFelySection = () => {
         method: "personal_sign",
         params: [message, accounts[0]], // message first, then address
       });
+      setUsedSignature(signature);
 
       console.log(ref);
       const regdata = {
@@ -184,6 +206,8 @@ const StakeFelySection = () => {
         setTransactionStatus("connected");
         setBareToken(regResoince.data.token);
         setReferalCode(regResoince.data.referral.url);
+        UserWithdrawalsHistory(regResoince.data.token);
+        getWithdrwalBalance(regResoince.data.token);
       } else {
         console.log("NOT Registerd");
         setIsConnected(false);
@@ -579,6 +603,61 @@ const StakeFelySection = () => {
   ) => {
     SetWithdrawCapitalPlan(e.target.value);
     console.log(e.target.value);
+  };
+
+  const UserWithdrawalsHistory = async (Bearer: any) => {
+    try {
+      const userWithdrawHistry = await serverGetWithBareGet(
+        "",
+        "/withdrawal/history?limit=50",
+        Bearer,
+      );
+      console.log(userWithdrawHistry);
+      setWithdrawData(userWithdrawHistry.data.withdrawals);
+    } catch (error) {
+      console.error("Error connecting wallet:", error);
+      setTransactionStatus("Failed to connect wallet");
+      setTimeout(() => setTransactionStatus(null), 3000);
+    }
+  };
+
+  const getWithdrwalBalance = async (Bearer: any) => {
+    try {
+      const getWithdrwalBalance = await serverGetWithBareGet(
+        "",
+        "/withdrawal/balance",
+        Bearer,
+      );
+      console.log(getWithdrwalBalance);
+      setWithdrawableFely(getWithdrwalBalance.data.withdrawable_fely);
+      setWithdrawableUsdt(getWithdrwalBalance.data.withdrawable_usdt);
+    } catch (error) {
+      console.error("Error connecting wallet:", error);
+      setTransactionStatus("Failed to connect wallet");
+      setTimeout(() => setTransactionStatus(null), 3000);
+    }
+  };
+
+  const createWithdrawalRequest = async (Bearer: any, amount: any) => {
+    try {
+      const obj = {
+        fely_amount: amount,
+        signature: usedSignature,
+        timestamp: Date.now().toString(),
+      };
+      const getWithdrwalBalance = await serverGetWithBarePost(
+        obj,
+        "/withdrawal/request",
+        Bearer,
+      );
+      console.log(getWithdrwalBalance);
+      setWithdrawableFely(getWithdrwalBalance.data.withdrawable_fely);
+      setWithdrawableUsdt(getWithdrwalBalance.data.withdrawable_usdt);
+    } catch (error) {
+      console.error("Error connecting wallet:", error);
+      setTransactionStatus("Failed to connect wallet");
+      setTimeout(() => setTransactionStatus(null), 3000);
+    }
   };
 
   return (
@@ -1065,13 +1144,15 @@ const StakeFelySection = () => {
             <div className="bg-secondary dark:bg-background-8 rounded-[30px] p-6 border border-stroke-2 dark:border-stroke-6 mt-8">
               <div className="flex flex-col gap-4 mb-6">
                 <h3 className="text-xl font-bold text-white">
-                  Total Bonus Balance
+                  Total Bonus Balance {parseFloat(withdrawableFely).toFixed(2)}{" "}
+                  ({parseFloat(withdrawableUsdt).toFixed(2)})
                 </h3>
 
                 <div className="flex flex-col sm:flex-row items-start gap-3 justify-start">
                   <div className="relative">
                     <input
                       type="number"
+                      value={parseFloat(withdrawableFely).toFixed(2) || ""}
                       placeholder="Amount to withdraw"
                       className="w-full sm:w-[250px] bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-primary-500 placeholder:text-sm"
                     />
@@ -1079,7 +1160,15 @@ const StakeFelySection = () => {
                       FELY
                     </span>
                   </div>
-                  <button className="btn btn-primary btn-sm whitespace-nowrap px-6 h-[38px] min-w-[120px]">
+                  <button
+                    onClick={() =>
+                      createWithdrawalRequest(
+                        bareToken,
+                        parseFloat(withdrawableFely).toFixed(2),
+                      )
+                    }
+                    className="btn btn-primary btn-sm whitespace-nowrap px-6 h-[38px] min-w-[120px]"
+                  >
                     WITHDRAW
                   </button>
                 </div>
@@ -1093,23 +1182,39 @@ const StakeFelySection = () => {
                         Date
                       </th>
                       <th className="p-4 text-white font-semibold whitespace-nowrap">
-                        Withdrawal Amount
+                        USDT Amount
                       </th>
                       <th className="p-4 text-white font-semibold whitespace-nowrap">
-                        Transaction #
+                        FELY Amount
+                      </th>
+                      <th className="p-4 text-white font-semibold whitespace-nowrap">
+                        Status
                       </th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr className="border-b border-[#2a333e] last:border-0 hover:bg-[#13171E]/50 transition-colors">
-                      <td
-                        className="p-4 text-gray-300"
-                        colSpan={3}
-                        style={{ textAlign: "center" }}
+                    {withdrawData.map((rows, i) => (
+                      <tr
+                        key={rows.id}
+                        className="border-b border-[#2a333e] last:border-0 hover:bg-[#13171E]/50 transition-colors"
                       >
-                        No withdrawals yet
-                      </td>
-                    </tr>
+                        <td className="p-4 text-white text-sm">
+                          {format(
+                            new Date(String(rows.created_at)),
+                            "dd/MM/yyyy",
+                          )}
+                        </td>
+                        <td className="p-4 text-white text-sm">
+                          {parseFloat(rows.usdt_amount).toFixed(2)}
+                        </td>
+                        <td className="p-4 text-white text-sm">
+                          {parseFloat(rows.fely_amount).toFixed(2)}
+                        </td>
+                        <td className="p-4 text-white text-sm">
+                          {rows.status.text}
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
