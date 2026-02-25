@@ -65,6 +65,7 @@ const StakeFelySection = () => {
 
   const [withdrawableFely, setWithdrawableFely] = useState("");
   const [withdrawableUsdt, setWithdrawableUsdt] = useState("");
+  const [withdrawableFelyFix, setwithdrawableFelyFix] = useState("");
 
   const [usedSignature, setUsedSignature] = useState("");
 
@@ -629,6 +630,7 @@ const StakeFelySection = () => {
         Bearer,
       );
       console.log(getWithdrwalBalance);
+      setwithdrawableFelyFix(getWithdrwalBalance.data.withdrawable_fely);
       setWithdrawableFely(getWithdrwalBalance.data.withdrawable_fely);
       setWithdrawableUsdt(getWithdrwalBalance.data.withdrawable_usdt);
     } catch (error) {
@@ -650,9 +652,8 @@ const StakeFelySection = () => {
         "/withdrawal/request",
         Bearer,
       );
+      UserWithdrawalsHistory(Bearer);
       console.log(getWithdrwalBalance);
-      setWithdrawableFely(getWithdrwalBalance.data.withdrawable_fely);
-      setWithdrawableUsdt(getWithdrwalBalance.data.withdrawable_usdt);
     } catch (error) {
       console.error("Error connecting wallet:", error);
       setTransactionStatus("Failed to connect wallet");
@@ -1144,18 +1145,33 @@ const StakeFelySection = () => {
             <div className="bg-secondary dark:bg-background-8 rounded-[30px] p-6 border border-stroke-2 dark:border-stroke-6 mt-8">
               <div className="flex flex-col gap-4 mb-6">
                 <h3 className="text-xl font-bold text-white">
-                  Total Bonus Balance {parseFloat(withdrawableFely).toFixed(2)}{" "}
-                  ({parseFloat(withdrawableUsdt).toFixed(2)})
+                  Total Bonus Balance{" "}
+                  {parseFloat(withdrawableFelyFix).toFixed(2)} (
+                  {parseFloat(withdrawableUsdt).toFixed(2)})
                 </h3>
 
                 <div className="flex flex-col sm:flex-row items-start gap-3 justify-start">
                   <div className="relative">
                     <input
                       type="number"
-                      value={parseFloat(withdrawableFely).toFixed(2) || ""}
+                      value={
+                        withdrawableFely
+                          ? (
+                              Math.trunc(parseFloat(withdrawableFely) * 100) /
+                              100
+                            ).toString()
+                          : ""
+                      }
+                      onChange={(e) => setWithdrawableFely(e.target.value)}
                       placeholder="Amount to withdraw"
                       className="w-full sm:w-[250px] bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-primary-500 placeholder:text-sm"
                     />
+                    {/* <input
+                      type="number"
+                      value={parseFloat(withdrawableFely).toFixed(2) || ""}
+                      placeholder="Amount to withdraw"
+                      className="w-full sm:w-[250px] bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-primary-500 placeholder:text-sm"
+                    /> */}
                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-xs">
                       FELY
                     </span>
@@ -1164,7 +1180,9 @@ const StakeFelySection = () => {
                     onClick={() =>
                       createWithdrawalRequest(
                         bareToken,
-                        parseFloat(withdrawableFely).toFixed(2),
+                        (
+                          Math.trunc(parseFloat(withdrawableFely) * 100) / 100
+                        ).toString(),
                       )
                     }
                     className="btn btn-primary btn-sm whitespace-nowrap px-6 h-[38px] min-w-[120px]"
