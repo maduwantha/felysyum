@@ -33,8 +33,13 @@ import { USDT_CONTRACT_ADDRESS, USDT_ABI } from "@/app/contracts/usdtContract";
 import { ethers } from "ethers";
 import { log } from "console";
 import { Cossette_Texte } from "next/font/google";
+import { useSearchParams } from "next/navigation";
 
 const StakeFelySection = () => {
+  const searchParams = useSearchParams();
+  const ref = searchParams.get("ref"); // get param for new user
+  const [referalCode, setReferalCode] = useState<string | null>(null);
+
   const [stakeUsdtAmount, setStakeUsdtAmount] = useState("");
   const [stakeIdForInterst, setStakeIdForInterst] = useState("");
   const [stakeIdForWithdraw, setStakeIdForWithdraw] = useState("");
@@ -58,6 +63,12 @@ const StakeFelySection = () => {
   const [bareToken, setBareToken] = useState("");
   const [isMobile, setIsMobile] = useState(false);
 
+  const [withdrawableFely, setWithdrawableFely] = useState("");
+  const [withdrawableUsdt, setWithdrawableUsdt] = useState("");
+  const [withdrawableFelyFix, setwithdrawableFelyFix] = useState("");
+
+  const [usedSignature, setUsedSignature] = useState("");
+
   type StakeRow = {
     id: number;
     month: number;
@@ -74,6 +85,19 @@ const StakeFelySection = () => {
   };
   const [stakeData, setStakeData] = useState<StakeRow[]>([]);
 
+  type WithdrawHistory = {
+    id: number;
+    usdt_amount: string;
+    fely_amount: string;
+    withdrawal_date: string;
+    status: {
+      code: number;
+      text: string;
+    };
+    created_at: string;
+  };
+  const [withdrawData, setWithdrawData] = useState<WithdrawHistory[]>([]);
+
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(
@@ -82,7 +106,7 @@ const StakeFelySection = () => {
         ),
       );
     };
-
+    console.log("ref" + ref);
     checkMobile();
     checkIfWalletIsConnected();
     setLockUpState(" No active stakes found");
@@ -136,6 +160,7 @@ const StakeFelySection = () => {
         method: "personal_sign",
         params: [message, accounts[0]], // message first, then address
       });
+      setUsedSignature(signature);
 
       const loginRowData = {
         wallet_address: accounts[0],
@@ -153,6 +178,9 @@ const StakeFelySection = () => {
       setTransactionStatus("connected");
       setBareToken(loginReturnData.data.token);
       getmyStaking(loginReturnData.data.token);
+      setReferalCode(loginReturnData.data.referral.url);
+      UserWithdrawalsHistory(loginReturnData.data.token);
+      getWithdrwalBalance(loginReturnData.data.token);
     } else {
       const tim = new Date().toISOString();
       const message = `Sign this message to authenticate with your wallet. Wallet: ${accounts[0]}. Timestamp: ${tim}`;
@@ -161,13 +189,15 @@ const StakeFelySection = () => {
         method: "personal_sign",
         params: [message, accounts[0]], // message first, then address
       });
+      setUsedSignature(signature);
 
+      console.log(ref);
       const regdata = {
         wallet_address: accounts[0],
         signature: signature,
         message: message,
         timestamp: tim,
-        sponsor_user_id: null,
+        referral_code: ref || null,
       };
       const regResoince = await serverPostRequest(regdata, "/auth/register");
       console.log(regResoince);
@@ -176,6 +206,9 @@ const StakeFelySection = () => {
         setIsConnected(true);
         setTransactionStatus("connected");
         setBareToken(regResoince.data.token);
+        setReferalCode(regResoince.data.referral.url);
+        UserWithdrawalsHistory(regResoince.data.token);
+        getWithdrwalBalance(regResoince.data.token);
       } else {
         console.log("NOT Registerd");
         setIsConnected(false);
@@ -573,6 +606,61 @@ const StakeFelySection = () => {
     console.log(e.target.value);
   };
 
+  const UserWithdrawalsHistory = async (Bearer: any) => {
+    try {
+      const userWithdrawHistry = await serverGetWithBareGet(
+        "",
+        "/withdrawal/history?limit=50",
+        Bearer,
+      );
+      console.log(userWithdrawHistry);
+      setWithdrawData(userWithdrawHistry.data.withdrawals);
+    } catch (error) {
+      console.error("Error connecting wallet:", error);
+      setTransactionStatus("Failed to connect wallet");
+      setTimeout(() => setTransactionStatus(null), 3000);
+    }
+  };
+
+  const getWithdrwalBalance = async (Bearer: any) => {
+    try {
+      const getWithdrwalBalance = await serverGetWithBareGet(
+        "",
+        "/withdrawal/balance",
+        Bearer,
+      );
+      console.log(getWithdrwalBalance);
+      setwithdrawableFelyFix(getWithdrwalBalance.data.withdrawable_fely);
+      setWithdrawableFely(getWithdrwalBalance.data.withdrawable_fely);
+      setWithdrawableUsdt(getWithdrwalBalance.data.withdrawable_usdt);
+    } catch (error) {
+      console.error("Error connecting wallet:", error);
+      setTransactionStatus("Failed to connect wallet");
+      setTimeout(() => setTransactionStatus(null), 3000);
+    }
+  };
+
+  const createWithdrawalRequest = async (Bearer: any, amount: any) => {
+    try {
+      const obj = {
+        fely_amount: amount,
+        signature: usedSignature,
+        timestamp: Date.now().toString(),
+      };
+      const getWithdrwalBalance = await serverGetWithBarePost(
+        obj,
+        "/withdrawal/request",
+        Bearer,
+      );
+      UserWithdrawalsHistory(Bearer);
+      console.log(getWithdrwalBalance);
+    } catch (error) {
+      console.error("Error connecting wallet:", error);
+      setTransactionStatus("Failed to connect wallet");
+      setTimeout(() => setTransactionStatus(null), 3000);
+    }
+  };
+
   return (
     <div className="space-y-10">
       {/* Header Section */}
@@ -584,50 +672,61 @@ const StakeFelySection = () => {
               contributing to the ecosystem stability.
             </p>
 
-
             <div className="flex flex-col items-center gap-4 w-full max-w-md mt-2">
-              <button
-                className="bg-primary-500 hover:bg-primary-600 text-white px-6 py-2 rounded-full font-medium text-sm md:text-base transition-colors shadow-[0_0_15px_rgba(228,145,39,0.2)]"
-              >
+              {/* <button className="bg-primary-500 hover:bg-primary-600 text-white px-6 py-2 rounded-full font-medium text-sm md:text-base transition-colors shadow-[0_0_15px_rgba(228,145,39,0.2)]">
                 Create Referral Link
-              </button>
+              </button> */}
 
               <div className="flex items-center gap-2 w-full">
                 <input
                   id="static-referral-input"
                   type="text"
                   readOnly
-                  value="ALEXSMITH20ALEXSMITH20ALEXSMITH20"
+                  value={referalCode || ""}
                   className="w-full bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-gray-300 focus:outline-none focus:border-primary-500"
                 />
                 <button
                   className="bg-secondary border border-stroke-2 p-3 rounded-xl hover:bg-[#2a333e] transition-colors flex-shrink-0"
                   title="Copy Link"
                   onClick={() => {
-                    const inputElement = document.getElementById('static-referral-input') as HTMLInputElement;
+                    const inputElement = document.getElementById(
+                      "static-referral-input",
+                    ) as HTMLInputElement;
                     if (inputElement) {
                       navigator.clipboard.writeText(inputElement.value);
-                      const msgElement = document.getElementById('copy-msg');
+                      const msgElement = document.getElementById("copy-msg");
                       if (msgElement) {
-                        msgElement.style.display = 'block';
+                        msgElement.style.display = "block";
                         setTimeout(() => {
-                          msgElement.style.display = 'none';
+                          msgElement.style.display = "none";
                         }, 2000);
                       }
                     }
                   }}
                 >
-                  <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  <svg
+                    className="w-5 h-5 text-gray-300"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                    />
                   </svg>
                 </button>
               </div>
-              <p id="copy-msg" className="text-xs text-primary-500 mt-1" style={{ display: 'none' }}>
+              <p
+                id="copy-msg"
+                className="text-xs text-primary-500 mt-1"
+                style={{ display: "none" }}
+              >
                 Copied to clipboard!
               </p>
             </div>
-
-
           </div>
         </RevealAnimation>
       </div>
@@ -1046,21 +1145,48 @@ const StakeFelySection = () => {
             <div className="bg-secondary dark:bg-background-8 rounded-[30px] p-6 border border-stroke-2 dark:border-stroke-6 mt-8">
               <div className="flex flex-col gap-4 mb-6">
                 <h3 className="text-xl font-bold text-white">
-                  Total Bonus Balance
+                  Total Bonus Balance{" "}
+                  {parseFloat(withdrawableFelyFix).toFixed(2)} (
+                  {parseFloat(withdrawableUsdt).toFixed(2)})
                 </h3>
 
                 <div className="flex flex-col sm:flex-row items-start gap-3 justify-start">
                   <div className="relative">
                     <input
                       type="number"
+                      value={
+                        withdrawableFely
+                          ? (
+                              Math.trunc(parseFloat(withdrawableFely) * 100) /
+                              100
+                            ).toString()
+                          : ""
+                      }
+                      onChange={(e) => setWithdrawableFely(e.target.value)}
                       placeholder="Amount to withdraw"
                       className="w-full sm:w-[250px] bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-primary-500 placeholder:text-sm"
                     />
+                    {/* <input
+                      type="number"
+                      value={parseFloat(withdrawableFely).toFixed(2) || ""}
+                      placeholder="Amount to withdraw"
+                      className="w-full sm:w-[250px] bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-primary-500 placeholder:text-sm"
+                    /> */}
                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-xs">
                       FELY
                     </span>
                   </div>
-                  <button className="btn btn-primary btn-sm whitespace-nowrap px-6 h-[38px] min-w-[120px]">
+                  <button
+                    onClick={() =>
+                      createWithdrawalRequest(
+                        bareToken,
+                        (
+                          Math.trunc(parseFloat(withdrawableFely) * 100) / 100
+                        ).toString(),
+                      )
+                    }
+                    className="btn btn-primary btn-sm whitespace-nowrap px-6 h-[38px] min-w-[120px]"
+                  >
                     WITHDRAW
                   </button>
                 </div>
@@ -1074,23 +1200,39 @@ const StakeFelySection = () => {
                         Date
                       </th>
                       <th className="p-4 text-white font-semibold whitespace-nowrap">
-                        Withdrawal Amount
+                        USDT Amount
                       </th>
                       <th className="p-4 text-white font-semibold whitespace-nowrap">
-                        Transaction #
+                        FELY Amount
+                      </th>
+                      <th className="p-4 text-white font-semibold whitespace-nowrap">
+                        Status
                       </th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr className="border-b border-[#2a333e] last:border-0 hover:bg-[#13171E]/50 transition-colors">
-                      <td
-                        className="p-4 text-gray-300"
-                        colSpan={3}
-                        style={{ textAlign: "center" }}
+                    {withdrawData.map((rows, i) => (
+                      <tr
+                        key={rows.id}
+                        className="border-b border-[#2a333e] last:border-0 hover:bg-[#13171E]/50 transition-colors"
                       >
-                        No withdrawals yet
-                      </td>
-                    </tr>
+                        <td className="p-4 text-white text-sm">
+                          {format(
+                            new Date(String(rows.created_at)),
+                            "dd/MM/yyyy",
+                          )}
+                        </td>
+                        <td className="p-4 text-white text-sm">
+                          {parseFloat(rows.usdt_amount).toFixed(2)}
+                        </td>
+                        <td className="p-4 text-white text-sm">
+                          {parseFloat(rows.fely_amount).toFixed(2)}
+                        </td>
+                        <td className="p-4 text-white text-sm">
+                          {rows.status.text}
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
