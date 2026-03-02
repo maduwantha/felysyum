@@ -12,6 +12,7 @@ export interface MobileMenuItem {
   id: string;
   label: string;
   href: string;
+  target?: string;
 }
 
 export interface MobileMenuGroup {
@@ -60,6 +61,7 @@ const MobileMenu = ({ menuData }: { menuData: MobileMenuGroup[] }) => {
                     <li key={subItem.id}>
                       <Link
                         href={subItem.href}
+                        target={subItem.target}
                         onClick={toggleMenu}
                         className="text-tagline-1 text-secondary dark:text-accent ml-4 block py-2.5 text-left font-normal transition-all duration-200">
                         {subItem.label}
@@ -70,6 +72,11 @@ const MobileMenu = ({ menuData }: { menuData: MobileMenuGroup[] }) => {
               </MobileMenuItem>
             ))}
           </ul>
+          <div className="mt-4 px-4">
+            <button className="btn btn-md btn-primary w-full hover:btn-white-dark dark:hover:btn-white">
+              <span>Connect</span>
+            </button>
+          </div>
         </div>
       </div>
     </aside>

@@ -12,16 +12,15 @@ const MeetOurTeam = () => {
       <div className="main-container">
         <div className="space-y-7 md:space-y-14">
           <h2 ref={titleRef} className="split-text-team-title text-center">
-            From intuitive dashboards to data-driven automation, NextSaaS is built for modern businesses that want to
-            simplify workflows and scale effortlessly.
+            We teach people the foundations of crypto, help transform innovative ideas into real projects, build marketplaces to sell them, and empower communities to confidently join the future digital economy.
           </h2>
 
           <RevealAnimation delay={0.2}>
             <div className="text-center">
               <LinkButton
-                href="/team"
+                href="/concept"
                 className="btn btn-primary btn-md hover:btn-secondary dark:hover:btn-accent w-[85%] md:w-auto">
-                Meet NextSaaS team
+                Read Concept
               </LinkButton>
             </div>
           </RevealAnimation>

@@ -1,5 +1,5 @@
 import CommonHero from '@/components/shared/CommonHero';
-import TokenomicsChart from '@/components/tokonomics/TokenomicsChart';
+import TokenomicsChart from '@/components/tokenomics/TokenomicsChart';
 import TokenDistributionContent from '@/components/token-distribution/TokenDistributionContent';
 import TokenHighlights from '@/components/token-distribution/TokenHighlights';
 import { Metadata } from 'next';

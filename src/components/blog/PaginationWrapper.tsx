@@ -5,15 +5,17 @@ import { useState } from 'react';
 import RevealAnimation from '../animation/RevealAnimation';
 import Pagination from '../shared/Pagination';
 import { BlogCard } from './BlogCard';
+import { AnnouncementCard } from './AnnouncementCard';
 
 interface PaginationWrapperProps {
     blogs: IBlogPost[];
     baseUrl?: string;
+    cardType?: 'blog' | 'announcement';
 }
 
-const PaginationWrapper = ({ blogs, baseUrl = '/blog' }: PaginationWrapperProps) => {
+const PaginationWrapper = ({ blogs, baseUrl = '/blog', cardType = 'blog' }: PaginationWrapperProps) => {
     const [currentPage, setCurrentPage] = useState(1);
-    const blogsPerPage = 8;
+    const blogsPerPage = 9;
 
     // Calculate pagination
     const totalPages = Math.ceil(blogs.length / blogsPerPage);
@@ -26,14 +28,20 @@ const PaginationWrapper = ({ blogs, baseUrl = '/blog' }: PaginationWrapperProps)
         window.scrollTo({ top: 1620, behavior: 'smooth' });
     };
 
+    const Card = cardType === 'announcement' ? AnnouncementCard : BlogCard;
+
+    const gridClass = cardType === 'announcement'
+        ? "grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 xl:gap-[30px]"
+        : "grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-2 xl:gap-[70px]";
+
     return (
         <>
             {/* Blog grid */}
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-2 xl:gap-[70px]">
+            <div className={gridClass}>
                 {currentBlogs?.map((blog, index) => (
                     <RevealAnimation key={blog?.slug} delay={0.3 + index * 0.1}>
                         <div>
-                            <BlogCard blog={blog} baseUrl={baseUrl} />
+                            <Card blog={blog} baseUrl={baseUrl} />
                         </div>
                     </RevealAnimation>
                 ))}

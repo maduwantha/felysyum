@@ -8,6 +8,14 @@ export const mobileMenuData: MobileMenuGroup[] = [
     href: '/',
   },
   {
+    id: 'fely',
+    title: 'FELY',
+    submenu: [
+      { id: 'buy-fely', label: 'Buy Fely', href: '/buy' },
+      { id: 'stake-fely', label: 'Stake Fely', href: '/stake' },
+    ],
+  },
+  {
     id: 'about',
     title: 'About',
     submenu: [
@@ -17,20 +25,12 @@ export const mobileMenuData: MobileMenuGroup[] = [
     ],
   },
   {
-    id: 'fely',
-    title: 'FELY',
-    submenu: [
-      { id: 'buy-fely', label: 'Buy Fely', href: '/buy' },
-      { id: 'stake-fely', label: 'Stake Fely', href: '/stake' },
-    ],
-  },
-  {
     id: 'insight',
     title: 'Insight',
     submenu: [
       { id: 'concept', label: 'Concept', href: '/concept' },
       { id: 'road-map', label: 'Road Map', href: '/road-map' },
-
+      { id: 'tokenomics', label: 'Tokenomics', href: '/tokenomics' },
       { id: 'token-distribution', label: 'Token Distribution', href: '/token-distribution' },
     ],
   },
@@ -38,11 +38,11 @@ export const mobileMenuData: MobileMenuGroup[] = [
     id: 'products',
     title: 'Products',
     submenu: [
-      { id: 'skillfullhub', label: 'Skillfullhub', href: 'https://skillfullhub.com/' },
-      { id: 'felyzone', label: 'Felyzone', href: 'http://felyzone.com/' },
-      { id: 'felynova', label: 'Felynova', href: 'https://felynova.com/' },
-      { id: 'aidora', label: 'Aidora', href: 'http://aidora.care/' },
-      { id: 'fely-wallet', label: 'Fely Wallet', href: 'http://felywallet.com/' },
+      { id: 'skillfullhub', label: 'Skillfullhub', href: 'https://skillfullhub.com/', target: '_blank' },
+      { id: 'felyzone', label: 'Felyzone', href: 'http://felyzone.com/', target: '_blank' },
+      { id: 'felynova', label: 'Felynova', href: 'https://felynova.com/', target: '_blank' },
+      { id: 'aidora', label: 'Aidora', href: 'http://aidora.care/', target: '_blank' },
+      { id: 'fely-wallet', label: 'Fely Wallet', href: 'http://felywallet.com/', target: '_blank' },
     ],
   },
   {
@@ -50,16 +50,13 @@ export const mobileMenuData: MobileMenuGroup[] = [
     title: 'Announcements',
     href: '/announcement',
   },
-  {
-    id: 'blog',
-    title: 'Blog',
-    href: '/blog',
-  },
+
   {
     id: 'contact',
     title: 'Contact',
     href: '/contact-us',
   },
+
 ];
 
 export const footerData: FooterOneData[] = [

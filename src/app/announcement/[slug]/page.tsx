@@ -1,6 +1,5 @@
 
 import BlogContent from '@/components/blog-details/BlogContent';
-import CTA from '@/components/shared/cta/CTA';
 import { defaultMetadata } from '@/utils/generateMetaData';
 import getMarkDownContent from '@/utils/getMarkDownContent';
 import getMarkDownData from '@/utils/getMarkDownData';
@@ -13,10 +12,31 @@ export async function generateStaticParams() {
     }));
 }
 
-export const metadata: Metadata = {
-    ...defaultMetadata,
-    title: 'Announcement Details - Felysyum',
-};
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+    const slug = (await params).slug;
+    const blogContent = getMarkDownContent('src/data/announcements/', slug);
+
+    return {
+        ...defaultMetadata,
+        title: `${blogContent.data.title} - Felysyum`,
+        description: blogContent.data.description,
+        openGraph: {
+            ...defaultMetadata.openGraph,
+            title: `${blogContent.data.title} - Felysyum`,
+            description: blogContent.data.description,
+            url: `https://dv.felysyum.com/announcement/${slug}`,
+            images: [
+                {
+                    url: `https://dv.felysyum.com${blogContent.data.thumbnail}`,
+                    width: 1200,
+                    height: 600,
+                    alt: blogContent.data.title,
+                },
+            ],
+            type: 'article',
+        },
+    };
+}
 
 const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
     const slug = (await params).slug;
@@ -25,14 +45,6 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
     return (
         <main className="bg-background-3 dark:bg-background-7">
             <BlogContent blog={blogContent} />
-            <CTA
-                className="dark:bg-background-7 bg-white"
-                badgeClass="!badge-orange-v2"  // Changed to orange to match theme
-                badgeText="Join Community"
-                ctaHeading="Join the Felysyum Revolution"
-                description="Be part of the future of decentralized finance and innovation."
-                ctaBtnText="Join Now"
-            />
         </main>
     );
 };

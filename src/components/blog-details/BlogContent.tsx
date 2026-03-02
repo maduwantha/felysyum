@@ -3,7 +3,7 @@ import Image, { StaticImageData } from 'next/image';
 import ReactMarkdown from 'react-markdown';
 import rehypeSlug from 'rehype-slug';
 import RevealAnimation from '../animation/RevealAnimation';
-import Comment from './Comment';
+
 import ShareLink from './ShareLink';
 
 const BlogContent = ({ blog }: { blog: matter.GrayMatterFile<string> }) => {
@@ -12,7 +12,7 @@ const BlogContent = ({ blog }: { blog: matter.GrayMatterFile<string> }) => {
       <div className="main-container">
         <div className="mx-auto max-w-[1209px] space-y-3">
           <RevealAnimation delay={0.1}>
-            <h2 className="max-w-[884px]">{blog.data.title}</h2>
+            <h2>{blog.data.title}</h2>
           </RevealAnimation>
           <div className="flex items-center gap-3">
             <RevealAnimation delay={0.2}>
@@ -35,20 +35,24 @@ const BlogContent = ({ blog }: { blog: matter.GrayMatterFile<string> }) => {
                 <time
                   dateTime={blog.data.publishDate}
                   className="text-tagline-2 text-secondary/60 dark:text-accent/60 flex items-center gap-2 font-normal">
-                  {blog.data.publishDate} <span>•</span> {blog.data.readTime}
+                  {blog.data.publishDate} {blog.data.readTime && (
+                    <>
+                      <span>•</span> {blog.data.readTime}
+                    </>
+                  )}
                 </time>
               </RevealAnimation>
             </div>
           </div>
         </div>
         <RevealAnimation delay={0.4}>
-          <figure className="my-10 max-w-full overflow-hidden rounded-lg md:my-[70px] md:rounded-4xl">
+          <figure className="my-10 max-w-full overflow-hidden rounded-lg md:my-[50px] md:rounded-4xl aspect-[2/1]">
             <Image
               src={blog.data.thumbnail as string | StaticImageData}
               className="h-full w-full object-cover object-center"
               alt="blog-details-cover"
               width={1200}
-              height={700}
+              height={600}
             />
           </figure>
         </RevealAnimation>
@@ -60,8 +64,8 @@ const BlogContent = ({ blog }: { blog: matter.GrayMatterFile<string> }) => {
           </article>
         </RevealAnimation>
         {/* details-footer */}
-        <ShareLink />
-        <Comment />
+        <ShareLink title={blog.data.title} description={blog.data.description} />
+
       </div>
     </section>
   );

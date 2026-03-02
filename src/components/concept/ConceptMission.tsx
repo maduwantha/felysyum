@@ -2,7 +2,7 @@ import Image from 'next/image';
 import RevealAnimation from '../animation/RevealAnimation';
 import heroImage from '@public/images/felysyum_hero_v3.jpg';
 import NumberAnimation from '../animation/NumberAnimation';
-import visionDashboard from '@public/images/vision_dashboard.png';
+import visionDashboard from '@public/images/team-3.png';
 
 const ConceptMission = () => {
     return (

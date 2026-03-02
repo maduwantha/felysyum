@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import RevealAnimation from '../animation/RevealAnimation';
 import LinkButton from '../ui/button/LinkButton';
-import visionDashboard from '@public/images/vision_dashboard.png';
+import visionDashboard from '@public/images/team-2.png';
 import { CheckIcon } from '@/icons';
 
 const VisionSection = () => {
@@ -51,7 +51,7 @@ const VisionSection = () => {
                                     </span>
                                     <br />
                                     <span className="text-white">
-                                        Building a New  Generation of    Digital Heroess
+                                        Building a New  Generation of Digital Heroes
                                     </span>
                                 </h2>
                             </RevealAnimation>
