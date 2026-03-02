@@ -348,7 +348,6 @@ const StakeFelySection = () => {
       }
     };
   }, []);
-  ``;
 
   const lockupStakes = async () => {
     setLockUpState("Wait..");
