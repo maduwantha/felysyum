@@ -98,6 +98,16 @@ const StakeFelySection = () => {
   };
   const [withdrawData, setWithdrawData] = useState<WithdrawHistory[]>([]);
 
+  type BonusHistory = {
+    id: number;
+    bonus_level: number;
+    bonus_percentage: string;
+    bonus_amount: string;
+    earned_at: string;
+  };
+
+  const [bonusData, setBonusData] = useState<BonusHistory[]>([]);
+
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(
@@ -181,6 +191,7 @@ const StakeFelySection = () => {
       setReferalCode(loginReturnData.data.referral.url);
       UserWithdrawalsHistory(loginReturnData.data.token);
       getWithdrwalBalance(loginReturnData.data.token);
+      getReferalBonus(loginReturnData.data.token);
     } else {
       const tim = new Date().toISOString();
       const message = `Sign this message to authenticate with your wallet. Wallet: ${accounts[0]}. Timestamp: ${tim}`;
@@ -209,6 +220,7 @@ const StakeFelySection = () => {
         setReferalCode(regResoince.data.referral.url);
         UserWithdrawalsHistory(regResoince.data.token);
         getWithdrwalBalance(regResoince.data.token);
+        getReferalBonus(regResoince.data.token);
       } else {
         console.log("NOT Registerd");
         setIsConnected(false);
@@ -621,6 +633,29 @@ const StakeFelySection = () => {
     }
   };
 
+  const getReferalBonus = async (Bearer: any) => {
+    try {
+      const ReferalBonus = await serverGetWithBareGet(
+        "",
+        "/staking/my-bonus-history", //?bonus_level=1&staking_month=12
+        Bearer,
+      );
+      console.log(ReferalBonus);
+
+      const bonuses = ReferalBonus.data.bonuses.map((item: any) => ({
+        id: item.id,
+        bonus_level: item.bonus_level,
+        bonus_percentage: item.bonus_percentage,
+        bonus_amount: item.bonus_amount,
+        earned_at: item.earned_at,
+      }));
+
+      setBonusData(bonuses);
+    } catch (error) {
+      console.error("Error connecting wallet:", error);
+    }
+  };
+
   const getWithdrwalBalance = async (Bearer: any) => {
     try {
       const getWithdrwalBalance = await serverGetWithBareGet(
@@ -629,13 +664,13 @@ const StakeFelySection = () => {
         Bearer,
       );
       console.log(getWithdrwalBalance);
-      setwithdrawableFelyFix(getWithdrwalBalance.data.withdrawable_fely);
-      setWithdrawableFely(getWithdrwalBalance.data.withdrawable_fely);
-      setWithdrawableUsdt(getWithdrwalBalance.data.withdrawable_usdt);
+      if (getWithdrwalBalance.success) {
+        setwithdrawableFelyFix(getWithdrwalBalance.data.fely_balance);
+        setWithdrawableFely(getWithdrwalBalance.data.fely_balance);
+        setWithdrawableUsdt(getWithdrwalBalance.data.usdt_equivalent);
+      }
     } catch (error) {
       console.error("Error connecting wallet:", error);
-      setTransactionStatus("Failed to connect wallet");
-      setTimeout(() => setTransactionStatus(null), 3000);
     }
   };
 
@@ -655,8 +690,6 @@ const StakeFelySection = () => {
       console.log(getWithdrwalBalance);
     } catch (error) {
       console.error("Error connecting wallet:", error);
-      setTransactionStatus("Failed to connect wallet");
-      setTimeout(() => setTransactionStatus(null), 3000);
     }
   };
 
@@ -1142,6 +1175,52 @@ const StakeFelySection = () => {
                           {row.status}
                         </span>
                       </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="bg-secondary dark:bg-background-8 rounded-[30px] p-6 border border-stroke-2 dark:border-stroke-6 overflow-x-auto">
+              <h3 className="text-xl font-bold text-white mb-4">
+                Referal Bonus
+              </h3>
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-[#2a333e]">
+                    <th className="p-4 text-white font-semibold whitespace-nowrap">
+                      Earned At
+                    </th>
+                    <th className="p-4 text-white font-semibold whitespace-nowrap">
+                      Bonus Level
+                    </th>
+                    <th className="p-4 text-white font-semibold whitespace-nowrap">
+                      Bonus Percentage
+                    </th>
+                    <th className="p-4 text-white font-semibold whitespace-nowrap">
+                      Bonus Amount
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {bonusData.map((row, i) => (
+                    <tr
+                      key={i}
+                      className="border-b border-[#2a333e] last:border-0 hover:bg-[#13171E]/50 transition-colors"
+                    >
+                      <td className="p-4 text-gray-300">
+                        {row.id
+                          ? format(
+                              new Date(String(row.earned_at)),
+                              "dd/MM/yyyy",
+                            )
+                          : "-"}
+                      </td>
+                      <td className="p-4 text-gray-300">{row.bonus_level}</td>
+                      <td className="p-4 text-gray-300">
+                        {row.bonus_percentage}
+                      </td>
+                      <td className="p-4 text-gray-300">{row.bonus_amount}</td>
                     </tr>
                   ))}
                 </tbody>
