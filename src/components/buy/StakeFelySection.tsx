@@ -69,6 +69,8 @@ const StakeFelySection = () => {
 
   const [usedSignature, setUsedSignature] = useState("");
 
+  const [balanceErr, setBalanceErr] = useState("");
+
   type StakeRow = {
     id: number;
     month: number;
@@ -675,6 +677,10 @@ const StakeFelySection = () => {
   };
 
   const createWithdrawalRequest = async (Bearer: any, amount: any) => {
+    if (amount == 0) {
+      setBalanceErr("0 value Not allowed");
+      return;
+    }
     try {
       const obj = {
         fely_amount: amount,
@@ -686,6 +692,10 @@ const StakeFelySection = () => {
         "/withdrawal/request",
         Bearer,
       );
+      if (!getWithdrwalBalance.success) {
+        console.log(getWithdrwalBalance.message);
+        setBalanceErr(getWithdrwalBalance.message);
+      }
       UserWithdrawalsHistory(Bearer);
       console.log(getWithdrwalBalance);
     } catch (error) {
@@ -1233,7 +1243,7 @@ const StakeFelySection = () => {
                 <h3 className="text-xl font-bold text-white">
                   Total Bonus Balance{" "}
                   {parseFloat(withdrawableFelyFix).toFixed(2)} (
-                  {parseFloat(withdrawableUsdt).toFixed(2)})
+                  {parseFloat(withdrawableUsdt).toFixed(2)}){balanceErr}
                 </h3>
 
                 <div className="flex flex-col sm:flex-row items-start gap-3 justify-start">
