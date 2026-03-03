@@ -1122,13 +1122,20 @@ const StakeFelySection = () => {
                         {row.fely_bonus_amount}
                       </td>
                       <td className="p-4 text-gray-300">
-                        {format(new Date(String(row.staked_at)), "dd/MM/yyyy")}
+                        {row.staked_at
+                          ? format(
+                              new Date(String(row.staked_at)),
+                              "dd/MM/yyyy",
+                            )
+                          : "-"}
                       </td>
                       <td className="p-4 text-gray-300">
-                        {format(
-                          new Date(String(row.maturity_date)),
-                          "dd/MM/yyyy",
-                        )}
+                        {row.maturity_date
+                          ? format(
+                              new Date(String(row.maturity_date)),
+                              "dd/MM/yyyy",
+                            )
+                          : "Pending"}
                       </td>
                       <td className="p-4">
                         <span className="inline-block px-2 py-1 bg-primary-500/20 text-primary-500 text-xs rounded-md">
@@ -1216,10 +1223,12 @@ const StakeFelySection = () => {
                         className="border-b border-[#2a333e] last:border-0 hover:bg-[#13171E]/50 transition-colors"
                       >
                         <td className="p-4 text-white text-sm">
-                          {format(
-                            new Date(String(rows.created_at)),
-                            "dd/MM/yyyy",
-                          )}
+                          {rows.created_at
+                            ? format(
+                                new Date(String(rows.created_at)),
+                                "dd/MM/yyyy",
+                              )
+                            : "-"}
                         </td>
                         <td className="p-4 text-white text-sm">
                           {parseFloat(rows.usdt_amount).toFixed(2)}
