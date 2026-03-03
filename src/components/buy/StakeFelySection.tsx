@@ -691,6 +691,7 @@ const StakeFelySection = () => {
     } catch (error) {
       console.error("Error connecting wallet:", error);
     }
+    getWithdrwalBalance(Bearer);
   };
 
   return (
