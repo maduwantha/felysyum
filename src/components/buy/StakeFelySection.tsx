@@ -54,6 +54,7 @@ const StakeFelySection = () => {
   const [lockUpState, setLockUpState] = useState<string | null>(null);
   const [ClameUpState, setClameUpState] = useState<string | null>(null);
   const [WithdrawState, setWithdrawState] = useState<string | null>(null);
+  const [copiedContract, setCopiedContract] = useState<string | null>(null);
 
   const [StakePlan, setStakePlan] = useState("");
   const [loockUpStakePlan, setLoockUpStakePlan] = useState("");
@@ -714,6 +715,9 @@ const StakeFelySection = () => {
               Maximize your holdings by staking FELY. Earn rewards while
               contributing to the ecosystem stability.
             </p>
+            <p className="text-primary-500 text-sm md:text-base max-w-3xl mx-auto mt-2 font-medium">
+              Connect your wallet, share your referral code, and earn rewards up to 3 levels deep!
+            </p>
 
             <div className="flex flex-col items-center gap-4 w-full max-w-md mt-2">
               {/* <button className="bg-primary-500 hover:bg-primary-600 text-white px-6 py-2 rounded-full font-medium text-sm md:text-base transition-colors shadow-[0_0_15px_rgba(228,145,39,0.2)]">
@@ -774,17 +778,214 @@ const StakeFelySection = () => {
         </RevealAnimation>
       </div>
 
+      <div className="text-left w-full  px-4 md:px-0">
+        <p className="text-gray-400 text-sm md:text-base">
+          Felysyum stakes are secured on smart contracts. Once you stake, only you can withdraw your daily interest and staking capital – not even we can access it. Your funds are safe in your hands.<br />
+          <span className="text-white font-medium mt-1 inline-block">Choose your staking plan and start earning</span>
+        </p>
+      </div>
+
+      {/* Staking Plan Data Boxes */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 mb-10 w-full px-4 md:px-0">
+        {/* Dolphin Box */}
+        <RevealAnimation delay={0.2}>
+          <div className="bg-secondary dark:bg-background-8 rounded-[24px] p-6 border border-stroke-2 dark:border-stroke-6 flex flex-col h-full relative overflow-hidden transition-all duration-300 hover:border-primary-500/50 hover:shadow-[0_0_20px_rgba(228,145,39,0.1)]">
+            <h3 className="text-xl font-bold text-white mb-1">Dolphin</h3>
+            <p className="text-primary-500 font-medium text-sm mb-6">Staking Period 3 Months</p>
+
+            <div className="flex-grow space-y-4 mb-6 text-sm">
+              <div className="flex justify-between border-b border-[#2a333e] pb-2 text-gray-400 font-medium">
+                <span>Staked Amount</span>
+                <span>Interest Rate</span>
+              </div>
+              <div className="flex justify-between text-white">
+                <span>0 - 1000 USDT</span>
+                <span className="text-ns-yellow font-bold">2.5%</span>
+              </div>
+              <div className="flex justify-between text-white">
+                <span>1001 - 5000 USDT</span>
+                <span className="text-ns-yellow font-bold">3%</span>
+              </div>
+              <div className="flex justify-between text-white">
+                <span>5001 - 10000 USDT</span>
+                <span className="text-ns-yellow font-bold">4%</span>
+              </div>
+            </div>
+
+            <div className="mt-auto pt-5 border-t border-[#2a333e] space-y-3">
+              <p className="text-[11px] text-gray-400 leading-relaxed">
+                Monitor Your Stake on Polygon Chain – <br />
+                <a href="https://polygonscan.com/address/0x66BAf11521Ee8B3eF84bd459F7062916b6218D68" target="_blank" rel="noreferrer" className="text-primary-500 hover:underline">Open the Contract on polygonscan.com</a>
+              </p>
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value="0x66BAf11521Ee8B3eF84bd459F7062916b6218D68"
+                    className="w-full bg-[#13171E] border border-[#2a333e] rounded-lg px-3 py-2 text-xs text-gray-300 focus:outline-none"
+                  />
+                  <button
+                    className="bg-primary-500 text-white p-2 rounded-lg hover:bg-primary-600 transition-colors flex-shrink-0"
+                    title="Copy Dolphin Contract"
+                    onClick={() => {
+                      navigator.clipboard.writeText("0x66BAf11521Ee8B3eF84bd459F7062916b6218D68");
+                      setCopiedContract("dolphin");
+                      setTimeout(() => setCopiedContract(null), 3000);
+                    }}
+                  >
+                    {copiedContract === "dolphin" ? (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                    ) : (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                    )}
+                  </button>
+                </div>
+                {copiedContract === "dolphin" && (
+                  <span className="text-xs text-primary-500 mt-1">Copied Dolphin Contract!</span>
+                )}
+              </div>
+            </div>
+          </div>
+        </RevealAnimation>
+
+        {/* Shark Box */}
+        <RevealAnimation delay={0.3}>
+          <div className="bg-secondary dark:bg-background-8 rounded-[24px] p-6 border border-stroke-2 dark:border-stroke-6 flex flex-col h-full relative overflow-hidden transition-all duration-300 hover:border-primary-500/50 hover:shadow-[0_0_20px_rgba(228,145,39,0.1)]">
+            <h3 className="text-xl font-bold text-white mb-1">Shark</h3>
+            <p className="text-primary-500 font-medium text-sm mb-6">Staking Period 6 Months</p>
+
+            <div className="flex-grow space-y-4 mb-6 text-sm">
+              <div className="flex justify-between border-b border-[#2a333e] pb-2 text-gray-400 font-medium">
+                <span>Staked Amount</span>
+                <span>Interest Rate</span>
+              </div>
+              <div className="flex justify-between text-white">
+                <span>0 - 1000 USDT</span>
+                <span className="text-ns-yellow font-bold">6%</span>
+              </div>
+              <div className="flex justify-between text-white">
+                <span>1001 - 5000 USDT</span>
+                <span className="text-ns-yellow font-bold">7%</span>
+              </div>
+              <div className="flex justify-between text-white">
+                <span>5001 - 10000 USDT</span>
+                <span className="text-ns-yellow font-bold">9%</span>
+              </div>
+            </div>
+
+            <div className="mt-auto pt-5 border-t border-[#2a333e] space-y-3">
+              <p className="text-[11px] text-gray-400 leading-relaxed">
+                Monitor Your Stake on Polygon Chain – <br />
+                <a href="https://polygonscan.com/address/0xe4410D26224d4728846722309fF386495Cc1E490" target="_blank" rel="noreferrer" className="text-primary-500 hover:underline">Open the Contract on polygonscan.com</a>
+              </p>
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value="0xe4410D26224d4728846722309fF386495Cc1E490"
+                    className="w-full bg-[#13171E] border border-[#2a333e] rounded-lg px-3 py-2 text-xs text-gray-300 focus:outline-none"
+                  />
+                  <button
+                    className="bg-primary-500 text-white p-2 rounded-lg hover:bg-primary-600 transition-colors flex-shrink-0"
+                    title="Copy Shark Contract"
+                    onClick={() => {
+                      navigator.clipboard.writeText("0xe4410D26224d4728846722309fF386495Cc1E490");
+                      setCopiedContract("shark");
+                      setTimeout(() => setCopiedContract(null), 3000);
+                    }}
+                  >
+                    {copiedContract === "shark" ? (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                    ) : (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                    )}
+                  </button>
+                </div>
+                {copiedContract === "shark" && (
+                  <span className="text-xs text-primary-500 mt-1">Copied Shark Contract!</span>
+                )}
+              </div>
+            </div>
+          </div>
+        </RevealAnimation>
+
+        {/* Whale Box */}
+        <RevealAnimation delay={0.4}>
+          <div className="bg-secondary dark:bg-background-8 rounded-[24px] p-6 border border-stroke-2 dark:border-stroke-6 flex flex-col h-full relative overflow-hidden transition-all duration-300 hover:border-primary-500/50 hover:shadow-[0_0_20px_rgba(228,145,39,0.1)]">
+            <h3 className="text-xl font-bold text-white mb-1">Whale</h3>
+            <p className="text-primary-500 font-medium text-sm mb-6">Staking Period 12 Months</p>
+
+            <div className="flex-grow space-y-4 mb-6 text-sm">
+              <div className="flex justify-between border-b border-[#2a333e] pb-2 text-gray-400 font-medium">
+                <span>Staked Amount</span>
+                <span>Interest Rate</span>
+              </div>
+              <div className="flex justify-between text-white">
+                <span>0 - 1000 USDT</span>
+                <span className="text-ns-yellow font-bold">12.5%</span>
+              </div>
+              <div className="flex justify-between text-white">
+                <span>1001 - 5000 USDT</span>
+                <span className="text-ns-yellow font-bold">15%</span>
+              </div>
+              <div className="flex justify-between text-white">
+                <span>5001 - 10000 USDT</span>
+                <span className="text-ns-yellow font-bold">20%</span>
+              </div>
+            </div>
+
+            <div className="mt-auto pt-5 border-t border-[#2a333e] space-y-3">
+              <p className="text-[11px] text-gray-400 leading-relaxed">
+                Monitor Your Stake on Polygon Chain – <br />
+                <a href="https://polygonscan.com/address/0x5eff66487f9d33465baf1ebd4cfa991f0b8cd963" target="_blank" rel="noreferrer" className="text-primary-500 hover:underline">Open the Contract on polygonscan.com</a>
+              </p>
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value="0x5eff66487f9d33465baf1ebd4cfa991f0b8cd963"
+                    className="w-full bg-[#13171E] border border-[#2a333e] rounded-lg px-3 py-2 text-xs text-gray-300 focus:outline-none"
+                  />
+                  <button
+                    className="bg-primary-500 text-white p-2 rounded-lg hover:bg-primary-600 transition-colors flex-shrink-0"
+                    title="Copy Whale Contract"
+                    onClick={() => {
+                      navigator.clipboard.writeText("0x5eff66487f9d33465baf1ebd4cfa991f0b8cd963");
+                      setCopiedContract("whale");
+                      setTimeout(() => setCopiedContract(null), 3000);
+                    }}
+                  >
+                    {copiedContract === "whale" ? (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                    ) : (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                    )}
+                  </button>
+                </div>
+                {copiedContract === "whale" && (
+                  <span className="text-xs text-primary-500 mt-1">Copied Whale Contract!</span>
+                )}
+              </div>
+            </div>
+          </div>
+        </RevealAnimation>
+      </div>
+
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* LEFT COLUMN: Main Staking Card */}
         <div className="space-y-8">
+
           {/* 1. Stake Card */}
           <RevealAnimation delay={0.3}>
             <div className="bg-secondary dark:bg-background-8 rounded-[30px] p-6 border border-stroke-2 dark:border-stroke-6 overflow-hidden relative h-full">
               <div className="relative z-10 space-y-6">
                 <div className="text-left">
                   <h3 className="text-xl font-bold text-white mb-1">
-                    Wallet Connection & Staking Actions
+                    Connect Your Wallet & Stake
                   </h3>
                 </div>
 
@@ -792,7 +993,7 @@ const StakeFelySection = () => {
 
                 <div className="bg-[#13171E] rounded-xl p-4 border border-[#2a333e] space-y-3">
                   <h4 className="text-white text-sm font-medium">
-                    Connection Status
+                    Use Polygon Network – keep Polygon USDT and a little POL for gas.
                   </h4>
 
                   <button
@@ -807,6 +1008,20 @@ const StakeFelySection = () => {
                         <p className="text-xs text-gray-500">Wallet Address:</p>
                         <p className="text-xs text-primary-500 font-medium font-mono">
                           {yourWalletAddress}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-xs text-gray-500">USDT Balance:</p>
+                        <p className="text-xs text-primary-500 font-medium font-mono">
+                          0
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-xs text-gray-500">POL Balance :</p>
+                        <p className="text-xs text-primary-500 font-medium font-mono">
+                          0
                         </p>
                       </div>
 
@@ -854,10 +1069,9 @@ const StakeFelySection = () => {
                           <option value="" disabled selected>
                             Select Plan
                           </option>
-                          <option value="5">5 Days - 1% APY</option>
-                          <option value="3">3 Months - 2.5% APY</option>
-                          <option value="6">6 Months - 8% APY</option>
-                          <option value="12">12 Months - 12.5% APY</option>
+                          <option value="3">Dolphin (3 Months)</option>
+                          <option value="6">Shark (6 Months)</option>
+                          <option value="12">Whale (12 Months)</option>
                         </select>
                         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
                           <svg
@@ -901,7 +1115,7 @@ const StakeFelySection = () => {
               <div className="bg-secondary dark:bg-background-8 rounded-[30px] p-6 border border-stroke-2 dark:border-stroke-6">
                 <div className="space-y-6">
                   <h3 className="text-xl font-bold text-white">
-                    Lookup Stake IDs
+                    Search Your Stake ID to Claim Bonuses
                   </h3>
                   <div className="flex flex-col md:flex-row gap-3 md:items-end">
                     {/* <div className="flex-1 flex flex-col space-y-2 w-full">
@@ -925,10 +1139,10 @@ const StakeFelySection = () => {
                           <option value="" disabled selected>
                             Select Plan
                           </option>
-                          <option value="5">5 Days - 1% APY</option>
-                          <option value="3">Silver (3 Months)</option>
-                          <option value="6">Gold (6 Months)</option>
-                          <option value="12">Platinum (12 Months)</option>
+
+                          <option value="3">Dolphin (3 Months)</option>
+                          <option value="6">Shark (6 Months)</option>
+                          <option value="12">Whale (12 Months)</option>
                         </select>
                         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
                           <svg
@@ -963,7 +1177,7 @@ const StakeFelySection = () => {
                   <div className="pl-1">
                     <p className="text-gray-400 text-sm">
                       Results:{" "}
-                      <span className="text-gray-500 italic ml-2">
+                      <span className="text-primary-500 italic ml-2">
                         {lockUpState}
                       </span>
                     </p>
@@ -976,7 +1190,7 @@ const StakeFelySection = () => {
             <RevealAnimation delay={0.4}>
               <div className="bg-secondary dark:bg-background-8 rounded-[30px] p-6 border border-stroke-2 dark:border-stroke-6">
                 <h3 className="text-xl font-bold text-white mb-4">
-                  % Claim Interest
+                  Claim Today’s Bonus
                 </h3>
                 <h5>{ClameUpState}</h5>
                 <div className="flex flex-col md:flex-row gap-3 md:items-end">
@@ -1002,10 +1216,10 @@ const StakeFelySection = () => {
                         <option value="" disabled selected>
                           Select Plan
                         </option>
-                        <option value="5">5 Days - 1% APY</option>
-                        <option value="3">Silver (3 Months)</option>
-                        <option value="6">Gold (6 Months)</option>
-                        <option value="12">Platinum (12 Months)</option>
+
+                        <option value="3">Dolphin (3 Months)</option>
+                        <option value="6">Shark (6 Months)</option>
+                        <option value="12">Whale (12 Months)</option>
                       </select>
                       <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
                         <svg
@@ -1043,7 +1257,7 @@ const StakeFelySection = () => {
             <RevealAnimation delay={0.5}>
               <div className="bg-secondary dark:bg-background-8 rounded-[30px] p-6 border border-stroke-2 dark:border-stroke-6">
                 <h3 className="text-xl font-bold text-white mb-4">
-                  ⎋ Withdraw Capital
+                  Withdraw Staked Funds After Lock Period
                 </h3>
                 <h5>{WithdrawState}</h5>
                 <div className="flex flex-col md:flex-row gap-3 md:items-end">
@@ -1069,10 +1283,9 @@ const StakeFelySection = () => {
                         <option value="" disabled selected>
                           Select Plan
                         </option>
-                        <option value="5">5 Days - 1% APY</option>
-                        <option value="3">Silver (3 Months)</option>
-                        <option value="6">Gold (6 Months)</option>
-                        <option value="12">Platinum (12 Months)</option>
+                        <option value="3">Dolphin (3 Months)</option>
+                        <option value="6">Shark (6 Months)</option>
+                        <option value="12">Whale (12 Months)</option>
                       </select>
                       <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
                         <svg
@@ -1121,7 +1334,7 @@ const StakeFelySection = () => {
                 <thead>
                   <tr className="border-b border-[#2a333e]">
                     <th className="p-4 text-white font-semibold whitespace-nowrap">
-                      Order No
+
                     </th>
                     <th className="p-4 text-white font-semibold whitespace-nowrap">
                       Plan
@@ -1136,7 +1349,7 @@ const StakeFelySection = () => {
                       Bonus %
                     </th>
                     <th className="p-4 text-white font-semibold whitespace-nowrap">
-                      Bonus Fely
+                      Bonus FELY
                     </th>
                     <th className="p-4 text-white font-semibold whitespace-nowrap">
                       Date
@@ -1168,17 +1381,17 @@ const StakeFelySection = () => {
                       <td className="p-4 text-gray-300">
                         {row.staked_at
                           ? format(
-                              new Date(String(row.staked_at)),
-                              "dd/MM/yyyy",
-                            )
+                            new Date(String(row.staked_at)),
+                            "dd/MM/yyyy",
+                          )
                           : "-"}
                       </td>
                       <td className="p-4 text-gray-300">
                         {row.maturity_date
                           ? format(
-                              new Date(String(row.maturity_date)),
-                              "dd/MM/yyyy",
-                            )
+                            new Date(String(row.maturity_date)),
+                            "dd/MM/yyyy",
+                          )
                           : "Pending"}
                       </td>
                       <td className="p-4">
@@ -1209,7 +1422,7 @@ const StakeFelySection = () => {
                       Bonus Percentage
                     </th>
                     <th className="p-4 text-white font-semibold whitespace-nowrap">
-                      Bonus Amount
+                      Bonus Amount (FELY)
                     </th>
                   </tr>
                 </thead>
@@ -1222,9 +1435,9 @@ const StakeFelySection = () => {
                       <td className="p-4 text-gray-300">
                         {row.id
                           ? format(
-                              new Date(String(row.earned_at)),
-                              "dd/MM/yyyy",
-                            )
+                            new Date(String(row.earned_at)),
+                            "dd/MM/yyyy",
+                          )
                           : "-"}
                       </td>
                       <td className="p-4 text-gray-300">{row.bonus_level}</td>
@@ -1242,8 +1455,8 @@ const StakeFelySection = () => {
               <div className="flex flex-col gap-4 mb-6">
                 <h3 className="text-xl font-bold text-white">
                   Total Bonus Balance{" "}
-                  {parseFloat(withdrawableFelyFix).toFixed(2)} (
-                  {parseFloat(withdrawableUsdt).toFixed(2)}){balanceErr}
+                  {parseFloat(withdrawableFelyFix).toFixed(2)} FELY (
+                  {parseFloat(withdrawableUsdt).toFixed(2)}) USDT {balanceErr}
                 </h3>
 
                 <div className="flex flex-col sm:flex-row items-start gap-3 justify-start">
@@ -1253,9 +1466,9 @@ const StakeFelySection = () => {
                       value={
                         withdrawableFely
                           ? (
-                              Math.trunc(parseFloat(withdrawableFely) * 100) /
-                              100
-                            ).toString()
+                            Math.trunc(parseFloat(withdrawableFely) * 100) /
+                            100
+                          ).toString()
                           : ""
                       }
                       onChange={(e) => setWithdrawableFely(e.target.value)}
@@ -1315,9 +1528,9 @@ const StakeFelySection = () => {
                         <td className="p-4 text-white text-sm">
                           {rows.created_at
                             ? format(
-                                new Date(String(rows.created_at)),
-                                "dd/MM/yyyy",
-                              )
+                              new Date(String(rows.created_at)),
+                              "dd/MM/yyyy",
+                            )
                             : "-"}
                         </td>
                         <td className="p-4 text-white text-sm">

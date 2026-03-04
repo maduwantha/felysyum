@@ -43,11 +43,7 @@ const OurMission = () => {
                   alt="business growth card"
                   className="block h-full w-full dark:hidden"
                 />
-                <Image
-                  src={businessGrowthCardDarkImg}
-                  alt="business growth card"
-                  className="hidden h-full w-full dark:block"
-                />
+
               </figure>
             </RevealAnimation>
             <RevealAnimation delay={0.6}>
@@ -61,65 +57,7 @@ const OurMission = () => {
                 <div className="-mt-20 text-center">
                   <div className="mb-4 flex items-center justify-center gap-4">
                     <div className="group flex -space-x-3.5">
-                      <figure className="relative inline-block size-11 overflow-hidden rounded-full bg-linear-[156deg,_#FFF_32.92%,_#A585FF_91%] ring-3 ring-white">
-                        <Image src={avatar1Img} alt="avatar" className="max-w-full" />
-                        <Image src={authorAvatarBgImg} alt="avatar" className="absolute top-0 left-0 -z-10" />
-                      </figure>
-                      <figure className="relative inline-block size-11 overflow-hidden rounded-full bg-linear-[156deg,_#FFF_32.92%,_#A585FF_91%] ring-3 ring-white">
-                        <Image src={avatar2Img} alt="avatar" className="max-w-full" />
-                        <Image src={authorAvatarBgImg} alt="avatar" className="absolute top-0 left-0 -z-10" />
-                      </figure>
-                      <figure className="relative inline-block size-11 overflow-hidden rounded-full bg-linear-[156deg,_#FFF_32.92%,_#A585FF_91%] ring-3 ring-white">
-                        <Image src={avatar3Img} alt="avatar" className="max-w-full" />
-                        <Image src={authorAvatarBgImg} alt="avatar" className="absolute top-0 left-0 -z-10" />
-                      </figure>
-                      <div className="text-secondary/80 bg-ns-yellow text-tagline-3 relative z-10 inline-flex size-12 items-center justify-center overflow-hidden rounded-full font-medium ring-3 ring-white">
-                        <svg
-                          width={24}
-                          height={24}
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-500 group-hover:translate-x-8 group-hover:-translate-y-12">
-                          <path
-                            d="M6 18L18 6"
-                            stroke="#1A1A1C"
-                            strokeWidth={2}
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                          <path
-                            d="M8.25 6H18V15.75"
-                            stroke="#1A1A1C"
-                            strokeWidth={2}
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                        {/*  */}
-                        <svg
-                          width={24}
-                          height={24}
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="absolute -translate-x-12 translate-y-6 transition-all duration-500 group-hover:-translate-x-[1px] group-hover:-translate-y-[2%]">
-                          <path
-                            d="M6 18L18 6"
-                            stroke="#1A1A1C"
-                            strokeWidth={2}
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                          <path
-                            d="M8.25 6H18V15.75"
-                            stroke="#1A1A1C"
-                            strokeWidth={2}
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                      </div>
+
                     </div>
                   </div>
                   <h6 className="text-secondary dark:text-accent leading-[1 .5] mb-1 text-xl font-normal">
