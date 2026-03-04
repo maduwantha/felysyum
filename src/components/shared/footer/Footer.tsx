@@ -5,7 +5,7 @@ import bgGradientImg from '@public/images/ns-img-524.png';
 import FelysyumLogo from '@public/images/shared/felysyum-logo.png';
 import Image from 'next/image';
 import Link from 'next/link';
-import { FaDiscord, FaLinkedin, FaMedium, FaReddit, FaXTwitter } from 'react-icons/fa6';
+import { FaDiscord, FaLinkedin, FaMedium, FaReddit, FaXTwitter, FaTelegram, FaFacebook, FaYoutube } from 'react-icons/fa6';
 import ThemeToggle from '../ThemeToggle';
 import FooterDivider from './FooterDivider';
 
@@ -38,11 +38,7 @@ const Footer = () => {
                     <span className="sr-only">Medium</span>
                     <FaMedium className="text-xl text-secondary dark:text-accent" />
                   </Link>
-                  <div className="bg-stroke-1 dark:bg-stroke-8 h-5 w-px"></div>
-                  <Link target="_blank" href="https://www.linkedin.com/company/102992887" className="footer-social-link">
-                    <span className="sr-only">LinkedIn</span>
-                    <FaLinkedin className="text-xl text-secondary dark:text-accent" />
-                  </Link>
+
                   <div className="bg-stroke-1 dark:bg-stroke-8 h-5 w-px"></div>
                   <Link target="_blank" href="https://x.com/felysyum" className="footer-social-link">
                     <span className="sr-only">X (Twitter)</span>
@@ -53,10 +49,23 @@ const Footer = () => {
                     <span className="sr-only">Discord</span>
                     <FaDiscord className="text-xl text-secondary dark:text-accent" />
                   </Link>
+
                   <div className="bg-stroke-1 dark:bg-stroke-8 h-5 w-px"></div>
-                  <Link target="_blank" href="https://www.reddit.com/r/felysyum/" className="footer-social-link">
-                    <span className="sr-only">Reddit</span>
-                    <FaReddit className="text-xl text-secondary dark:text-accent" />
+                  <Link target="_blank" href="https://t.me/felysyum" className="footer-social-link">
+                    <span className="sr-only">Telegram</span>
+                    <FaTelegram className="text-xl text-secondary dark:text-accent" />
+                  </Link>
+
+                  <div className="bg-stroke-1 dark:bg-stroke-8 h-5 w-px"></div>
+                  <Link target="_blank" href="https://www.facebook.com/felysyumfely" className="footer-social-link">
+                    <span className="sr-only">Facebook</span>
+                    <FaFacebook className="text-xl text-secondary dark:text-accent" />
+                  </Link>
+
+                  <div className="bg-stroke-1 dark:bg-stroke-8 h-5 w-px"></div>
+                  <Link target="_blank" href="https://www.youtube.com/@Felysyumfely" className="footer-social-link">
+                    <span className="sr-only">Youtube</span>
+                    <FaYoutube className="text-xl text-secondary dark:text-accent" />
                   </Link>
                 </div>
               </div>
