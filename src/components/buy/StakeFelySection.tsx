@@ -782,10 +782,12 @@ const StakeFelySection = () => {
               Maximize your holdings by staking FELY. Earn rewards while
               contributing to the ecosystem stability.
             </p>
-            <p className="text-primary-500 text-sm md:text-base max-w-3xl mx-auto mt-2 font-medium">
-              Connect your wallet, share your referral code, and earn rewards up
-              to 3 levels deep!
-            </p>
+            <div className="bg-primary-500/10 border border-primary-500/20 px-6 py-3 rounded-xl shadow-[0_0_20px_rgba(228,145,39,0.15)] mt-2">
+              <p className="text-primary-500 text-sm md:text-base font-bold text-center">
+                Connect your wallet, share your referral code, and earn rewards up
+                to 3 levels deep!
+              </p>
+            </div>
 
             <div className="flex flex-col items-center gap-4 w-full max-w-md mt-2">
               {/* <button className="bg-primary-500 hover:bg-primary-600 text-white px-6 py-2 rounded-full font-medium text-sm md:text-base transition-colors shadow-[0_0_15px_rgba(228,145,39,0.2)]">
@@ -846,14 +848,18 @@ const StakeFelySection = () => {
         </RevealAnimation>
       </div>
 
-      <div className="text-left w-full  px-4 md:px-0">
-        <p className="text-gray-400 text-sm md:text-base">
+      <div className="text-center w-full  px-4 md:px-0">
+        <p className="text-white font-bold text-sm md:text-base">
           Felysyum stakes are secured on smart contracts. Once you stake, only
           you can withdraw your daily interest and staking capital – not even we
           can access it. Your funds are safe in your hands.
           <br />
-          <span className="text-white font-medium mt-1 inline-block">
+          <span className="text-primary-500 font-medium mt-4 inline-block">
             Choose your staking plan and start earning
+          </span>
+
+          <span className="text-primary-500 font-bold block my-4 text-base md:text-lg">
+            Enjoy premium interest on every plan—even for small stakes! Whale 20%, Shark 9%, Dolphin 4%. Don’t miss this limited-time opportunity!
           </span>
         </p>
       </div>
@@ -1273,7 +1279,9 @@ const StakeFelySection = () => {
                           </svg>
                         </div>
                         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400"></div>
-                        <div>{stakeState}</div>
+
+                        <p className="text-primary-500 text-xs mt-2">{stakeState}</p>
+
                       </div>
                     </div>
                     <button
@@ -1376,7 +1384,7 @@ const StakeFelySection = () => {
                 <h3 className="text-xl font-bold text-white mb-4">
                   Claim Today’s Bonus
                 </h3>
-                <h5>{ClameUpState}</h5>
+
                 <div className="flex flex-col md:flex-row gap-3 md:items-end">
                   <div className="flex-1 flex flex-col space-y-2 w-full">
                     <label className="text-xs text-gray-300 ml-1">
@@ -1434,6 +1442,8 @@ const StakeFelySection = () => {
                     </button>
                   </div>
                 </div>
+
+                <p className="text-primary-500 text-xs mt-2">{ClameUpState}</p>
               </div>
             </RevealAnimation>
 
@@ -1443,7 +1453,7 @@ const StakeFelySection = () => {
                 <h3 className="text-xl font-bold text-white mb-4">
                   Withdraw Staked Funds After Lock Period
                 </h3>
-                <h5>{WithdrawState}</h5>
+
                 <div className="flex flex-col md:flex-row gap-3 md:items-end">
                   <div className="flex-1 flex flex-col space-y-2 w-full">
                     <label className="text-xs text-gray-300 ml-1">
@@ -1500,6 +1510,8 @@ const StakeFelySection = () => {
                     </button>
                   </div>
                 </div>
+
+                <p className="text-primary-500 text-xs mt-2">{WithdrawState}</p>
               </div>
             </RevealAnimation>
           </div>
@@ -1525,13 +1537,13 @@ const StakeFelySection = () => {
                       USDT
                     </th>
                     <th className="p-4 text-white font-semibold whitespace-nowrap">
-                      Fely Amount
+                      Staked (FELY)
                     </th>
                     <th className="p-4 text-white font-semibold whitespace-nowrap">
                       Bonus %
                     </th>
                     <th className="p-4 text-white font-semibold whitespace-nowrap">
-                      Bonus FELY
+                      Bonus (FELY)
                     </th>
                     <th className="p-4 text-white font-semibold whitespace-nowrap">
                       Date
@@ -1569,17 +1581,17 @@ const StakeFelySection = () => {
                       <td className="p-4 text-gray-300">
                         {row.staked_at
                           ? format(
-                              new Date(String(row.staked_at)),
-                              "dd/MM/yyyy",
-                            )
+                            new Date(String(row.staked_at)),
+                            "dd/MM/yyyy",
+                          )
                           : "-"}
                       </td>
                       <td className="p-4 text-gray-300">
                         {row.maturity_date
                           ? format(
-                              new Date(String(row.maturity_date)),
-                              "dd/MM/yyyy",
-                            )
+                            new Date(String(row.maturity_date)),
+                            "dd/MM/yyyy",
+                          )
                           : "-"}
                       </td>
 
@@ -1671,9 +1683,9 @@ const StakeFelySection = () => {
                       <td className="p-4 text-gray-300">
                         {row.id
                           ? format(
-                              new Date(String(row.earned_at)),
-                              "dd/MM/yyyy",
-                            )
+                            new Date(String(row.earned_at)),
+                            "dd/MM/yyyy",
+                          )
                           : "-"}
                       </td>
                       <td className="p-4 text-gray-300">{row.bonus_level}</td>
@@ -1702,9 +1714,9 @@ const StakeFelySection = () => {
                       value={
                         withdrawableFely
                           ? (
-                              Math.trunc(parseFloat(withdrawableFely) * 100) /
-                              100
-                            ).toString()
+                            Math.trunc(parseFloat(withdrawableFely) * 100) /
+                            100
+                          ).toString()
                           : ""
                       }
                       onChange={(e) => setWithdrawableFely(e.target.value)}
@@ -1767,9 +1779,9 @@ const StakeFelySection = () => {
                         <td className="p-4 text-white text-sm">
                           {rows.created_at
                             ? format(
-                                new Date(String(rows.created_at)),
-                                "dd/MM/yyyy",
-                              )
+                              new Date(String(rows.created_at)),
+                              "dd/MM/yyyy",
+                            )
                             : "-"}
                         </td>
                         <td className="p-4 text-white text-sm">
@@ -1794,7 +1806,7 @@ const StakeFelySection = () => {
                               className="text-gray-500 hover:text-primary-500 transition-colors flex-shrink-0"
                             >
                               {copiedHashWith ===
-                              String(rows.transaction_hash) ? (
+                                String(rows.transaction_hash) ? (
                                 <svg
                                   className="w-3.5 h-3.5 text-primary-500"
                                   fill="none"
@@ -1828,7 +1840,9 @@ const StakeFelySection = () => {
                         </td>
 
                         <td className="p-4 text-white text-sm">
-                          {rows.status.text}
+                          <span className="inline-block px-2 py-1 bg-primary-500/20 text-primary-500 text-xs rounded-md">
+                            {rows.status.text}
+                          </span>
                         </td>
                       </tr>
                     ))}

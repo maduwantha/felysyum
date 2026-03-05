@@ -43,7 +43,6 @@ export default function RootLayout({
           <Suspense>
             <SmoothScrollProvider>
               <Navbar />
-              {process.env.NODE_ENV === 'development' && <DemoShowcase activeDemoId={22} />}
               {children}
               <Footer />
             </SmoothScrollProvider>
