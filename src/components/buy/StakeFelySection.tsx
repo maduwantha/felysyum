@@ -78,6 +78,7 @@ const StakeFelySection = () => {
   const [PolyBalance, setPolyBalance] = useState("");
 
   const [copiedHash, setCopiedHash] = useState<string | null>(null);
+  const [copiedHashWith, setCopiedHashhis] = useState<string | null>(null);
 
   type StakeRow = {
     id: number;
@@ -106,6 +107,7 @@ const StakeFelySection = () => {
       text: string;
     };
     created_at: string;
+    transaction_hash: String;
   };
   const [withdrawData, setWithdrawData] = useState<WithdrawHistory[]>([]);
 
@@ -1749,6 +1751,9 @@ const StakeFelySection = () => {
                         FELY Amount
                       </th>
                       <th className="p-4 text-white font-semibold whitespace-nowrap">
+                        Transaction Hash
+                      </th>
+                      <th className="p-4 text-white font-semibold whitespace-nowrap">
                         Status
                       </th>
                     </tr>
@@ -1773,6 +1778,55 @@ const StakeFelySection = () => {
                         <td className="p-4 text-white text-sm">
                           {parseFloat(rows.fely_amount).toFixed(2)}
                         </td>
+
+                        <td className="p-4 text-white text-sm">
+                          <div className="flex items-center gap-2">
+                            <span>{shortenHash(rows.transaction_hash)}</span>
+                            <button
+                              title="Copy transaction hash"
+                              onClick={() => {
+                                navigator.clipboard.writeText(
+                                  String(rows.transaction_hash),
+                                );
+                                setCopiedHashhis(String(rows.transaction_hash));
+                                setTimeout(() => setCopiedHashhis(null), 2000);
+                              }}
+                              className="text-gray-500 hover:text-primary-500 transition-colors flex-shrink-0"
+                            >
+                              {copiedHashWith ===
+                              String(rows.transaction_hash) ? (
+                                <svg
+                                  className="w-3.5 h-3.5 text-primary-500"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M5 13l4 4L19 7"
+                                  />
+                                </svg>
+                              ) : (
+                                <svg
+                                  className="w-3.5 h-3.5"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 002 2z"
+                                  />
+                                </svg>
+                              )}
+                            </button>
+                          </div>
+                        </td>
+
                         <td className="p-4 text-white text-sm">
                           {rows.status.text}
                         </td>
