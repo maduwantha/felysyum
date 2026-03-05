@@ -80,6 +80,10 @@ const StakeFelySection = () => {
   const [copiedHash, setCopiedHash] = useState<string | null>(null);
   const [copiedHashWith, setCopiedHashhis] = useState<string | null>(null);
 
+  // Sample UI testing
+  const [isProcessing, setIsProcessing] = useState(false);
+  // Sample UI testing end
+
   type StakeRow = {
     id: number;
     month: number;
@@ -1855,8 +1859,47 @@ const StakeFelySection = () => {
       ) : (
         <div></div>
       )}
+
+      {/* SAMPLE PROCESS BUTTON FOR UI TESTING */}
+
+      <div className="flex flex-col items-center gap-3">
+        <button
+          onClick={() => setIsProcessing(true)}
+          className="btn btn-primary px-8 h-[46px]"
+        >
+          Process
+        </button>
+      </div>
+
+
+      {/* Web3 Transaction Pending Modal */}
+      {isProcessing && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-[#13171E] border border-[#2a333e] rounded-2xl p-8 max-w-sm w-full mx-4 flex flex-col items-center justify-center text-center shadow-2xl relative overflow-hidden">
+            {/* Background glowing effect */}
+            <div className="absolute inset-0 bg-primary-500/10 blur-3xl rounded-full" />
+
+            <div className="relative mb-6">
+              <div className="w-16 h-16 border-4 border-[#2a333e] border-t-primary-500 rounded-full animate-spin"></div>
+              <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-50 text-[10px] font-bold text-primary-500 tracking-wider">
+                FELY
+              </span>
+            </div>
+
+            <h3 className="text-xl font-bold text-white mb-2">Transaction Pending...</h3>
+            <p className="text-gray-400 text-sm mb-6">
+              Please wait while your transaction is being processed. Confirm the request in your wallet if prompted.
+            </p>
+
+          </div>
+        </div>
+      )}
+      {/* SAMPLE PROCESS BUTTON FOR UI END */}
+
+
     </div>
   );
 };
 
 export default StakeFelySection;
+
