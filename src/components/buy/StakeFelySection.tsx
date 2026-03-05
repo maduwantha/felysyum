@@ -77,6 +77,8 @@ const StakeFelySection = () => {
   const [usdtBalance, setUsdtBalance] = useState("");
   const [PolyBalance, setPolyBalance] = useState("");
 
+  const [copiedHash, setCopiedHash] = useState<string | null>(null);
+
   type StakeRow = {
     id: number;
     month: number;
@@ -89,6 +91,7 @@ const StakeFelySection = () => {
     maturity_date: String;
     days_until_maturity: number;
     is_matured: false;
+    transaction_hash: String;
     status: String;
   };
   const [stakeData, setStakeData] = useState<StakeRow[]>([]);
@@ -134,6 +137,10 @@ const StakeFelySection = () => {
     3: "Dolphin",
     6: "Shark",
     12: "Whale",
+  };
+
+  const shortenHash = (address: any) => {
+    return `${address.slice(0, 4)}...${address.slice(-4)}`;
   };
 
   // Change the function to accept address as parameter
@@ -232,6 +239,7 @@ const StakeFelySection = () => {
         wallet_address: accounts[0],
         signature: signature,
         nonce: nonce.data.nonce,
+        message: message,
       };
       console.log(loginRowData);
       const loginReturnData = await serverPostRequest(
@@ -1530,6 +1538,9 @@ const StakeFelySection = () => {
                       End Date
                     </th>
                     <th className="p-4 text-white font-semibold whitespace-nowrap">
+                      Tansaction Hash
+                    </th>
+                    <th className="p-4 text-white font-semibold whitespace-nowrap">
                       Status
                     </th>
                   </tr>
@@ -1567,8 +1578,56 @@ const StakeFelySection = () => {
                               new Date(String(row.maturity_date)),
                               "dd/MM/yyyy",
                             )
-                          : "Pending"}
+                          : "-"}
                       </td>
+
+                      <td className="p-4 text-gray-300">
+                        <div className="flex items-center gap-2">
+                          <span>{shortenHash(row.transaction_hash)}</span>
+                          <button
+                            title="Copy transaction hash"
+                            onClick={() => {
+                              navigator.clipboard.writeText(
+                                String(row.transaction_hash),
+                              );
+                              setCopiedHash(String(row.transaction_hash));
+                              setTimeout(() => setCopiedHash(null), 2000);
+                            }}
+                            className="text-gray-500 hover:text-primary-500 transition-colors flex-shrink-0"
+                          >
+                            {copiedHash === String(row.transaction_hash) ? (
+                              <svg
+                                className="w-3.5 h-3.5 text-primary-500"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M5 13l4 4L19 7"
+                                />
+                              </svg>
+                            ) : (
+                              <svg
+                                className="w-3.5 h-3.5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 002 2z"
+                                />
+                              </svg>
+                            )}
+                          </button>
+                        </div>
+                      </td>
+
                       <td className="p-4">
                         <span className="inline-block px-2 py-1 bg-primary-500/20 text-primary-500 text-xs rounded-md">
                           {row.status}
