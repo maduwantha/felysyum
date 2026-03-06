@@ -27,13 +27,81 @@ import {
   STAKE5DAYS_ABI,
 } from "@/app/contracts/stake5days";
 
-import { POL_CONTRACT, POL_ABI } from "@/app/contracts/polygonContract";
 import { USDT_CONTRACT_ADDRESS, USDT_ABI } from "@/app/contracts/usdtContract";
 
 import { ethers } from "ethers";
 import { useSearchParams } from "next/navigation";
 
-// ─── EIP-6963 types ──────────────────────────────────────────────────────────
+// ─── Public Polygon RPC — simple retry, NO FallbackProvider ──────────────────
+// FallbackProvider fires eth_blockNumber to all nodes simultaneously which
+// causes -32603 "Failed to fetch" on Trust/Coinbase wallet environments.
+const POLYGON_RPC_URLS = [
+  "https://polygon-bor-rpc.publicnode.com",
+  "https://1rpc.io/matic",
+  "https://polygon.meowrpc.com",
+  "https://polygon.drpc.org",
+];
+
+// Returns a working JsonRpcProvider by trying each URL in order
+const getPublicProvider = async (): Promise<ethers.JsonRpcProvider> => {
+  for (const url of POLYGON_RPC_URLS) {
+    try {
+      const provider = new ethers.JsonRpcProvider(url, {
+        chainId: 137,
+        name: "polygon",
+      });
+      // Quick liveness check — if this throws, try next URL
+      await Promise.race([
+        provider.getBlockNumber(),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("timeout")), 3000),
+        ),
+      ]);
+      return provider;
+    } catch (_) {
+      console.warn(`RPC ${url} failed, trying next...`);
+    }
+  }
+  // Last resort — return first one anyway and let the caller handle it
+  return new ethers.JsonRpcProvider(POLYGON_RPC_URLS[0], {
+    chainId: 137,
+    name: "polygon",
+  });
+};
+
+// Cached provider promise so we don't re-test RPCs on every call
+let _providerCache: Promise<ethers.JsonRpcProvider> | null = null;
+const getCachedPublicProvider = (): Promise<ethers.JsonRpcProvider> => {
+  if (!_providerCache) {
+    _providerCache = getPublicProvider();
+    // Reset cache after 60s so a failed node can recover
+    setTimeout(() => {
+      _providerCache = null;
+    }, 60_000);
+  }
+  return _providerCache;
+};
+
+// ─── Mobile-safe clipboard copy ───────────────────────────────────────────────
+const copyToClipboard = (text: string) => {
+  if (navigator.clipboard && window.isSecureContext) {
+    return navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
+  }
+  fallbackCopy(text);
+};
+
+const fallbackCopy = (text: string) => {
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.cssText = "position:fixed;left:-9999px;top:-9999px;opacity:0";
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try {
+    document.execCommand("copy");
+  } catch (_) {}
+  document.body.removeChild(ta);
+};
 interface EIP6963ProviderInfo {
   uuid: string;
   name: string;
@@ -45,57 +113,132 @@ interface EIP6963ProviderDetail {
   provider: any;
 }
 
-// ─── Wallet selector modal ────────────────────────────────────────────────────
+// ─── Mobile wallet deep links ─────────────────────────────────────────────────
+const getMobileDeepLinks = (currentUrl: string) => {
+  const encoded = encodeURIComponent(currentUrl);
+  const bare = currentUrl.replace(/^https?:\/\//, "");
+  return [
+    {
+      name: "MetaMask",
+      icon: "https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg",
+      url: `https://metamask.app.link/dapp/${bare}`,
+    },
+    {
+      name: "Trust Wallet",
+      icon: "https://trustwallet.com/assets/images/favicon.png",
+      url: `https://link.trustwallet.com/open_url?coin_id=966&url=${encoded}`,
+    },
+    {
+      name: "Coinbase Wallet",
+      icon: "https://www.coinbase.com/favicon.ico",
+      url: `https://go.cb-w.com/dapp?cb_url=${encoded}`,
+    },
+  ];
+};
+
+// ─── Wallet selector modal (desktop + mobile deep links) ─────────────────────
 const WalletModal = ({
   wallets,
   onSelect,
   onClose,
+  isMobile,
 }: {
   wallets: EIP6963ProviderDetail[];
   onSelect: (provider: any, name: string) => void;
   onClose: () => void;
-}) => (
-  <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 backdrop-blur-sm">
-    <div className="bg-[#13171E] border border-[#2a333e] rounded-2xl p-6 max-w-xs w-full mx-4 shadow-2xl">
-      <div className="flex items-center justify-between mb-5">
-        <h3 className="text-white font-bold text-lg">Choose Wallet</h3>
-        <button
-          onClick={onClose}
-          className="text-gray-500 hover:text-white text-xl leading-none"
-        >
-          ✕
-        </button>
-      </div>
-      <div className="flex flex-col gap-3">
-        {wallets.map((w) => (
+  isMobile: boolean;
+}) => {
+  const deepLinks = getMobileDeepLinks(
+    typeof window !== "undefined" ? window.location.href : "",
+  );
+
+  return (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 backdrop-blur-sm">
+      <div className="bg-[#13171E] border border-[#2a333e] rounded-2xl p-6 max-w-xs w-full mx-4 shadow-2xl">
+        <div className="flex items-center justify-between mb-5">
+          <h3 className="text-white font-bold text-lg">Choose Wallet</h3>
           <button
-            key={w.info.uuid}
-            onClick={() => onSelect(w.provider, w.info.name)}
-            className="flex items-center gap-3 bg-[#1c2230] hover:bg-[#2a333e] border border-[#2a333e] rounded-xl px-4 py-3 transition-colors text-left"
+            onClick={onClose}
+            className="text-gray-500 hover:text-white text-xl leading-none"
           >
-            {w.info.icon && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={w.info.icon}
-                alt={w.info.name}
-                className="w-8 h-8 rounded-full"
-              />
-            )}
-            <span className="text-white text-sm font-medium">
-              {w.info.name}
-            </span>
+            ✕
           </button>
-        ))}
-        {wallets.length === 0 && (
+        </div>
+
+        {/* Injected wallets (desktop / in-app browser) */}
+        {wallets.length > 0 && (
+          <div className="flex flex-col gap-3 mb-4">
+            {wallets.map((w) => (
+              <button
+                key={w.info.uuid}
+                onClick={() => onSelect(w.provider, w.info.name)}
+                className="flex items-center gap-3 bg-[#1c2230] hover:bg-[#2a333e] border border-[#2a333e] rounded-xl px-4 py-3 transition-colors text-left"
+              >
+                {w.info.icon && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={w.info.icon}
+                    alt={w.info.name}
+                    className="w-8 h-8 rounded-full"
+                  />
+                )}
+                <span className="text-white text-sm font-medium">
+                  {w.info.name}
+                </span>
+                <span className="ml-auto text-xs text-green-400">Detected</span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Mobile deep links — always shown on mobile */}
+        {isMobile && (
+          <>
+            {wallets.length > 0 && (
+              <p className="text-gray-500 text-xs mb-3 text-center">
+                — or open in wallet app —
+              </p>
+            )}
+            <div className="flex flex-col gap-3">
+              {deepLinks.map((dl) => (
+                <a
+                  key={dl.name}
+                  href={dl.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-3 bg-[#1c2230] hover:bg-[#2a333e] border border-[#2a333e] rounded-xl px-4 py-3 transition-colors"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={dl.icon}
+                    alt={dl.name}
+                    className="w-8 h-8 rounded-full"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = "none";
+                    }}
+                  />
+                  <span className="text-white text-sm font-medium">
+                    {dl.name}
+                  </span>
+                  <span className="ml-auto text-xs text-primary-500">
+                    Open App →
+                  </span>
+                </a>
+              ))}
+            </div>
+          </>
+        )}
+
+        {wallets.length === 0 && !isMobile && (
           <p className="text-gray-400 text-sm text-center py-4">
             No wallet detected. Install MetaMask, Trust Wallet, or Coinbase
-            Wallet.
+            Wallet extension.
           </p>
         )}
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 const StakeFelySection = () => {
@@ -185,96 +328,232 @@ const StakeFelySection = () => {
   };
   const [bonusData, setBonusData] = useState<BonusHistory[]>([]);
 
-  // ── EIP-6963: listen for wallet announcements ─────────────────────────────
+  // ── EIP-6963 + legacy scan ─────────────────────────────────────────────────
   useEffect(() => {
-    const checkMobile = () =>
-      setIsMobile(
-        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          navigator.userAgent,
-        ),
-      );
-    checkMobile();
+    const ua = navigator.userAgent;
+    const mobile =
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+    setIsMobile(mobile);
     setLockUpState("No active stakes found");
 
     const walletMap = new Map<string, EIP6963ProviderDetail>();
 
+    const registerProvider = (p: any, key: string) => {
+      if (!p || walletMap.has(key)) return;
+      const name =
+        p.isCoinbaseWallet || p.isCoinbaseBrowser
+          ? "Coinbase Wallet"
+          : p.isTrust || p.isTrustWallet
+            ? "Trust Wallet"
+            : p.isMetaMask
+              ? "MetaMask"
+              : p.isBraveWallet
+                ? "Brave Wallet"
+                : "Browser Wallet";
+      walletMap.set(key, {
+        info: { uuid: key, name, icon: "", rdns: key },
+        provider: p,
+      });
+      setDetectedWallets(Array.from(walletMap.values()));
+    };
+
     const handleAnnounce = (event: any) => {
-      const detail: EIP6963ProviderDetail = event.detail;
-      walletMap.set(detail.info.uuid, detail);
+      const d: EIP6963ProviderDetail = event.detail;
+      walletMap.set(d.info.uuid, d);
       setDetectedWallets(Array.from(walletMap.values()));
     };
 
     window.addEventListener("eip6963:announceProvider", handleAnnounce);
-    // Request all wallets to announce themselves
     window.dispatchEvent(new Event("eip6963:requestProvider"));
 
-    // Also add legacy window.ethereum as fallback (MetaMask, Trust, Coinbase inject this)
-    setTimeout(() => {
+    // Poll for window.ethereum — wallets inject it at different times
+    let attempts = 0;
+    const maxAttempts = 20; // 20 × 200ms = 4 seconds
+    const scanInterval = setInterval(() => {
+      attempts++;
       const eth = (window as any).ethereum;
-      if (eth && walletMap.size === 0) {
-        // Legacy single provider – wrap it
-        const legacy: EIP6963ProviderDetail = {
-          info: {
-            uuid: "legacy",
-            name: eth.isMetaMask
-              ? "MetaMask"
-              : eth.isTrust || eth.isTrustWallet
-                ? "Trust Wallet"
-                : eth.isCoinbaseWallet
-                  ? "Coinbase Wallet"
-                  : "Browser Wallet",
-            icon: "",
-            rdns: "legacy",
-          },
-          provider: eth,
-        };
-        walletMap.set("legacy", legacy);
-        setDetectedWallets(Array.from(walletMap.values()));
+      if (eth) {
+        registerProvider(eth, "legacy");
+        (eth.providers ?? []).forEach((p: any, i: number) =>
+          registerProvider(p, `legacy-${i}`),
+        );
       }
 
-      // Also handle multi-provider from window.ethereum.providers[] (Trust/Coinbase inject this)
-      const providers: any[] = eth?.providers ?? [];
-      providers.forEach((p, idx) => {
-        const name = p.isMetaMask
-          ? "MetaMask"
-          : p.isTrust || p.isTrustWallet
-            ? "Trust Wallet"
-            : p.isCoinbaseWallet
-              ? "Coinbase Wallet"
-              : `Wallet ${idx + 1}`;
-        const key = `legacy-${idx}`;
-        walletMap.set(key, {
-          info: { uuid: key, name, icon: "", rdns: key },
-          provider: p,
-        });
-      });
-      if (providers.length > 0)
-        setDetectedWallets(Array.from(walletMap.values()));
+      if (attempts >= maxAttempts) {
+        clearInterval(scanInterval);
+        // Nothing found after 4s on mobile → show deep-link modal
+        if (mobile && walletMap.size === 0) setShowWalletModal(true);
+      }
+    }, 200);
 
-      // Auto-reconnect silently (no popup)
-      autoReconnect();
-    }, 300);
+    // Silent reconnect — checks if already authorised without triggering popup
+    // On mobile in-app browsers, eth_accounts returns [] until eth_requestAccounts
+    // is called at least once. So we only auto-reconnect if we get an address back.
+    const silentReconnect = async () => {
+      const eth = (window as any).ethereum;
+      if (!eth) return;
+      try {
+        const accounts = await eth.request({ method: "eth_accounts" });
+        if (accounts?.length > 0) {
+          setWalletAddress(accounts[0]);
+          setActiveProvider(eth);
+          await regProgress(eth, accounts[0]);
+          eth.on?.("chainChanged", () => window.location.reload());
+          eth.on?.("accountsChanged", (accs: string[]) => {
+            if (accs.length > 0) setWalletAddress(accs[0]);
+            else {
+              setIsConnected(false);
+              setWalletAddress(null);
+            }
+          });
+        }
+      } catch (_) {}
+    };
+    const reconnectTimer = setTimeout(silentReconnect, 600);
 
     return () => {
       window.removeEventListener("eip6963:announceProvider", handleAnnounce);
+      clearInterval(scanInterval);
+      clearTimeout(reconnectTimer);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ── Auto-reconnect if already authorised ─────────────────────────────────
-  const autoReconnect = async () => {
+  // ── Core connect logic ────────────────────────────────────────────────────
+  const doConnect = async (provider: any) => {
     try {
-      const eth = (window as any).ethereum;
-      if (!eth) return;
-      const accounts = await eth.request({ method: "eth_accounts" });
-      if (accounts?.length > 0) {
-        await checkAndSwitchNetwork(eth);
-        setActiveProvider(eth);
-        setWalletAddress(accounts[0]);
-        setTransactionStatus("connected");
-        await regProgress(eth);
+      setTransactionStatus("Connecting...");
+
+      // On mobile, eth_requestAccounts must be called FIRST before anything else
+      // This triggers the wallet approval UI if not yet approved
+      let accounts: string[] = [];
+      try {
+        accounts = await provider.request({ method: "eth_requestAccounts" });
+      } catch (e: any) {
+        if (e.code === 4001) throw new Error("User rejected connection");
+        // Some mobile wallets throw on first call — retry once
+        await new Promise((r) => setTimeout(r, 500));
+        accounts = await provider.request({ method: "eth_requestAccounts" });
       }
-    } catch (_) {}
+
+      if (!accounts || accounts.length === 0) {
+        throw new Error("No accounts returned from wallet");
+      }
+
+      // Set address immediately — don't wait for full auth flow
+      setWalletAddress(accounts[0]);
+      setActiveProvider(provider);
+
+      // Switch network (non-blocking on failure)
+      await checkAndSwitchNetwork(provider);
+
+      // Auth with backend
+      await regProgress(provider, accounts[0]);
+
+      provider.on?.("chainChanged", () => window.location.reload());
+      provider.on?.("accountsChanged", (accs: string[]) => {
+        if (accs.length > 0) setWalletAddress(accs[0]);
+        else {
+          setIsConnected(false);
+          setWalletAddress(null);
+        }
+      });
+    } catch (e: any) {
+      console.error("Connect error", e);
+      setTransactionStatus(e?.message || "Failed to connect");
+      setTimeout(() => setTransactionStatus(null), 4000);
+    }
+  };
+
+  // ── Registration / Login — accepts pre-fetched accounts ───────────────────
+  const regProgress = async (provider: any, walletAddr: string) => {
+    try {
+      const nonce = await getNonce(walletAddr);
+
+      // personal_sign — try [message, address] first (standard)
+      // fallback to [address, message] for Trust Wallet mobile
+      const signMessage = async (message: string): Promise<string> => {
+        try {
+          return await provider.request({
+            method: "personal_sign",
+            params: [message, walletAddr],
+          });
+        } catch (e: any) {
+          if (e.code === -32000 || e.message?.includes("param")) {
+            // Try reversed params (Trust Wallet Android quirk)
+            return await provider.request({
+              method: "personal_sign",
+              params: [walletAddr, message],
+            });
+          }
+          throw e;
+        }
+      };
+
+      if (nonce?.success) {
+        const message = `Sign this message to authenticate with your wallet:  ${nonce.data.nonce}`;
+        const signature = await signMessage(message);
+        setUsedSignature(signature);
+
+        const loginData = await serverPostRequest(
+          {
+            wallet_address: walletAddr,
+            signature,
+            nonce: nonce.data.nonce,
+            message,
+          },
+          "/auth/login",
+        );
+        setIsConnected(true);
+        setWalletAddress(walletAddr);
+        setTransactionStatus("connected");
+        setBareToken(loginData.data.token);
+        setReferalCode(loginData.data.referral.url);
+        // Fetch balances and data async — don't block UI
+        getUsdtBalance(walletAddr);
+        getPolyBalance(walletAddr);
+        getmyStaking(loginData.data.token);
+        UserWithdrawalsHistory(loginData.data.token);
+        getWithdrwalBalance(loginData.data.token);
+        getReferalBonus(loginData.data.token);
+      } else {
+        const tim = new Date().toISOString();
+        const message = `Sign this message to authenticate with your wallet. Wallet: ${walletAddr}. Timestamp: ${tim}`;
+        const signature = await signMessage(message);
+        setUsedSignature(signature);
+
+        const regData = await serverPostRequest(
+          {
+            wallet_address: walletAddr,
+            signature,
+            message,
+            timestamp: tim,
+            referral_code: ref || null,
+          },
+          "/auth/register",
+        );
+        if (regData.success) {
+          setIsConnected(true);
+          setWalletAddress(walletAddr);
+          setTransactionStatus("connected");
+          setBareToken(regData.data.token);
+          setReferalCode(regData.data.referral.url);
+          getUsdtBalance(walletAddr);
+          getPolyBalance(walletAddr);
+          UserWithdrawalsHistory(regData.data.token);
+          getWithdrwalBalance(regData.data.token);
+          getReferalBonus(regData.data.token);
+        } else {
+          setIsConnected(false);
+          setTransactionStatus("Registration failed");
+        }
+      }
+    } catch (e: any) {
+      console.error("Auth error", e);
+      if (e.code === 4001) setTransactionStatus("Signature rejected");
+      else setTransactionStatus("Authentication failed: " + (e.message || ""));
+      setTimeout(() => setTransactionStatus(null), 4000);
+    }
   };
 
   const planNames: Record<number, string> = {
@@ -286,34 +565,47 @@ const StakeFelySection = () => {
   const shortenHash = (address: any) =>
     `${address.slice(0, 4)}...${address.slice(-4)}`;
 
-  // ── Balances ──────────────────────────────────────────────────────────────
-  const getUsdtBalance = async (address: string, provider: any) => {
-    try {
-      if (!address || !provider) return;
-      const ethersProvider = new ethers.BrowserProvider(provider);
-      const signer = await ethersProvider.getSigner();
-      const usdtContract = new ethers.Contract(
-        USDT_CONTRACT_ADDRESS,
-        USDT_ABI,
-        signer,
-      );
-      const rawBalance = await usdtContract.balanceOf(address);
-      setUsdtBalance(ethers.formatUnits(rawBalance, 6));
-    } catch (e) {
-      console.error("USDT balance error", e);
+  // ── Balances — with retry for slow mobile networks ────────────────────────
+  const getUsdtBalance = async (address: string) => {
+    for (let i = 0; i < 3; i++) {
+      try {
+        const pub = await getCachedPublicProvider();
+        const usdtContract = new ethers.Contract(
+          USDT_CONTRACT_ADDRESS,
+          USDT_ABI,
+          pub,
+        );
+        const rawBalance = await usdtContract.balanceOf(address);
+        setUsdtBalance(
+          parseFloat(ethers.formatUnits(rawBalance, 6)).toFixed(2),
+        );
+        return;
+      } catch (e) {
+        _providerCache = null; // reset cache so next attempt picks a different RPC
+        if (i === 2) {
+          setUsdtBalance("0");
+          console.error("USDT balance error", e);
+        } else await new Promise((r) => setTimeout(r, 1000));
+      }
     }
   };
 
-  const getPolyBalance = async (address: string, provider: any) => {
-    try {
-      if (!address || !provider) return;
-      const ethersProvider = new ethers.BrowserProvider(provider);
-      const signer = await ethersProvider.getSigner();
-      const polContract = new ethers.Contract(POL_CONTRACT, POL_ABI, signer);
-      const rawBalance = await polContract.balanceOf(address);
-      setPolyBalance(ethers.formatUnits(rawBalance, 18));
-    } catch (e) {
-      console.error("POL balance error", e);
+  const getPolyBalance = async (address: string) => {
+    for (let i = 0; i < 3; i++) {
+      try {
+        const pub = await getCachedPublicProvider();
+        const rawBalance = await pub.getBalance(address);
+        setPolyBalance(
+          parseFloat(ethers.formatUnits(rawBalance, 18)).toFixed(4),
+        );
+        return;
+      } catch (e) {
+        _providerCache = null;
+        if (i === 2) {
+          setPolyBalance("0");
+          console.error("POL balance error", e);
+        } else await new Promise((r) => setTimeout(r, 1000));
+      }
     }
   };
 
@@ -321,15 +613,29 @@ const StakeFelySection = () => {
   const checkAndSwitchNetwork = async (provider: any) => {
     try {
       const chainId = await provider.request({ method: "eth_chainId" });
-      if (chainId !== POLYGON_CHAIN_ID) {
-        setTransactionStatus("Switching to Polygon network...");
-        try {
-          await provider.request({
-            method: "wallet_switchEthereumChain",
-            params: [{ chainId: POLYGON_CHAIN_ID }],
-          });
-        } catch (switchError: any) {
-          if (switchError.code === 4902) {
+      // Already on Polygon — nothing to do
+      if (chainId === POLYGON_CHAIN_ID || parseInt(chainId, 16) === 137) return;
+
+      setTransactionStatus("Switching to Polygon network...");
+
+      // Try switch first
+      try {
+        await provider.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: POLYGON_CHAIN_ID }],
+        });
+        setTransactionStatus("Switched to Polygon");
+        setTimeout(() => setTransactionStatus(null), 2000);
+        return;
+      } catch (switchErr: any) {
+        // 4902 = chain not added yet — add it
+        // Some wallets throw without a code (Coinbase iOS) — try addEthereumChain anyway
+        if (
+          switchErr.code === 4902 ||
+          switchErr.code === -32603 ||
+          !switchErr.code
+        ) {
+          try {
             await provider.request({
               method: "wallet_addEthereumChain",
               params: [
@@ -337,157 +643,153 @@ const StakeFelySection = () => {
                   chainId: POLYGON_CHAIN_ID,
                   chainName: "Polygon Mainnet",
                   nativeCurrency: { name: "POL", symbol: "POL", decimals: 18 },
-                  rpcUrls: ["https://polygon-rpc.com/"],
+                  rpcUrls: [
+                    "https://polygon-bor-rpc.publicnode.com",
+                    "https://1rpc.io/matic",
+                  ],
                   blockExplorerUrls: ["https://polygonscan.com/"],
                 },
               ],
             });
-          } else throw switchError;
+            setTransactionStatus("Polygon network added");
+            setTimeout(() => setTransactionStatus(null), 2000);
+            return;
+          } catch (addErr: any) {
+            // Coinbase Wallet sometimes rejects addEthereumChain but IS on Polygon already
+            // Re-check chainId before giving up
+            const chainIdNow = await provider
+              .request({ method: "eth_chainId" })
+              .catch(() => null);
+            if (
+              chainIdNow === POLYGON_CHAIN_ID ||
+              parseInt(chainIdNow, 16) === 137
+            )
+              return;
+            console.warn("addEthereumChain failed:", addErr);
+            // Don't throw — let connection continue, user may already be on right network
+          }
+        } else if (switchErr.code === 4001) {
+          throw new Error("User rejected network switch");
         }
-        setTransactionStatus("Network switched to Polygon");
-        setTimeout(() => setTransactionStatus(null), 3000);
+        // For any other error, re-check and continue if already on Polygon
+        const chainIdNow = await provider
+          .request({ method: "eth_chainId" })
+          .catch(() => null);
+        if (chainIdNow === POLYGON_CHAIN_ID || parseInt(chainIdNow, 16) === 137)
+          return;
       }
-    } catch (e) {
-      console.error("Network switch error", e);
-      setTransactionStatus("Failed to switch network");
-      setTimeout(() => setTransactionStatus(null), 3000);
-      throw e;
-    }
-  };
-
-  // ── Registration / Login flow (provider-agnostic) ─────────────────────────
-  const regProgress = async (provider: any) => {
-    const accounts = await provider.request({ method: "eth_requestAccounts" });
-    const nonce = await getNonce(accounts[0]);
-
-    if (nonce?.success) {
-      const message = `Sign this message to authenticate with your wallet:  ${nonce.data.nonce}`;
-      const signature = await provider.request({
-        method: "personal_sign",
-        params: [message, accounts[0]],
-      });
-      setUsedSignature(signature);
-
-      const loginReturnData = await serverPostRequest(
-        {
-          wallet_address: accounts[0],
-          signature,
-          nonce: nonce.data.nonce,
-          message,
-        },
-        "/auth/login",
-      );
-      setIsConnected(true);
-      getUsdtBalance(accounts[0], provider);
-      getPolyBalance(accounts[0], provider);
-      setTransactionStatus("connected");
-      setBareToken(loginReturnData.data.token);
-      getmyStaking(loginReturnData.data.token);
-      setReferalCode(loginReturnData.data.referral.url);
-      UserWithdrawalsHistory(loginReturnData.data.token);
-      getWithdrwalBalance(loginReturnData.data.token);
-      getReferalBonus(loginReturnData.data.token);
-    } else {
-      const tim = new Date().toISOString();
-      const message = `Sign this message to authenticate with your wallet. Wallet: ${accounts[0]}. Timestamp: ${tim}`;
-      const signature = await provider.request({
-        method: "personal_sign",
-        params: [message, accounts[0]],
-      });
-      setUsedSignature(signature);
-
-      const regResoince = await serverPostRequest(
-        {
-          wallet_address: accounts[0],
-          signature,
-          message,
-          timestamp: tim,
-          referral_code: ref || null,
-        },
-        "/auth/register",
-      );
-      if (regResoince.success) {
-        setIsConnected(true);
-        getUsdtBalance(accounts[0], provider);
-        getPolyBalance(accounts[0], provider);
-        setTransactionStatus("connected");
-        setBareToken(regResoince.data.token);
-        setReferalCode(regResoince.data.referral.url);
-        UserWithdrawalsHistory(regResoince.data.token);
-        getWithdrwalBalance(regResoince.data.token);
-        getReferalBonus(regResoince.data.token);
-      } else {
-        setIsConnected(false);
-      }
+    } catch (e: any) {
+      // If it's a user rejection, rethrow
+      if (e.message?.includes("rejected")) throw e;
+      // Otherwise log and continue — don't block connection over network switch
+      console.warn("Network switch warning (non-fatal):", e.message);
     }
   };
 
   // ── Called when user picks a wallet from modal ────────────────────────────
   const handleWalletSelect = async (provider: any, name: string) => {
     setShowWalletModal(false);
-    try {
-      setTransactionStatus(`Connecting ${name}...`);
-      await checkAndSwitchNetwork(provider);
-      setActiveProvider(provider);
-      await regProgress(provider);
-
-      // Listen for events on chosen provider
-      provider.on?.("chainChanged", () => window.location.reload());
-      provider.on?.("accountsChanged", (accounts: string[]) => {
-        if (accounts.length > 0) setWalletAddress(accounts[0]);
-        else {
-          setIsConnected(false);
-          setWalletAddress(null);
-        }
-      });
-    } catch (e: any) {
-      console.error("Wallet connect error", e);
-      setTransactionStatus(e?.message || "Failed to connect");
-      setTimeout(() => setTransactionStatus(null), 3000);
-    }
+    await doConnect(provider);
   };
 
   // ── Connect button ────────────────────────────────────────────────────────
   const connectWallet = async () => {
-    // Deep link for mobile browsers without injected wallet
-    if (isMobile && !(window as any).ethereum) {
-      const dappUrl = window.location.href.replace(/^https?:\/\//, "");
-      window.open(`https://metamask.app.link/dapp/${dappUrl}`, "_blank");
+    const eth = (window as any).ethereum;
+
+    // If only one wallet detected — connect directly, no modal
+    if (detectedWallets.length === 1) {
+      await doConnect(detectedWallets[0].provider);
       return;
     }
 
-    if (detectedWallets.length === 1) {
-      // Only one wallet – connect directly
-      await handleWalletSelect(
-        detectedWallets[0].provider,
-        detectedWallets[0].info.name,
-      );
-    } else if (detectedWallets.length > 1) {
+    // Multiple wallets detected — let user choose
+    if (detectedWallets.length > 1) {
       setShowWalletModal(true);
-    } else {
-      setTransactionStatus(
-        "No wallet detected. Please install MetaMask or Trust Wallet.",
-      );
-      setTimeout(() => setTransactionStatus(null), 4000);
+      return;
     }
+
+    // No EIP-6963 wallets detected yet — try window.ethereum directly
+    if (eth) {
+      await doConnect(eth);
+      return;
+    }
+
+    // Nothing at all — show modal with deep links on mobile, message on desktop
+    setShowWalletModal(true);
   };
 
-  // ── returnContract uses activeProvider ────────────────────────────────────
+  // ── returnContract: public RPC provider + wallet signer ──────────────────
+  // KEY FIX: ethers.BrowserProvider uses the wallet's own RPC for eth_blockNumber
+  // which fails on Trust/Coinbase. Instead we use a public JsonRpcProvider
+  // and inject just the wallet's signing key into it.
   const returnContract = async (plan: number): Promise<ethers.Contract> => {
-    const provider = new ethers.BrowserProvider(
-      activeProvider ?? (window as any).ethereum,
-    );
-    const signer = await provider.getSigner();
+    const rawProvider = activeProvider ?? (window as any).ethereum;
 
-    if (plan === 100)
-      return new ethers.Contract(USDT_CONTRACT_ADDRESS, USDT_ABI, signer);
+    // Get the wallet address + signing capability from the injected wallet
+    const walletBrowser = new ethers.BrowserProvider(rawProvider);
+    const walletSigner = await walletBrowser.getSigner();
+
+    // Wrap signer so it uses our reliable public RPC for network calls
+    // but still signs with the user's private key
+    const pub = await getCachedPublicProvider();
+    const reliableSigner = new ethers.JsonRpcSigner(
+      pub,
+      await walletSigner.getAddress(),
+    ) as any;
+
+    // Override sendTransaction to delegate signing to wallet but broadcast via public RPC
+    const signerWithWallet = {
+      ...reliableSigner,
+      getAddress: () => walletSigner.getAddress(),
+      signTransaction: (tx: any) => walletSigner.signTransaction(tx),
+      sendTransaction: async (tx: any) => {
+        // Let the wallet sign & send — it knows the user's key
+        return walletSigner.sendTransaction(tx);
+      },
+      provider: pub,
+    };
+
+    const abi =
+      plan === 100
+        ? USDT_ABI
+        : plan === 5
+          ? STAKE5DAYS_ABI
+          : plan === 3
+            ? STAKE3MONTH_ABI
+            : plan === 6
+              ? STAKE6MONTH_ABI
+              : STAKE12MONTH_ABI;
+
+    const address =
+      plan === 100
+        ? USDT_CONTRACT_ADDRESS
+        : plan === 5
+          ? STAKE5DAYS_CONTRACT
+          : plan === 3
+            ? STAKE3MONTH_CONTRACT
+            : plan === 6
+              ? STAKE6MONTH_CONTRACT
+              : STAKE12MONTH_CONTRACT;
+
+    // Use walletSigner for sending (wallet handles signing),
+    // but connect contract to public provider for read calls (balanceOf, etc.)
+    const contractRead = new ethers.Contract(address, abi, pub);
+    const contractWrite = new ethers.Contract(address, abi, walletSigner);
+
+    // Return write contract — reads fall back to public automatically
+    return contractWrite;
+  };
+
+  // ── returnReadContract: public RPC for read-only calls (getStakeIds etc) ──
+  const returnReadContract = async (plan: number): Promise<ethers.Contract> => {
+    const pub = await getCachedPublicProvider();
     if (plan === 5)
-      return new ethers.Contract(STAKE5DAYS_CONTRACT, STAKE5DAYS_ABI, signer);
+      return new ethers.Contract(STAKE5DAYS_CONTRACT, STAKE5DAYS_ABI, pub);
     if (plan === 3)
-      return new ethers.Contract(STAKE3MONTH_CONTRACT, STAKE3MONTH_ABI, signer);
+      return new ethers.Contract(STAKE3MONTH_CONTRACT, STAKE3MONTH_ABI, pub);
     if (plan === 6)
-      return new ethers.Contract(STAKE6MONTH_CONTRACT, STAKE6MONTH_ABI, signer);
-    return new ethers.Contract(STAKE12MONTH_CONTRACT, STAKE12MONTH_ABI, signer);
+      return new ethers.Contract(STAKE6MONTH_CONTRACT, STAKE6MONTH_ABI, pub);
+    return new ethers.Contract(STAKE12MONTH_CONTRACT, STAKE12MONTH_ABI, pub);
   };
 
   // ── All other functions unchanged below ──────────────────────────────────
@@ -512,6 +814,21 @@ const StakeFelySection = () => {
     }
   };
 
+  // ── waitForTx: polls public RPC for receipt instead of using wallet RPC ────
+  const waitForTx = async (
+    txHash: string,
+    timeoutMs = 120_000,
+  ): Promise<ethers.TransactionReceipt> => {
+    const pub = await getCachedPublicProvider();
+    const start = Date.now();
+    while (Date.now() - start < timeoutMs) {
+      const receipt = await pub.getTransactionReceipt(txHash).catch(() => null);
+      if (receipt) return receipt;
+      await new Promise((r) => setTimeout(r, 2500));
+    }
+    throw new Error("Transaction not confirmed within timeout");
+  };
+
   const lockupStakes = async () => {
     setLockUpState("Wait..");
     try {
@@ -525,7 +842,7 @@ const StakeFelySection = () => {
         return;
       }
       setLockUpState("Looking for Stake IDs");
-      const contract = await returnContract(parseInt(loockUpStakePlan));
+      const contract = await returnReadContract(parseInt(loockUpStakePlan));
       const stakeIds = await contract.getStakeIdsByAccount(yourWalletAddress);
       if (!stakeIds || stakeIds === "") {
         setLockUpState("Stake ID not found");
@@ -555,7 +872,7 @@ const StakeFelySection = () => {
       setStakeState("Approving transaction...");
       const txn = await usdtContract.transfer(recipient, amountInWei);
       setStakeState("Transaction submitted. Waiting for confirmation...");
-      const receipt = await txn.wait();
+      const receipt = await waitForTx(txn.hash);
       if (receipt.status === 1) {
         setStakeState("Transaction successful!");
         createstakePlan(receipt.hash);
@@ -614,7 +931,7 @@ const StakeFelySection = () => {
       setClameUpState("Requesting signature...");
       const tx = await contract.claimInterest(stakeIdForInterst);
       setClameUpState("Transaction submitted. Waiting for confirmation...");
-      await tx.wait();
+      await waitForTx(tx.hash);
       setClameUpState("Success!");
       alert("Interest claimed successfully!");
     } catch (e: any) {
@@ -645,7 +962,7 @@ const StakeFelySection = () => {
       setWithdrawState("Requesting signature...");
       const tx = await contract.withdrawCapital(stakeIdForWithdraw);
       setWithdrawState("Transaction submitted. Waiting for confirmation...");
-      await tx.wait();
+      await waitForTx(tx.hash);
       setWithdrawState("Success!");
       alert("Capital withdrawn successfully!");
     } catch (e: any) {
@@ -739,6 +1056,7 @@ const StakeFelySection = () => {
           wallets={detectedWallets}
           onSelect={handleWalletSelect}
           onClose={() => setShowWalletModal(false)}
+          isMobile={isMobile}
         />
       )}
 
@@ -770,18 +1088,13 @@ const StakeFelySection = () => {
                   className="bg-secondary border border-stroke-2 p-3 rounded-xl hover:bg-[#2a333e] transition-colors flex-shrink-0"
                   title="Copy Link"
                   onClick={() => {
-                    const el = document.getElementById(
-                      "static-referral-input",
-                    ) as HTMLInputElement;
-                    if (el) {
-                      navigator.clipboard.writeText(el.value);
-                      const msg = document.getElementById("copy-msg");
-                      if (msg) {
-                        msg.style.display = "block";
-                        setTimeout(() => {
-                          msg.style.display = "none";
-                        }, 2000);
-                      }
+                    copyToClipboard(referalCode || "");
+                    const msg = document.getElementById("copy-msg");
+                    if (msg) {
+                      msg.style.display = "block";
+                      setTimeout(() => {
+                        msg.style.display = "none";
+                      }, 2000);
                     }
                   }}
                 >
@@ -878,7 +1191,7 @@ const StakeFelySection = () => {
                   <button
                     className="bg-primary-500 text-white p-2 rounded-lg hover:bg-primary-600 transition-colors flex-shrink-0"
                     onClick={() => {
-                      navigator.clipboard.writeText(
+                      copyToClipboard(
                         "0x66BAf11521Ee8B3eF84bd459F7062916b6218D68",
                       );
                       setCopiedContract("dolphin");
@@ -974,7 +1287,7 @@ const StakeFelySection = () => {
                   <button
                     className="bg-primary-500 text-white p-2 rounded-lg hover:bg-primary-600 transition-colors flex-shrink-0"
                     onClick={() => {
-                      navigator.clipboard.writeText(
+                      copyToClipboard(
                         "0xe4410D26224d4728846722309fF386495Cc1E490",
                       );
                       setCopiedContract("shark");
@@ -1070,7 +1383,7 @@ const StakeFelySection = () => {
                   <button
                     className="bg-primary-500 text-white p-2 rounded-lg hover:bg-primary-600 transition-colors flex-shrink-0"
                     onClick={() => {
-                      navigator.clipboard.writeText(
+                      copyToClipboard(
                         "0x5eff66487f9d33465baf1ebd4cfa991f0b8cd963",
                       );
                       setCopiedContract("whale");
@@ -1518,9 +1831,7 @@ const StakeFelySection = () => {
                           <span>{shortenHash(row.transaction_hash)}</span>
                           <button
                             onClick={() => {
-                              navigator.clipboard.writeText(
-                                String(row.transaction_hash),
-                              );
+                              copyToClipboard(String(row.transaction_hash));
                               setCopiedHash(String(row.transaction_hash));
                               setTimeout(() => setCopiedHash(null), 2000);
                             }}
@@ -1707,9 +2018,7 @@ const StakeFelySection = () => {
                             <span>{shortenHash(rows.transaction_hash)}</span>
                             <button
                               onClick={() => {
-                                navigator.clipboard.writeText(
-                                  String(rows.transaction_hash),
-                                );
+                                copyToClipboard(String(rows.transaction_hash));
                                 setCopiedHashhis(String(rows.transaction_hash));
                                 setTimeout(() => setCopiedHashhis(null), 2000);
                               }}
