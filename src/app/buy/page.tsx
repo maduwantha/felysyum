@@ -16,7 +16,7 @@ const Page = () => {
             <div className="mx-auto w-full max-w-[1290px] px-4">
                 <div className="mb-8 text-center">
                     <h1 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60">
-                        BUY FELYSYUM
+                        GET FELYSYUM
                     </h1>
                 </div>
                 <BuyFelySection />

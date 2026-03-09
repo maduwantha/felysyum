@@ -113,7 +113,7 @@ const getReadProvider = async (
             "https://polygon-bor-rpc.publicnode.com",
             { chainId: 137, name: "polygon" },
           );
-        } catch (_) {}
+        } catch (_) { }
       }
     }
   }
@@ -206,7 +206,7 @@ const fallbackCopy = (text: string) => {
   ta.select();
   try {
     document.execCommand("copy");
-  } catch (_) {}
+  } catch (_) { }
   document.body.removeChild(ta);
 };
 
@@ -516,7 +516,7 @@ const StakeFelySection = () => {
             }
           });
         }
-      } catch (_) {}
+      } catch (_) { }
     };
     const reconnectTimer = setTimeout(silentReconnect, 1500);
 
@@ -622,7 +622,7 @@ const StakeFelySection = () => {
                 method: "personal_sign",
                 params: [hexMsg, walletAddr],
               });
-            } catch (_) {}
+            } catch (_) { }
             return await provider.request({
               method: "eth_sign",
               params: [walletAddr, ethers.hashMessage(message)],
@@ -638,14 +638,14 @@ const StakeFelySection = () => {
               method: "personal_sign",
               params: [walletAddr, hexMsg],
             });
-          } catch (_) {}
+          } catch (_) { }
           // iOS: hex message first
           try {
             return await provider.request({
               method: "personal_sign",
               params: [hexMsg, walletAddr],
             });
-          } catch (_) {}
+          } catch (_) { }
           // plain string fallback
           try {
             return await provider.request({
@@ -674,14 +674,14 @@ const StakeFelySection = () => {
                 method: "personal_sign",
                 params: [walletAddr, hexMsg],
               });
-            } catch (_) {}
+            } catch (_) { }
           }
           try {
             return await provider.request({
               method: "eth_sign",
               params: [walletAddr, ethers.hashMessage(message)],
             });
-          } catch (_) {}
+          } catch (_) { }
           throw e;
         }
       };
@@ -777,16 +777,16 @@ const StakeFelySection = () => {
     const providers = isLocalhost
       ? [() => getReadProvider(walletProvider)]
       : [
-          () => getReadProvider(walletProvider),
-          () => {
-            clearProviderCache();
-            return getCachedPublicProvider();
-          },
-          () => {
-            clearProviderCache();
-            return getCachedPublicProvider();
-          },
-        ];
+        () => getReadProvider(walletProvider),
+        () => {
+          clearProviderCache();
+          return getCachedPublicProvider();
+        },
+        () => {
+          clearProviderCache();
+          return getCachedPublicProvider();
+        },
+      ];
 
     for (let i = 0; i < providers.length; i++) {
       try {
@@ -825,16 +825,16 @@ const StakeFelySection = () => {
     const providers = isLocalhost
       ? [() => getReadProvider(walletProvider)]
       : [
-          () => getReadProvider(walletProvider),
-          () => {
-            clearProviderCache();
-            return getCachedPublicProvider();
-          },
-          () => {
-            clearProviderCache();
-            return getCachedPublicProvider();
-          },
-        ];
+        () => getReadProvider(walletProvider),
+        () => {
+          clearProviderCache();
+          return getCachedPublicProvider();
+        },
+        () => {
+          clearProviderCache();
+          return getCachedPublicProvider();
+        },
+      ];
 
     for (let i = 0; i < providers.length; i++) {
       try {
@@ -1359,8 +1359,7 @@ const StakeFelySection = () => {
         <RevealAnimation delay={0.2}>
           <div className="flex flex-col items-center justify-center gap-4">
             <p className="text-accent/80 text-base md:text-lg max-w-3xl mx-auto">
-              Maximize your holdings by staking FELY. Earn rewards while
-              contributing to the ecosystem stability.
+              Participate in the Felysyum staking program by locking FELY tokens and supporting the ecosystem.
             </p>
             <div className="bg-primary-500/10 border border-primary-500/20 px-6 py-3 rounded-xl shadow-[0_0_20px_rgba(228,145,39,0.15)] mt-2">
               <p className="text-primary-500 text-sm md:text-base font-bold text-center">
@@ -1421,16 +1420,13 @@ const StakeFelySection = () => {
 
       <div className="text-center w-full px-4 md:px-0">
         <p className="text-white font-bold text-sm md:text-base">
-          Felysyum stakes are secured on smart contracts. Once you stake, only
-          you can withdraw your daily interest and staking capital – not even we
-          can access it. Your funds are safe in your hands.
+          ⁠Rewards are distributed through secure smart contracts, and staked tokens remain under your wallet control.
           <br />
           <span className="text-primary-500 font-medium mt-4 inline-block">
-            Choose your staking plan and start earning
+            Choose a staking option and participate in the reward program.
           </span>
           <span className="text-primary-500 font-bold block my-4 text-base md:text-lg">
-            Enjoy premium interest on every plan—even for small stakes! Whale
-            20%, Shark 9%, Dolphin 4%. Don't miss this limited-time opportunity!
+            During this limited bonus period, all staking amounts receive the highest reward tier available in each plan — Whale up to 20%, Shark up to 9%, Dolphin up to 4%.
           </span>
         </p>
       </div>
@@ -1447,7 +1443,7 @@ const StakeFelySection = () => {
             <div className="flex-grow space-y-4 mb-6 text-sm">
               <div className="flex justify-between border-b border-[#2a333e] pb-2 text-gray-400 font-medium">
                 <span>Staked Amount</span>
-                <span>Interest Rate</span>
+                <span>Reward Rate</span>
               </div>
               <div className="flex justify-between text-white">
                 <span>0 - 1000 USDT</span>
@@ -1543,7 +1539,7 @@ const StakeFelySection = () => {
             <div className="flex-grow space-y-4 mb-6 text-sm">
               <div className="flex justify-between border-b border-[#2a333e] pb-2 text-gray-400 font-medium">
                 <span>Staked Amount</span>
-                <span>Interest Rate</span>
+                <span>Reward Rate</span>
               </div>
               <div className="flex justify-between text-white">
                 <span>0 - 1000 USDT</span>
@@ -1639,7 +1635,7 @@ const StakeFelySection = () => {
             <div className="flex-grow space-y-4 mb-6 text-sm">
               <div className="flex justify-between border-b border-[#2a333e] pb-2 text-gray-400 font-medium">
                 <span>Staked Amount</span>
-                <span>Interest Rate</span>
+                <span>Reward Rate</span>
               </div>
               <div className="flex justify-between text-white">
                 <span>0 - 1000 USDT</span>
@@ -2111,17 +2107,17 @@ const StakeFelySection = () => {
                       <td className="p-4 text-gray-300">
                         {row.staked_at
                           ? format(
-                              new Date(String(row.staked_at)),
-                              "dd/MM/yyyy",
-                            )
+                            new Date(String(row.staked_at)),
+                            "dd/MM/yyyy",
+                          )
                           : "-"}
                       </td>
                       <td className="p-4 text-gray-300">
                         {row.maturity_date
                           ? format(
-                              new Date(String(row.maturity_date)),
-                              "dd/MM/yyyy",
-                            )
+                            new Date(String(row.maturity_date)),
+                            "dd/MM/yyyy",
+                          )
                           : "-"}
                       </td>
                       <td className="p-4 text-gray-300">
@@ -2210,9 +2206,9 @@ const StakeFelySection = () => {
                       <td className="p-4 text-gray-300">
                         {row.id
                           ? format(
-                              new Date(String(row.earned_at)),
-                              "dd/MM/yyyy",
-                            )
+                            new Date(String(row.earned_at)),
+                            "dd/MM/yyyy",
+                          )
                           : "-"}
                       </td>
                       <td className="p-4 text-gray-300">{row.bonus_level}</td>
@@ -2242,9 +2238,9 @@ const StakeFelySection = () => {
                       value={
                         withdrawableFely
                           ? (
-                              Math.trunc(parseFloat(withdrawableFely) * 100) /
-                              100
-                            ).toString()
+                            Math.trunc(parseFloat(withdrawableFely) * 100) /
+                            100
+                          ).toString()
                           : ""
                       }
                       onChange={(e) => setWithdrawableFely(e.target.value)}
@@ -2300,9 +2296,9 @@ const StakeFelySection = () => {
                         <td className="p-4 text-white text-sm">
                           {rows.created_at
                             ? format(
-                                new Date(String(rows.created_at)),
-                                "dd/MM/yyyy",
-                              )
+                              new Date(String(rows.created_at)),
+                              "dd/MM/yyyy",
+                            )
                             : "-"}
                         </td>
                         <td className="p-4 text-white text-sm">
@@ -2323,7 +2319,7 @@ const StakeFelySection = () => {
                               className="text-gray-500 hover:text-primary-500 transition-colors flex-shrink-0"
                             >
                               {copiedHashWith ===
-                              String(rows.transaction_hash) ? (
+                                String(rows.transaction_hash) ? (
                                 <svg
                                   className="w-3.5 h-3.5 text-primary-500"
                                   fill="none"
