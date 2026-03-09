@@ -32,6 +32,12 @@ import { USDT_CONTRACT_ADDRESS, USDT_ABI } from "@/app/contracts/usdtContract";
 import { ethers } from "ethers";
 import { useSearchParams } from "next/navigation";
 
+// ─── Localhost detection (public RPCs block localhost CORS) ───────────────────
+const isLocalhost =
+  typeof window !== "undefined" &&
+  (window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1");
+
 // ─── Public Polygon RPC ───────────────────────────────────────────────────────
 const POLYGON_RPC_URLS = [
   "https://polygon-bor-rpc.publicnode.com",
@@ -40,9 +46,6 @@ const POLYGON_RPC_URLS = [
   "https://polygon.drpc.org",
 ];
 
-// FIX 1: Timeout raised to 8s — mobile 3G/4G DNS alone can take 3-5s.
-// FIX 2: Uses eth_call (a real read) not getBlockNumber for liveness check,
-//         because some RPCs respond to blockNumber but fail on contract calls.
 const getPublicProvider = async (): Promise<ethers.JsonRpcProvider> => {
   for (const url of POLYGON_RPC_URLS) {
     try {
@@ -52,8 +55,8 @@ const getPublicProvider = async (): Promise<ethers.JsonRpcProvider> => {
       });
       await Promise.race([
         provider.getBlockNumber(),
-        new Promise(
-          (_, reject) => setTimeout(() => reject(new Error("timeout")), 8000), // was 3000
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("timeout")), 8000),
         ),
       ]);
       return provider;
@@ -61,25 +64,21 @@ const getPublicProvider = async (): Promise<ethers.JsonRpcProvider> => {
       console.warn(`RPC ${url} failed, trying next...`);
     }
   }
-  // Last resort — return first one anyway
   return new ethers.JsonRpcProvider(POLYGON_RPC_URLS[0], {
     chainId: 137,
     name: "polygon",
   });
 };
 
-// FIX 3: Cache is now per-resolved-provider, not per-promise.
-// When cache is cleared on error, next call picks a fresh working RPC.
 let _providerCache: ethers.JsonRpcProvider | null = null;
 let _providerCacheTime = 0;
-const CACHE_TTL = 90_000; // 90s
+const CACHE_TTL = 90_000;
 
 const getCachedPublicProvider = async (): Promise<ethers.JsonRpcProvider> => {
   const now = Date.now();
   if (_providerCache && now - _providerCacheTime < CACHE_TTL) {
     return _providerCache;
   }
-  // Build a fresh one
   const p = await getPublicProvider();
   _providerCache = p;
   _providerCacheTime = Date.now();
@@ -91,18 +90,13 @@ const clearProviderCache = () => {
   _providerCacheTime = 0;
 };
 
-// FIX 4: Balance helper that tries the wallet's own injected RPC FIRST
-// (it always works inside the wallet browser), then falls back to public RPCs.
-// This is the main reason balances fail on mobile — we were skipping the
-// injected provider entirely for reads.
+// ─── Read provider: wallet injected first, then public RPC ───────────────────
 const getReadProvider = async (
   injectedProvider?: any,
 ): Promise<ethers.JsonRpcProvider | ethers.BrowserProvider> => {
-  // If we have an injected wallet provider, use it — it works on mobile
   if (injectedProvider) {
     try {
       const bp = new ethers.BrowserProvider(injectedProvider);
-      // Quick check — if this throws the provider is broken
       await Promise.race([
         bp.getBlockNumber(),
         new Promise((_, r) => setTimeout(() => r(new Error("timeout")), 5000)),
@@ -112,6 +106,15 @@ const getReadProvider = async (
       console.warn(
         "Injected provider unavailable for reads, falling back to public RPC",
       );
+      // Coinbase fallback
+      if (injectedProvider?.isCoinbaseWallet && injectedProvider?.chainId) {
+        try {
+          return new ethers.JsonRpcProvider(
+            "https://polygon-bor-rpc.publicnode.com",
+            { chainId: 137, name: "polygon" },
+          );
+        } catch (_) {}
+      }
     }
   }
   return getCachedPublicProvider();
@@ -123,7 +126,21 @@ const detectMobile = () =>
     typeof navigator !== "undefined" ? navigator.userAgent : "",
   );
 
-// ─── Detect if we are INSIDE a wallet's in-app browser ───────────────────────
+// ─── Trust Wallet detection ───────────────────────────────────────────────────
+const detectTrustWallet = (provider: any): boolean => {
+  if (!provider) return false;
+  return (
+    provider?.isTrust ||
+    provider?.isTrustWallet ||
+    provider?.isTrustBrowser ||
+    /TrustWallet|Trust\//.test(
+      typeof navigator !== "undefined" ? navigator.userAgent : "",
+    ) ||
+    !!(typeof window !== "undefined" && (window as any).trustwallet)
+  );
+};
+
+// ─── In-app wallet browser detection ─────────────────────────────────────────
 const detectInAppWalletBrowser = (): { isInApp: boolean; name: string } => {
   if (typeof navigator === "undefined") return { isInApp: false, name: "" };
   const ua = navigator.userAgent;
@@ -132,37 +149,42 @@ const detectInAppWalletBrowser = (): { isInApp: boolean; name: string } => {
   if (/CoinbaseWallet|Coinbase\//.test(ua))
     return { isInApp: true, name: "Coinbase Wallet" };
   if (/MetaMaskMobile/.test(ua)) return { isInApp: true, name: "MetaMask" };
-  // Generic: if window.ethereum exists on mobile, we're likely in-app
   if (
     detectMobile() &&
     typeof window !== "undefined" &&
-    (window as any).ethereum
+    ((window as any).ethereum || (window as any).trustwallet)
   ) {
     return { isInApp: true, name: "Wallet Browser" };
   }
   return { isInApp: false, name: "" };
 };
 
-// ─── Wait for window.ethereum to be injected (mobile wallets inject late) ────
-const waitForEthereum = (timeoutMs = 4000): Promise<any> => {
+// ─── Wait for ethereum injection (Trust Wallet injects late on mobile) ────────
+const waitForEthereum = (timeoutMs = 6000): Promise<any> => {
   return new Promise((resolve) => {
-    // Already injected
-    if ((window as any).ethereum) {
-      resolve((window as any).ethereum);
+    const getTrustProvider = () =>
+      (window as any).ethereum ||
+      (window as any).trustwallet?.ethereum ||
+      (window as any).trustwallet;
+
+    const existing = getTrustProvider();
+    if (existing) {
+      resolve(existing);
       return;
     }
-    // Poll for injection
+
     const interval = setInterval(() => {
-      if ((window as any).ethereum) {
+      const p = getTrustProvider();
+      if (p) {
         clearInterval(interval);
         clearTimeout(timer);
-        resolve((window as any).ethereum);
+        resolve(p);
       }
     }, 100);
-    // Timeout fallback
+
     const timer = setTimeout(() => {
       clearInterval(interval);
-      resolve(null);
+      resolve(getTrustProvider() || null);
     }, timeoutMs);
   });
 };
@@ -411,7 +433,7 @@ const StakeFelySection = () => {
   };
   const [bonusData, setBonusData] = useState<BonusHistory[]>([]);
 
-  // ── EIP-6963 + legacy scan ─────────────────────────────────────────────────
+  // ── EIP-6963 + legacy + Trust + Coinbase scan ──────────────────────────────
   useEffect(() => {
     const mobile = detectMobile();
     setIsMobile(mobile);
@@ -424,7 +446,7 @@ const StakeFelySection = () => {
       const name =
         p.isCoinbaseWallet || p.isCoinbaseBrowser
           ? "Coinbase Wallet"
-          : p.isTrust || p.isTrustWallet
+          : detectTrustWallet(p)
             ? "Trust Wallet"
             : p.isMetaMask
               ? "MetaMask"
@@ -447,12 +469,22 @@ const StakeFelySection = () => {
     window.dispatchEvent(new Event("eip6963:requestProvider"));
 
     const scan = () => {
+      // Standard ethereum
       const eth = (window as any).ethereum;
-      if (!eth) return;
-      registerProvider(eth, "legacy");
-      (eth.providers ?? []).forEach((p: any, i: number) =>
-        registerProvider(p, `legacy-${i}`),
-      );
+      if (eth) {
+        registerProvider(eth, "legacy");
+        (eth.providers ?? []).forEach((p: any, i: number) =>
+          registerProvider(p, `legacy-${i}`),
+        );
+      }
+      // Trust Wallet specific globals
+      const tw =
+        (window as any).trustwallet?.ethereum || (window as any).trustwallet;
+      if (tw) registerProvider(tw, "trustwallet");
+
+      // Coinbase Wallet Extension
+      const cbw = (window as any).coinbaseWalletExtension;
+      if (cbw) registerProvider(cbw, "coinbase-ext");
     };
 
     scan();
@@ -460,17 +492,16 @@ const StakeFelySection = () => {
     const t2 = setTimeout(scan, 300);
     const t3 = setTimeout(scan, 600);
     const t4 = setTimeout(scan, 1200);
-    // Extended scan for slow mobile injection
     const t5 = setTimeout(scan, 2000);
+    // Trust Wallet on Android can inject at 3-4s
     const t6 = setTimeout(scan, 3000);
+    const t7 = setTimeout(scan, 4000);
 
-    // ── Silent reconnect — AFTER giving wallet time to inject ──────────────
-    // KEY FIX: use waitForEthereum so we don't run before injection completes
+    // Silent reconnect
     const silentReconnect = async () => {
-      const eth = await waitForEthereum(3000);
+      const eth = await waitForEthereum(4000);
       if (!eth) return;
       try {
-        // eth_accounts does NOT trigger approval UI — safe to call silently
         const accounts = await eth.request({ method: "eth_accounts" });
         if (accounts?.length > 0) {
           setWalletAddress(accounts[0]);
@@ -491,7 +522,7 @@ const StakeFelySection = () => {
 
     return () => {
       window.removeEventListener("eip6963:announceProvider", handleAnnounce);
-      [t1, t2, t3, t4, t5, t6, reconnectTimer].forEach(clearTimeout);
+      [t1, t2, t3, t4, t5, t6, t7, reconnectTimer].forEach(clearTimeout);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -501,18 +532,44 @@ const StakeFelySection = () => {
     try {
       setTransactionStatus("Connecting...");
 
+      const isTrust = detectTrustWallet(provider);
+      const isCoinbase =
+        provider?.isCoinbaseWallet || provider?.isCoinbaseBrowser;
+
+      if (isCoinbase) provider.overrideIsMetaMask = false;
+
       let accounts: string[] = [];
-      for (let attempt = 0; attempt < 3; attempt++) {
+      const maxAttempts = isTrust ? 5 : 3;
+      const retryDelay = isTrust ? 1200 : 700;
+
+      for (let attempt = 0; attempt < maxAttempts; attempt++) {
         try {
-          accounts = await provider.request({ method: "eth_requestAccounts" });
+          accounts = await Promise.race([
+            provider.request({
+              method: "eth_requestAccounts",
+              params: [],
+            }),
+            new Promise<never>((_, reject) =>
+              setTimeout(
+                () => reject(new Error("Request timeout")),
+                isTrust ? 15000 : 10000,
+              ),
+            ),
+          ]);
           if (accounts?.length > 0) break;
         } catch (e: any) {
           if (e.code === 4001) throw new Error("User rejected connection");
-          if (attempt < 2) await new Promise((r) => setTimeout(r, 700));
-          else throw e;
+          if (e.message === "Request timeout" && attempt < maxAttempts - 1) {
+            setTransactionStatus(`Retrying... (${attempt + 2}/${maxAttempts})`);
+            await new Promise((r) => setTimeout(r, retryDelay));
+            continue;
+          }
+          if (attempt < maxAttempts - 1) {
+            await new Promise((r) => setTimeout(r, retryDelay));
+          } else throw e;
         }
-        if (accounts?.length === 0 && attempt < 2) {
-          await new Promise((r) => setTimeout(r, 700));
+        if (accounts?.length === 0 && attempt < maxAttempts - 1) {
+          await new Promise((r) => setTimeout(r, retryDelay));
         }
       }
 
@@ -522,7 +579,6 @@ const StakeFelySection = () => {
 
       setWalletAddress(accounts[0]);
       setActiveProvider(provider);
-
       await checkAndSwitchNetwork(provider);
       await regProgress(provider, accounts[0]);
 
@@ -546,16 +602,68 @@ const StakeFelySection = () => {
     try {
       const nonce = await getNonce(walletAddr);
 
+      const isTrust = detectTrustWallet(provider);
+      const isCoinbase =
+        provider?.isCoinbaseWallet || provider?.isCoinbaseBrowser;
+
       const signMessage = async (message: string): Promise<string> => {
         const hexMsg = ethers.hexlify(ethers.toUtf8Bytes(message));
-        // Try standard personal_sign [message, address]
+
+        // ── Coinbase Wallet ─────────────────────────────────────────────────
+        if (isCoinbase) {
+          try {
+            return await provider.request({
+              method: "personal_sign",
+              params: [message, walletAddr], // plain string first
+            });
+          } catch (_) {
+            try {
+              return await provider.request({
+                method: "personal_sign",
+                params: [hexMsg, walletAddr],
+              });
+            } catch (_) {}
+            return await provider.request({
+              method: "eth_sign",
+              params: [walletAddr, ethers.hashMessage(message)],
+            });
+          }
+        }
+
+        // ── Trust Wallet Mobile ─────────────────────────────────────────────
+        if (isTrust) {
+          // Android: address first
+          try {
+            return await provider.request({
+              method: "personal_sign",
+              params: [walletAddr, hexMsg],
+            });
+          } catch (_) {}
+          // iOS: hex message first
+          try {
+            return await provider.request({
+              method: "personal_sign",
+              params: [hexMsg, walletAddr],
+            });
+          } catch (_) {}
+          // plain string fallback
+          try {
+            return await provider.request({
+              method: "personal_sign",
+              params: [message, walletAddr],
+            });
+          } catch (e: any) {
+            throw new Error("Trust Wallet signing failed: " + e.message);
+          }
+        }
+
+        // ── MetaMask / Default ──────────────────────────────────────────────
         try {
           return await provider.request({
             method: "personal_sign",
             params: [hexMsg, walletAddr],
           });
         } catch (e: any) {
-          // Trust Wallet Android sometimes needs reversed params
           if (
             e.code === -32000 ||
             e.message?.includes("param") ||
@@ -568,7 +676,6 @@ const StakeFelySection = () => {
               });
             } catch (_) {}
           }
-          // Fallback: try eth_sign (Coinbase Wallet in-app)
           try {
             return await provider.request({
               method: "eth_sign",
@@ -593,17 +700,20 @@ const StakeFelySection = () => {
           },
           "/auth/login",
         );
-        setIsConnected(true);
-        setWalletAddress(walletAddr);
-        setTransactionStatus("connected");
-        setBareToken(loginData.data.token);
-        setReferalCode(loginData.data.referral.url);
-        getUsdtBalance(walletAddr, provider);
-        getPolyBalance(walletAddr, provider);
-        getmyStaking(loginData.data.token);
-        UserWithdrawalsHistory(loginData.data.token);
-        getWithdrwalBalance(loginData.data.token);
-        getReferalBonus(loginData.data.token);
+
+        if (loginData?.success) {
+          setIsConnected(true);
+          setWalletAddress(walletAddr);
+          setTransactionStatus("connected");
+          setBareToken(loginData.data.token);
+          setReferalCode(loginData.data.referral?.url ?? null);
+          getUsdtBalance(walletAddr, provider);
+          getPolyBalance(walletAddr, provider);
+          getmyStaking(loginData.data.token);
+          UserWithdrawalsHistory(loginData.data.token);
+          getWithdrwalBalance(loginData.data.token);
+          getReferalBonus(loginData.data.token);
+        }
       } else {
         const tim = new Date().toISOString();
         const message = `Sign this message to authenticate with your wallet. Wallet: ${walletAddr}. Timestamp: ${tim}`;
@@ -620,12 +730,13 @@ const StakeFelySection = () => {
           },
           "/auth/register",
         );
-        if (regData.success) {
+
+        if (regData?.success) {
           setIsConnected(true);
           setWalletAddress(walletAddr);
           setTransactionStatus("connected");
           setBareToken(regData.data.token);
-          setReferalCode(regData.data.referral.url);
+          setReferalCode(regData.data.referral?.url ?? null);
           getUsdtBalance(walletAddr, provider);
           getPolyBalance(walletAddr, provider);
           UserWithdrawalsHistory(regData.data.token);
@@ -649,29 +760,34 @@ const StakeFelySection = () => {
     6: "Shark",
     12: "Whale",
   };
+
   const shortenHash = (address: any) =>
     `${address.slice(0, 4)}...${address.slice(-4)}`;
 
   // ── Balances ──────────────────────────────────────────────────────────────
-  // FIX: Accept injectedProvider param — React state (activeProvider) is async
-  // so it may still be null when called right after setActiveProvider().
   const getUsdtBalance = async (address: string, injectedProvider?: any) => {
     const walletProvider =
-      injectedProvider || activeProvider || (window as any).ethereum;
-    const providers = [
-      // Attempt 1: wallet's own injected RPC (always works in-app)
-      () => getReadProvider(walletProvider),
-      // Attempt 2: fresh public RPC
-      () => {
-        clearProviderCache();
-        return getCachedPublicProvider();
-      },
-      // Attempt 3: another fresh public RPC
-      () => {
-        clearProviderCache();
-        return getCachedPublicProvider();
-      },
-    ];
+      injectedProvider ||
+      activeProvider ||
+      (window as any).ethereum ||
+      (window as any).trustwallet?.ethereum ||
+      (window as any).trustwallet;
+
+    // On localhost public RPCs block CORS — only use injected provider
+    const providers = isLocalhost
+      ? [() => getReadProvider(walletProvider)]
+      : [
+          () => getReadProvider(walletProvider),
+          () => {
+            clearProviderCache();
+            return getCachedPublicProvider();
+          },
+          () => {
+            clearProviderCache();
+            return getCachedPublicProvider();
+          },
+        ];
+
     for (let i = 0; i < providers.length; i++) {
       try {
         const provider = await providers[i]();
@@ -699,18 +815,27 @@ const StakeFelySection = () => {
 
   const getPolyBalance = async (address: string, injectedProvider?: any) => {
     const walletProvider =
-      injectedProvider || activeProvider || (window as any).ethereum;
-    const providers = [
-      () => getReadProvider(walletProvider),
-      () => {
-        clearProviderCache();
-        return getCachedPublicProvider();
-      },
-      () => {
-        clearProviderCache();
-        return getCachedPublicProvider();
-      },
-    ];
+      injectedProvider ||
+      activeProvider ||
+      (window as any).ethereum ||
+      (window as any).trustwallet?.ethereum ||
+      (window as any).trustwallet;
+
+    // On localhost public RPCs block CORS — only use injected provider
+    const providers = isLocalhost
+      ? [() => getReadProvider(walletProvider)]
+      : [
+          () => getReadProvider(walletProvider),
+          () => {
+            clearProviderCache();
+            return getCachedPublicProvider();
+          },
+          () => {
+            clearProviderCache();
+            return getCachedPublicProvider();
+          },
+        ];
+
     for (let i = 0; i < providers.length; i++) {
       try {
         const provider = await providers[i]();
@@ -808,32 +933,36 @@ const StakeFelySection = () => {
 
   // ── Connect button ────────────────────────────────────────────────────────
   const connectWallet = async () => {
-    // Guard: prevent double-click while already connecting
     if (isConnecting) return;
     setIsConnecting(true);
 
     try {
       const inApp = detectInAppWalletBrowser();
 
-      // ── IN-APP WALLET BROWSER (Trust, Coinbase, MetaMask mobile) ──────────
+      // ── IN-APP / MOBILE ───────────────────────────────────────────────────
       if (inApp.isInApp || isMobile) {
         setTransactionStatus("Connecting...");
 
-        // Check if already injected first (no wait needed)
-        const ethImmediate = (window as any).ethereum;
-        if (ethImmediate) {
-          await doConnect(ethImmediate);
-          return;
-        }
+        // Trust Wallet injects into window.trustwallet on some versions
+        const trustProvider =
+          (window as any).trustwallet?.ethereum || (window as any).trustwallet;
 
-        // Not yet injected — wait up to 3s (reduced from 4s to feel faster)
-        const eth = await waitForEthereum(3000);
+        const eth = (window as any).ethereum || trustProvider;
+
         if (eth) {
           await doConnect(eth);
           return;
         }
 
-        // No ethereum found — check EIP-6963 results
+        // Not yet injected — wait longer for Trust Wallet (injects at 2-4s)
+        setTransactionStatus("Waiting for wallet...");
+        const injected = await waitForEthereum(6000);
+
+        if (injected) {
+          await doConnect(injected);
+          return;
+        }
+
         if (detectedWallets.length === 1) {
           await doConnect(detectedWallets[0].provider);
           return;
@@ -843,12 +972,11 @@ const StakeFelySection = () => {
           return;
         }
 
-        // Nothing found at all — show deep links
         setShowWalletModal(true);
         return;
       }
 
-      // ── DESKTOP path — re-broadcast EIP-6963 ──────────────────────────────
+      // ── DESKTOP ───────────────────────────────────────────────────────────
       setTransactionStatus("Detecting wallet...");
 
       const freshWallets = await new Promise<EIP6963ProviderDetail[]>(
@@ -878,7 +1006,6 @@ const StakeFelySection = () => {
         setShowWalletModal(true);
         return;
       }
-      // EIP-6963 found nothing — try legacy window.ethereum
       const eth = (window as any).ethereum;
       if (eth) {
         await doConnect(eth);
@@ -886,14 +1013,17 @@ const StakeFelySection = () => {
       }
       setShowWalletModal(true);
     } finally {
-      // Always re-enable button when done, even on error
       setIsConnecting(false);
     }
   };
 
   // ── returnContract ────────────────────────────────────────────────────────
   const returnContract = async (plan: number): Promise<ethers.Contract> => {
-    const rawProvider = activeProvider ?? (window as any).ethereum;
+    const rawProvider =
+      activeProvider ||
+      (window as any).ethereum ||
+      (window as any).trustwallet?.ethereum ||
+      (window as any).trustwallet;
     const walletBrowser = new ethers.BrowserProvider(rawProvider);
     const walletSigner = await walletBrowser.getSigner();
 
@@ -923,11 +1053,13 @@ const StakeFelySection = () => {
   };
 
   // ── returnReadContract ────────────────────────────────────────────────────
-  // FIX: Use wallet's injected provider first — always works on mobile in-app
   const returnReadContract = async (plan: number): Promise<ethers.Contract> => {
-    const provider = await getReadProvider(
-      activeProvider || (window as any).ethereum,
-    );
+    const walletProvider =
+      activeProvider ||
+      (window as any).ethereum ||
+      (window as any).trustwallet?.ethereum ||
+      (window as any).trustwallet;
+    const provider = await getReadProvider(walletProvider);
     if (plan === 5)
       return new ethers.Contract(STAKE5DAYS_CONTRACT, STAKE5DAYS_ABI, provider);
     if (plan === 3)
@@ -971,14 +1103,16 @@ const StakeFelySection = () => {
   };
 
   // ── waitForTx ─────────────────────────────────────────────────────────────
-  // FIX: Use injected provider first so receipt polling works on mobile
   const waitForTx = async (
     txHash: string,
     timeoutMs = 120_000,
   ): Promise<ethers.TransactionReceipt> => {
-    const provider = await getReadProvider(
-      activeProvider || (window as any).ethereum,
-    );
+    const walletProvider =
+      activeProvider ||
+      (window as any).ethereum ||
+      (window as any).trustwallet?.ethereum ||
+      (window as any).trustwallet;
+    const provider = await getReadProvider(walletProvider);
     const start = Date.now();
     while (Date.now() - start < timeoutMs) {
       const receipt = await provider
@@ -1479,7 +1613,7 @@ const StakeFelySection = () => {
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           strokeWidth="2"
-                          d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 00-2-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                          d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
                         />
                       </svg>
                     )}
@@ -1575,7 +1709,7 @@ const StakeFelySection = () => {
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           strokeWidth="2"
-                          d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 12 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                          d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
                         />
                       </svg>
                     )}

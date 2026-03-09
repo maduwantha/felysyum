@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 
-export const DEFAULT_URL = 'https://dv.felysyum.com';
+export const DEFAULT_URL = "https://dv.felysyum.com";
 export const DEFAULT_TITLE = "Felysyum : Elysium's Digital Gold";
 export const DEFAULT_DESCRIPTION =
-  'Discover your digital elysium at The Oasis of Legends, a vibrant ecosystem fueled by Felysyum (FELY) cryptocurrency.';
-export const DEFAULT_IMAGE_URL = '/images/shared/felysyum-logo.png';
-export const BASE_URL = "https://felysyum.cloud/api";
+  "Discover your digital elysium at The Oasis of Legends, a vibrant ecosystem fueled by Felysyum (FELY) cryptocurrency.";
+export const DEFAULT_IMAGE_URL = "/images/shared/felysyum-logo.png";
+export const BASE_URL = "https://dev.felysyum.cloud/api";
 
 const defaultMetadata: Metadata = {
   metadataBase: new URL(DEFAULT_URL),
@@ -13,7 +13,7 @@ const defaultMetadata: Metadata = {
   description: DEFAULT_DESCRIPTION,
   openGraph: {
     type: "website",
-    siteName: 'Felysyum',
+    siteName: "Felysyum",
     url: DEFAULT_URL,
     title: DEFAULT_TITLE,
     description: DEFAULT_DESCRIPTION,
