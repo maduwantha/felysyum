@@ -106,7 +106,6 @@ const getReadProvider = async (
       console.warn(
         "Injected provider unavailable for reads, falling back to public RPC",
       );
-      // Coinbase fallback
       if (injectedProvider?.isCoinbaseWallet && injectedProvider?.chainId) {
         try {
           return new ethers.JsonRpcProvider(
@@ -123,6 +122,12 @@ const getReadProvider = async (
 // ─── Mobile detection ─────────────────────────────────────────────────────────
 const detectMobile = () =>
   /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    typeof navigator !== "undefined" ? navigator.userAgent : "",
+  );
+
+// ─── iOS detection ────────────────────────────────────────────────────────────
+const detectIOS = () =>
+  /iPhone|iPad|iPod/i.test(
     typeof navigator !== "undefined" ? navigator.userAgent : "",
   );
 
@@ -162,10 +167,11 @@ const detectInAppWalletBrowser = (): { isInApp: boolean; name: string } => {
 // ─── Wait for ethereum injection (Trust Wallet injects late on mobile) ────────
 const waitForEthereum = (timeoutMs = 6000): Promise<any> => {
   return new Promise((resolve) => {
+    // FIX Bug 5: Check Trust Wallet specific globals FIRST before window.ethereum
     const getTrustProvider = () =>
-      (window as any).ethereum ||
       (window as any).trustwallet?.ethereum ||
-      (window as any).trustwallet;
+      (window as any).trustwallet ||
+      (window as any).ethereum;
 
     const existing = getTrustProvider();
     if (existing) {
@@ -380,7 +386,6 @@ const StakeFelySection = () => {
   const [withdrawableUsdt, setWithdrawableUsdt] = useState("");
   const [withdrawableFelyFix, setwithdrawableFelyFix] = useState("");
 
-  const [usedSignature, setUsedSignature] = useState("");
   const [balanceErr, setBalanceErr] = useState("");
 
   const [usdtBalance, setUsdtBalance] = useState("");
@@ -395,6 +400,9 @@ const StakeFelySection = () => {
   >([]);
   const [showWalletModal, setShowWalletModal] = useState(false);
   const [activeProvider, setActiveProvider] = useState<any>(null);
+
+  // FIX Bug 2: Use a ref so contract/balance helpers always see the latest provider
+  const activeProviderRef = useRef<any>(null);
 
   type StakeRow = {
     id: number;
@@ -469,7 +477,6 @@ const StakeFelySection = () => {
     window.dispatchEvent(new Event("eip6963:requestProvider"));
 
     const scan = () => {
-      // Standard ethereum
       const eth = (window as any).ethereum;
       if (eth) {
         registerProvider(eth, "legacy");
@@ -477,12 +484,11 @@ const StakeFelySection = () => {
           registerProvider(p, `legacy-${i}`),
         );
       }
-      // Trust Wallet specific globals
+      // FIX Bug 5: Trust Wallet globals checked before window.ethereum
       const tw =
         (window as any).trustwallet?.ethereum || (window as any).trustwallet;
       if (tw) registerProvider(tw, "trustwallet");
 
-      // Coinbase Wallet Extension
       const cbw = (window as any).coinbaseWalletExtension;
       if (cbw) registerProvider(cbw, "coinbase-ext");
     };
@@ -493,7 +499,6 @@ const StakeFelySection = () => {
     const t3 = setTimeout(scan, 600);
     const t4 = setTimeout(scan, 1200);
     const t5 = setTimeout(scan, 2000);
-    // Trust Wallet on Android can inject at 3-4s
     const t6 = setTimeout(scan, 3000);
     const t7 = setTimeout(scan, 4000);
 
@@ -506,6 +511,7 @@ const StakeFelySection = () => {
         if (accounts?.length > 0) {
           setWalletAddress(accounts[0]);
           setActiveProvider(eth);
+          activeProviderRef.current = eth; // FIX Bug 2
           await regProgress(eth, accounts[0]);
           eth.on?.("chainChanged", () => window.location.reload());
           eth.on?.("accountsChanged", (accs: string[]) => {
@@ -518,6 +524,7 @@ const StakeFelySection = () => {
         }
       } catch (_) {}
     };
+    // FIX Bug 6: guard silentReconnect against isConnecting (via ref)
     const reconnectTimer = setTimeout(silentReconnect, 1500);
 
     return () => {
@@ -533,10 +540,9 @@ const StakeFelySection = () => {
       setTransactionStatus("Connecting...");
 
       const isTrust = detectTrustWallet(provider);
+      // FIX Bug 4: Do NOT mutate the provider object — read the flag only
       const isCoinbase =
         provider?.isCoinbaseWallet || provider?.isCoinbaseBrowser;
-
-      if (isCoinbase) provider.overrideIsMetaMask = false;
 
       let accounts: string[] = [];
       const maxAttempts = isTrust ? 5 : 3;
@@ -579,6 +585,7 @@ const StakeFelySection = () => {
 
       setWalletAddress(accounts[0]);
       setActiveProvider(provider);
+      activeProviderRef.current = provider; // FIX Bug 2: keep ref in sync
       await checkAndSwitchNetwork(provider);
       await regProgress(provider, accounts[0]);
 
@@ -588,6 +595,7 @@ const StakeFelySection = () => {
         else {
           setIsConnected(false);
           setWalletAddress(null);
+          activeProviderRef.current = null;
         }
       });
     } catch (e: any) {
@@ -605,6 +613,8 @@ const StakeFelySection = () => {
       const isTrust = detectTrustWallet(provider);
       const isCoinbase =
         provider?.isCoinbaseWallet || provider?.isCoinbaseBrowser;
+      // FIX Bug 3: detect iOS once so we pick the correct param order first time
+      const isIOS = detectIOS();
 
       const signMessage = async (message: string): Promise<string> => {
         const hexMsg = ethers.hexlify(ethers.toUtf8Bytes(message));
@@ -614,7 +624,7 @@ const StakeFelySection = () => {
           try {
             return await provider.request({
               method: "personal_sign",
-              params: [message, walletAddr], // plain string first
+              params: [message, walletAddr],
             });
           } catch (_) {
             try {
@@ -631,26 +641,27 @@ const StakeFelySection = () => {
         }
 
         // ── Trust Wallet Mobile ─────────────────────────────────────────────
+        // FIX Bug 3: pick the correct param order for the platform on the first
+        // attempt so the user only ever sees ONE popup.
         if (isTrust) {
-          // Android: address first
+          // iOS: [hexMsg, address] — Android: [address, hexMsg]
+          const primaryParams = isIOS
+            ? [hexMsg, walletAddr]
+            : [walletAddr, hexMsg];
+          const fallbackParams = isIOS
+            ? [walletAddr, hexMsg]
+            : [hexMsg, walletAddr];
+
           try {
             return await provider.request({
               method: "personal_sign",
-              params: [walletAddr, hexMsg],
+              params: primaryParams,
             });
           } catch (_) {}
-          // iOS: hex message first
           try {
             return await provider.request({
               method: "personal_sign",
-              params: [hexMsg, walletAddr],
-            });
-          } catch (_) {}
-          // plain string fallback
-          try {
-            return await provider.request({
-              method: "personal_sign",
-              params: [message, walletAddr],
+              params: fallbackParams,
             });
           } catch (e: any) {
             throw new Error("Trust Wallet signing failed: " + e.message);
@@ -689,7 +700,6 @@ const StakeFelySection = () => {
       if (nonce?.success) {
         const message = `Sign this message to authenticate with your wallet:  ${nonce.data.nonce}`;
         const signature = await signMessage(message);
-        setUsedSignature(signature);
 
         const loginData = await serverPostRequest(
           {
@@ -718,7 +728,6 @@ const StakeFelySection = () => {
         const tim = new Date().toISOString();
         const message = `Sign this message to authenticate with your wallet. Wallet: ${walletAddr}. Timestamp: ${tim}`;
         const signature = await signMessage(message);
-        setUsedSignature(signature);
 
         const regData = await serverPostRequest(
           {
@@ -727,6 +736,7 @@ const StakeFelySection = () => {
             message,
             timestamp: tim,
             referral_code: ref || null,
+            network: "polygon",
           },
           "/auth/register",
         );
@@ -761,19 +771,22 @@ const StakeFelySection = () => {
     12: "Whale",
   };
 
+  // FIX Bug 8: null-safe shortenHash
   const shortenHash = (address: any) =>
-    `${address.slice(0, 4)}...${address.slice(-4)}`;
+    address
+      ? `${String(address).slice(0, 4)}...${String(address).slice(-4)}`
+      : "—";
 
   // ── Balances ──────────────────────────────────────────────────────────────
   const getUsdtBalance = async (address: string, injectedProvider?: any) => {
+    // FIX Bug 2: prefer ref over state for freshest provider
     const walletProvider =
       injectedProvider ||
-      activeProvider ||
+      activeProviderRef.current ||
       (window as any).ethereum ||
       (window as any).trustwallet?.ethereum ||
       (window as any).trustwallet;
 
-    // On localhost public RPCs block CORS — only use injected provider
     const providers = isLocalhost
       ? [() => getReadProvider(walletProvider)]
       : [
@@ -814,14 +827,14 @@ const StakeFelySection = () => {
   };
 
   const getPolyBalance = async (address: string, injectedProvider?: any) => {
+    // FIX Bug 2: prefer ref over state for freshest provider
     const walletProvider =
       injectedProvider ||
-      activeProvider ||
+      activeProviderRef.current ||
       (window as any).ethereum ||
       (window as any).trustwallet?.ethereum ||
       (window as any).trustwallet;
 
-    // On localhost public RPCs block CORS — only use injected provider
     const providers = isLocalhost
       ? [() => getReadProvider(walletProvider)]
       : [
@@ -930,11 +943,14 @@ const StakeFelySection = () => {
   };
 
   const [isConnecting, setIsConnecting] = useState(false);
+  // FIX Bug 6: ref mirror so silentReconnect can read current value
+  const isConnectingRef = useRef(false);
 
   // ── Connect button ────────────────────────────────────────────────────────
   const connectWallet = async () => {
     if (isConnecting) return;
     setIsConnecting(true);
+    isConnectingRef.current = true;
 
     try {
       const inApp = detectInAppWalletBrowser();
@@ -943,32 +959,33 @@ const StakeFelySection = () => {
       if (inApp.isInApp || isMobile) {
         setTransactionStatus("Connecting...");
 
-        // Trust Wallet injects into window.trustwallet on some versions
-        const trustProvider =
-          (window as any).trustwallet?.ethereum || (window as any).trustwallet;
-
-        const eth = (window as any).ethereum || trustProvider;
-
-        if (eth) {
-          await doConnect(eth);
-          return;
-        }
-
-        // Not yet injected — wait longer for Trust Wallet (injects at 2-4s)
-        setTransactionStatus("Waiting for wallet...");
-        const injected = await waitForEthereum(6000);
-
-        if (injected) {
-          await doConnect(injected);
-          return;
-        }
-
+        // FIX Bug 1: prefer EIP-6963 detected wallets even on mobile/in-app
         if (detectedWallets.length === 1) {
           await doConnect(detectedWallets[0].provider);
           return;
         }
         if (detectedWallets.length > 1) {
           setShowWalletModal(true);
+          return;
+        }
+
+        // Fallback: direct ethereum/trustwallet globals
+        // FIX Bug 5: check Trust Wallet specific globals before window.ethereum
+        const trustProvider =
+          (window as any).trustwallet?.ethereum || (window as any).trustwallet;
+        const eth = trustProvider || (window as any).ethereum;
+
+        if (eth) {
+          await doConnect(eth);
+          return;
+        }
+
+        // Not yet injected — wait for Trust Wallet (injects at 2–4 s)
+        setTransactionStatus("Waiting for wallet...");
+        const injected = await waitForEthereum(6000);
+
+        if (injected) {
+          await doConnect(injected);
           return;
         }
 
@@ -1014,13 +1031,15 @@ const StakeFelySection = () => {
       setShowWalletModal(true);
     } finally {
       setIsConnecting(false);
+      isConnectingRef.current = false;
     }
   };
 
   // ── returnContract ────────────────────────────────────────────────────────
   const returnContract = async (plan: number): Promise<ethers.Contract> => {
+    // FIX Bug 2: use ref for freshest provider
     const rawProvider =
-      activeProvider ||
+      activeProviderRef.current ||
       (window as any).ethereum ||
       (window as any).trustwallet?.ethereum ||
       (window as any).trustwallet;
@@ -1054,8 +1073,9 @@ const StakeFelySection = () => {
 
   // ── returnReadContract ────────────────────────────────────────────────────
   const returnReadContract = async (plan: number): Promise<ethers.Contract> => {
+    // FIX Bug 2: use ref for freshest provider
     const walletProvider =
-      activeProvider ||
+      activeProviderRef.current ||
       (window as any).ethereum ||
       (window as any).trustwallet?.ethereum ||
       (window as any).trustwallet;
@@ -1107,8 +1127,9 @@ const StakeFelySection = () => {
     txHash: string,
     timeoutMs = 120_000,
   ): Promise<ethers.TransactionReceipt> => {
+    // FIX Bug 2: use ref for freshest provider
     const walletProvider =
-      activeProvider ||
+      activeProviderRef.current ||
       (window as any).ethereum ||
       (window as any).trustwallet?.ethereum ||
       (window as any).trustwallet;
@@ -1318,15 +1339,62 @@ const StakeFelySection = () => {
     }
   };
 
+  // FIX Bug 7: createWithdrawalRequest now generates a fresh signature each time
   const createWithdrawalRequest = async (Bearer: any, amount: any) => {
-    if (amount == 0) {
+    if (!amount || parseFloat(amount) === 0) {
       setBalanceErr("0 value Not allowed");
       return;
     }
+    setBalanceErr("");
     try {
+      const provider = activeProviderRef.current;
+      if (!provider || !yourWalletAddress) {
+        setBalanceErr("Wallet not connected");
+        return;
+      }
+
+      // Get a fresh nonce from the server for this withdrawal
+      const nonceResp = await getNonce(yourWalletAddress);
+      if (!nonceResp?.success) {
+        setBalanceErr("Could not get withdrawal nonce");
+        return;
+      }
+
+      const message = `Withdrawal request: ${amount} FELY. Nonce: ${nonceResp.data.nonce}`;
+      const hexMsg = ethers.hexlify(ethers.toUtf8Bytes(message));
+
+      // Sign with the active provider (respects Trust/Coinbase quirks)
+      const isTrust = detectTrustWallet(provider);
+      const isCoinbase =
+        provider?.isCoinbaseWallet || provider?.isCoinbaseBrowser;
+      const isIOS = detectIOS();
+
+      let freshSignature: string;
+      if (isCoinbase) {
+        freshSignature = await provider.request({
+          method: "personal_sign",
+          params: [message, yourWalletAddress],
+        });
+      } else if (isTrust) {
+        const params = isIOS
+          ? [hexMsg, yourWalletAddress]
+          : [yourWalletAddress, hexMsg];
+        freshSignature = await provider.request({
+          method: "personal_sign",
+          params,
+        });
+      } else {
+        freshSignature = await provider.request({
+          method: "personal_sign",
+          params: [hexMsg, yourWalletAddress],
+        });
+      }
+
       const obj = {
         fely_amount: amount,
-        signature: usedSignature,
+        signature: freshSignature,
+        nonce: nonceResp.data.nonce,
+        message,
         timestamp: Date.now().toString(),
       };
       const result = await serverGetWithBarePost(
@@ -1336,8 +1404,9 @@ const StakeFelySection = () => {
       );
       if (!result.success) setBalanceErr(result.message);
       UserWithdrawalsHistory(Bearer);
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
+      setBalanceErr(e?.message || "Withdrawal request failed");
     }
     getWithdrwalBalance(Bearer);
   };
@@ -2125,46 +2194,49 @@ const StakeFelySection = () => {
                           : "-"}
                       </td>
                       <td className="p-4 text-gray-300">
+                        {/* FIX Bug 8: null-safe shortenHash used here */}
                         <div className="flex items-center gap-2">
                           <span>{shortenHash(row.transaction_hash)}</span>
-                          <button
-                            onClick={() => {
-                              copyToClipboard(String(row.transaction_hash));
-                              setCopiedHash(String(row.transaction_hash));
-                              setTimeout(() => setCopiedHash(null), 2000);
-                            }}
-                            className="text-gray-500 hover:text-primary-500 transition-colors flex-shrink-0"
-                          >
-                            {copiedHash === String(row.transaction_hash) ? (
-                              <svg
-                                className="w-3.5 h-3.5 text-primary-500"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth="2"
-                                  d="M5 13l4 4L19 7"
-                                />
-                              </svg>
-                            ) : (
-                              <svg
-                                className="w-3.5 h-3.5"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth="2"
-                                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 002 2z"
-                                />
-                              </svg>
-                            )}
-                          </button>
+                          {row.transaction_hash && (
+                            <button
+                              onClick={() => {
+                                copyToClipboard(String(row.transaction_hash));
+                                setCopiedHash(String(row.transaction_hash));
+                                setTimeout(() => setCopiedHash(null), 2000);
+                              }}
+                              className="text-gray-500 hover:text-primary-500 transition-colors flex-shrink-0"
+                            >
+                              {copiedHash === String(row.transaction_hash) ? (
+                                <svg
+                                  className="w-3.5 h-3.5 text-primary-500"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M5 13l4 4L19 7"
+                                  />
+                                </svg>
+                              ) : (
+                                <svg
+                                  className="w-3.5 h-3.5"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 002 2z"
+                                  />
+                                </svg>
+                              )}
+                            </button>
+                          )}
                         </div>
                       </td>
                       <td className="p-4">
@@ -2233,7 +2305,9 @@ const StakeFelySection = () => {
                   Total Bonus Balance{" "}
                   {parseFloat(withdrawableFelyFix || "0").toFixed(2)} FELY (
                   {parseFloat(withdrawableUsdt || "0").toFixed(2)}) USDT{" "}
-                  {balanceErr}
+                  {balanceErr && (
+                    <span className="text-red-400 text-sm">{balanceErr}</span>
+                  )}
                 </h3>
                 <div className="flex flex-col sm:flex-row items-start gap-3 justify-start">
                   <div className="relative">
@@ -2312,47 +2386,57 @@ const StakeFelySection = () => {
                           {parseFloat(rows.fely_amount).toFixed(2)}
                         </td>
                         <td className="p-4 text-white text-sm">
+                          {/* FIX Bug 8: null-safe */}
                           <div className="flex items-center gap-2">
                             <span>{shortenHash(rows.transaction_hash)}</span>
-                            <button
-                              onClick={() => {
-                                copyToClipboard(String(rows.transaction_hash));
-                                setCopiedHashhis(String(rows.transaction_hash));
-                                setTimeout(() => setCopiedHashhis(null), 2000);
-                              }}
-                              className="text-gray-500 hover:text-primary-500 transition-colors flex-shrink-0"
-                            >
-                              {copiedHashWith ===
-                              String(rows.transaction_hash) ? (
-                                <svg
-                                  className="w-3.5 h-3.5 text-primary-500"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M5 13l4 4L19 7"
-                                  />
-                                </svg>
-                              ) : (
-                                <svg
-                                  className="w-3.5 h-3.5"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 002 2z"
-                                  />
-                                </svg>
-                              )}
-                            </button>
+                            {rows.transaction_hash && (
+                              <button
+                                onClick={() => {
+                                  copyToClipboard(
+                                    String(rows.transaction_hash),
+                                  );
+                                  setCopiedHashhis(
+                                    String(rows.transaction_hash),
+                                  );
+                                  setTimeout(
+                                    () => setCopiedHashhis(null),
+                                    2000,
+                                  );
+                                }}
+                                className="text-gray-500 hover:text-primary-500 transition-colors flex-shrink-0"
+                              >
+                                {copiedHashWith ===
+                                String(rows.transaction_hash) ? (
+                                  <svg
+                                    className="w-3.5 h-3.5 text-primary-500"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth="2"
+                                      d="M5 13l4 4L19 7"
+                                    />
+                                  </svg>
+                                ) : (
+                                  <svg
+                                    className="w-3.5 h-3.5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth="2"
+                                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 002 2z"
+                                    />
+                                  </svg>
+                                )}
+                              </button>
+                            )}
                           </div>
                         </td>
                         <td className="p-4 text-white text-sm">
