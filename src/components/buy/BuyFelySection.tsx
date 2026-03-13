@@ -128,7 +128,7 @@ const fallbackCopy = (text: string) => {
   ta.select();
   try {
     document.execCommand("copy");
-  } catch (_) {}
+  } catch (_) { }
   document.body.removeChild(ta);
 };
 
@@ -253,7 +253,7 @@ const BuyFelySection = () => {
             }
           });
         }
-      } catch (_) {}
+      } catch (_) { }
     };
     const t = setTimeout(silentReconnect, 1500);
     return () => clearTimeout(t);
@@ -582,15 +582,12 @@ const BuyFelySection = () => {
       <div className="text-center space-y-4">
         <RevealAnimation delay={0.1}>
           <h2 className="text-2xl md:text-3xl font-bold text-white leading-tight">
-            Golden Opportunity Unveiled
+            Discover Felysyum
           </h2>
         </RevealAnimation>
         <RevealAnimation delay={0.2}>
           <p className="text-accent/80 text-base md:text-lg max-w-3xl mx-auto">
-            Your once-in-a-lifetime chance to get Felysyum at a
-            never-before-seen price is here! The public sale is open for a
-            limited period only. Act now to secure your stake and become an
-            early pioneer of digital gold!
+            Access FELY during the public availability phase and become part of the growing Felysyum ecosystem. Early participants can acquire FELY at the current release price while the allocation is available. Use FELY to interact with the expanding Felysyum platform and its upcoming ecosystem features.
           </p>
         </RevealAnimation>
       </div>
@@ -602,10 +599,10 @@ const BuyFelySection = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center relative z-10">
             <div className="space-y-6 text-center lg:text-left">
               <h3 className="text-2xl md:text-3xl font-bold text-white leading-tight">
-                Buy FELY now!
+                Get FELY
                 <br />
-                This price is available for a{" "}
-                <span className="text-primary-500">limited time.</span>
+                Current release price available for a {" "}
+                <span className="text-primary-500">limited allocation period.</span>
               </h3>
             </div>
 
