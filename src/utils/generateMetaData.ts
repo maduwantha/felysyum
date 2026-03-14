@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 export const DEFAULT_URL = "https://dv.felysyum.com";
+
 export const DEFAULT_TITLE = "Felysyum : Elysium's Digital Gold";
 export const DEFAULT_DESCRIPTION =
   "Discover your digital elysium at The Oasis of Legends, a vibrant ecosystem fueled by Felysyum (FELY) cryptocurrency.";
