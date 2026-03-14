@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
 
-export const DEFAULT_URL = "https://dv.felysyum.com";
+//export const DEFAULT_URL = "https://dv.felysyum.com";
+
+export const DEFAULT_URL =
+  typeof window !== "undefined" &&
+  window.location.hostname === "dv.felysyum.com"
+    ? "https://dv.felysyum.com"
+    : "https://felysyum.com";
 
 export const DEFAULT_TITLE = "Felysyum : Elysium's Digital Gold";
 export const DEFAULT_DESCRIPTION =
