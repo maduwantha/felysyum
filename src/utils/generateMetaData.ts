@@ -5,7 +5,12 @@ export const DEFAULT_TITLE = "Felysyum : Elysium's Digital Gold";
 export const DEFAULT_DESCRIPTION =
   "Discover your digital elysium at The Oasis of Legends, a vibrant ecosystem fueled by Felysyum (FELY) cryptocurrency.";
 export const DEFAULT_IMAGE_URL = "/images/shared/felysyum-logo.png";
-export const BASE_URL = "https://dev.felysyum.cloud/api";
+
+export const BASE_URL =
+  typeof window !== "undefined" &&
+  window.location.hostname === "dv.felysyum.com"
+    ? "https://dev.felysyum.cloud/api"
+    : "https://felysyum.cloud/api";
 
 const defaultMetadata: Metadata = {
   metadataBase: new URL(DEFAULT_URL),

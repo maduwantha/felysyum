@@ -1,22 +1,5 @@
 "use client";
 
-/**
- * StakeFelySection — wallet compatibility matrix
- * ─────────────────────────────────────────────────────────────────────────
- *  Wallet                  | Desktop browser ext | Mobile in-app browser
- * ─────────────────────────────────────────────────────────────────────────
- *  MetaMask                |  ✅                  |  ✅
- *  Trust Wallet            |  ✅                  |  ✅
- *  Coinbase Wallet         |  ✅                  |  ✅
- *  Binance Web3 Wallet     |  ✅                  |  ✅
- *  Brave Wallet            |  ✅                  |  —
- *  Any EIP-6963 wallet     |  ✅                  |  —
- * ─────────────────────────────────────────────────────────────────────────
- *
- * REQUIRED companion file → app/api/rpc/route.ts
- * (code at the bottom of this file)
- */
-
 import RevealAnimation from "../animation/RevealAnimation";
 import { format } from "date-fns";
 import { serverPostRequest } from "@/app/serverServices/serverCalls";
