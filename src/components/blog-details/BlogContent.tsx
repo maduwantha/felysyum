@@ -1,6 +1,7 @@
 import matter from 'gray-matter';
 import Image, { StaticImageData } from 'next/image';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import rehypeSlug from 'rehype-slug';
 import RevealAnimation from '../animation/RevealAnimation';
 
@@ -12,7 +13,7 @@ const BlogContent = ({ blog }: { blog: matter.GrayMatterFile<string> }) => {
       <div className="main-container">
         <div className="mx-auto max-w-[1209px] space-y-3">
           <RevealAnimation delay={0.1}>
-            <h2>{blog.data.title}</h2>
+            <h2 className="text-heading-5 md:text-heading-4">{blog.data.title}</h2>
           </RevealAnimation>
           <div className="flex items-center gap-3">
             <RevealAnimation delay={0.2}>
@@ -60,7 +61,7 @@ const BlogContent = ({ blog }: { blog: matter.GrayMatterFile<string> }) => {
 
         <RevealAnimation delay={0.5}>
           <article className="details-body">
-            <ReactMarkdown rehypePlugins={[[rehypeSlug]]}>{blog.content}</ReactMarkdown>
+            <ReactMarkdown rehypePlugins={[[rehypeSlug]]} remarkPlugins={[remarkGfm]}>{blog.content}</ReactMarkdown>
           </article>
         </RevealAnimation>
         {/* details-footer */}
