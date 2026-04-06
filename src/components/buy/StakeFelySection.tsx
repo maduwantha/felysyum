@@ -81,8 +81,8 @@ const getReadProvider = async (
 const detectMobile = (): boolean =>
   isBrowser
     ? /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-        navigator.userAgent,
-      )
+      navigator.userAgent,
+    )
     : false;
 
 const detectIOS = (): boolean =>
@@ -121,8 +121,8 @@ const getWalletProviders = () => {
       : null) ??
     (Array.isArray(win.ethereum?.providers)
       ? (win.ethereum.providers.find(
-          (p: any) => p.isTrust || p.isTrustWallet,
-        ) ?? null)
+        (p: any) => p.isTrust || p.isTrustWallet,
+      ) ?? null)
       : null);
 
   // Coinbase Wallet
@@ -141,8 +141,8 @@ const getWalletProviders = () => {
       : null) ??
     (Array.isArray(win.ethereum?.providers)
       ? (win.ethereum.providers.find(
-          (p: any) => p.isBinance || p.isBinanceW3W,
-        ) ?? null)
+        (p: any) => p.isBinance || p.isBinanceW3W,
+      ) ?? null)
       : null);
 
   return { metamask, trust, coinbase, binance, ethereum: win.ethereum ?? null };
@@ -250,7 +250,7 @@ const signMessageWithProvider = async (
     ]) {
       try {
         return await provider.request({ method: "personal_sign", params });
-      } catch (_) {}
+      } catch (_) { }
     }
     return provider.request({
       method: "eth_sign",
@@ -267,7 +267,7 @@ const signMessageWithProvider = async (
     ]) {
       try {
         return await provider.request({ method: "personal_sign", params });
-      } catch (_) {}
+      } catch (_) { }
     }
     throw new Error("Binance Web3 Wallet signing failed");
   }
@@ -282,7 +282,7 @@ const signMessageWithProvider = async (
         method: "personal_sign",
         params: primary,
       });
-    } catch (_) {}
+    } catch (_) { }
     try {
       return await provider.request({
         method: "personal_sign",
@@ -310,14 +310,14 @@ const signMessageWithProvider = async (
           method: "personal_sign",
           params: [walletAddr, hexMsg],
         });
-      } catch (_) {}
+      } catch (_) { }
     }
     try {
       return await provider.request({
         method: "eth_sign",
         params: [walletAddr, ethers.hashMessage(message)],
       });
-    } catch (_) {}
+    } catch (_) { }
     throw e;
   }
 };
@@ -344,7 +344,7 @@ const fallbackCopy = (text: string) => {
   ta.select();
   try {
     document.execCommand("copy");
-  } catch (_) {}
+  } catch (_) { }
   document.body.removeChild(ta);
 };
 
@@ -765,7 +765,7 @@ const StakeFelySection = () => {
           await regProgress(eth, accounts[0]);
           attachListeners(eth);
         }
-      } catch (_) {}
+      } catch (_) { }
     };
     const reconnectTimer = setTimeout(silentReconnect, 1500);
 
@@ -1087,9 +1087,9 @@ const StakeFelySection = () => {
           i === 0
             ? await getReadProvider(wp)
             : (() => {
-                clearProviderCache();
-                return getCachedPublicProvider();
-              })();
+              clearProviderCache();
+              return getCachedPublicProvider();
+            })();
         const raw = await new ethers.Contract(
           USDT_CONTRACT_ADDRESS,
           USDT_ABI,
@@ -1112,9 +1112,9 @@ const StakeFelySection = () => {
           i === 0
             ? await getReadProvider(wp)
             : (() => {
-                clearProviderCache();
-                return getCachedPublicProvider();
-              })();
+              clearProviderCache();
+              return getCachedPublicProvider();
+            })();
         const raw = await p.getBalance(address);
         setPolyBalance(parseFloat(ethers.formatUnits(raw, 18)).toFixed(4));
         return;
@@ -1430,7 +1430,7 @@ const StakeFelySection = () => {
         <div className="flex-grow space-y-4 mb-6 text-sm">
           <div className="flex justify-between border-b border-[#2a333e] pb-2 text-gray-400 font-medium">
             <span>Staked Amount</span>
-            <span>Interest Rate</span>
+            <span>Reward Rate</span>
           </div>
           {rates.map(([range, rate]) => (
             <div key={range} className="flex justify-between text-white">
@@ -1500,8 +1500,7 @@ const StakeFelySection = () => {
         <RevealAnimation delay={0.2}>
           <div className="flex flex-col items-center justify-center gap-4">
             <p className="text-accent/80 text-base md:text-lg max-w-3xl mx-auto">
-              Maximize your holdings by staking FELY. Earn rewards while
-              contributing to the ecosystem stability.
+              ⁠Participate in the Felysyum staking program by locking FELY tokens and supporting the ecosystem.
             </p>
             <div className="bg-primary-500/10 border border-primary-500/20 px-6 py-3 rounded-xl shadow-[0_0_20px_rgba(228,145,39,0.15)] mt-2">
               <p className="text-primary-500 text-sm md:text-base font-bold text-center">
@@ -1560,16 +1559,13 @@ const StakeFelySection = () => {
 
       <div className="text-center w-full px-4 md:px-0">
         <p className="text-white font-bold text-sm md:text-base">
-          Felysyum stakes are secured on smart contracts. Once you stake, only
-          you can withdraw your daily interest and staking capital – not even we
-          can access it.
+          Rewards are distributed through secure smart contracts, and staked tokens remain under your wallet control.
           <br />
           <span className="text-primary-500 font-medium mt-4 inline-block">
-            Choose your staking plan and start earning
+            Choose a staking option and participate in the reward program.
           </span>
           <span className="text-primary-500 font-bold block my-4 text-base md:text-lg">
-            Enjoy premium interest on every plan—even for small stakes! Whale
-            20%, Shark 9%, Dolphin 4%. Don't miss this limited-time opportunity!
+            During this limited bonus period, all staking amounts receive the highest reward tier available in each plan — Whale up to 20%, Shark up to 9%, Dolphin up to 4%.
           </span>
         </p>
       </div>
@@ -1582,9 +1578,9 @@ const StakeFelySection = () => {
           cardKey="dolphin"
           delay={0.2}
           rates={[
-            ["0 - 1000 USDT", "2.5%"],
-            ["1001 - 5000 USDT", "3%"],
-            ["5001 - 10000 USDT", "4%"],
+            ["0 - 1000 USDT", "10% APR"],
+            ["1001 - 5000 USDT", "12% APR"],
+            ["5001 - 10000 USDT", "16% APR"],
           ]}
           address="0x66BAf11521Ee8B3eF84bd459F7062916b6218D68"
           scanUrl="https://polygonscan.com/address/0x66BAf11521Ee8B3eF84bd459F7062916b6218D68"
@@ -1595,9 +1591,9 @@ const StakeFelySection = () => {
           cardKey="shark"
           delay={0.3}
           rates={[
-            ["0 - 1000 USDT", "6%"],
-            ["1001 - 5000 USDT", "7%"],
-            ["5001 - 10000 USDT", "9%"],
+            ["0 - 1000 USDT", "12% APR"],
+            ["1001 - 5000 USDT", "14% APR"],
+            ["5001 - 10000 USDT", "18% APR"],
           ]}
           address="0xe4410D26224d4728846722309fF386495Cc1E490"
           scanUrl="https://polygonscan.com/address/0xe4410D26224d4728846722309fF386495Cc1E490"
@@ -1608,9 +1604,9 @@ const StakeFelySection = () => {
           cardKey="whale"
           delay={0.4}
           rates={[
-            ["0 - 1000 USDT", "12.5%"],
-            ["1001 - 5000 USDT", "15%"],
-            ["5001 - 10000 USDT", "20%"],
+            ["0 - 1000 USDT", "14% APY"],
+            ["1001 - 5000 USDT", "16% APY"],
+            ["5001 - 10000 USDT", "20% APY"],
           ]}
           address="0x5eff66487f9d33465baf1ebd4cfa991f0b8cd963"
           scanUrl="https://polygonscan.com/address/0x5eff66487f9d33465baf1ebd4cfa991f0b8cd963"
@@ -2036,9 +2032,9 @@ const StakeFelySection = () => {
                       value={
                         withdrawableFely
                           ? (
-                              Math.trunc(parseFloat(withdrawableFely) * 100) /
-                              100
-                            ).toString()
+                            Math.trunc(parseFloat(withdrawableFely) * 100) /
+                            100
+                          ).toString()
                           : ""
                       }
                       onChange={(e) => setWithdrawableFely(e.target.value)}
