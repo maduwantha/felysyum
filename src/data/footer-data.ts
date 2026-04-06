@@ -7,6 +7,8 @@ export const footerLinks: FooterData[] = [
       { label: 'Behind the Story', href: '/about' },
       { label: 'White Paper', href: '/whitepaper' },
       { label: 'Team', href: '/team' },
+      { label: 'Terms & Conditions', href: '/terms-conditions' },
+      { label: 'Felysyum Disclaimer', href: '/disclaimer' },
     ],
   },
   {

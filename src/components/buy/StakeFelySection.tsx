@@ -1604,9 +1604,9 @@ const StakeFelySection = () => {
           cardKey="whale"
           delay={0.4}
           rates={[
-            ["0 - 1000 USDT", "14% APY"],
-            ["1001 - 5000 USDT", "16% APY"],
-            ["5001 - 10000 USDT", "20% APY"],
+            ["0 - 1000 USDT", "14% APR"],
+            ["1001 - 5000 USDT", "16% APR"],
+            ["5001 - 10000 USDT", "20% APR"],
           ]}
           address="0x5eff66487f9d33465baf1ebd4cfa991f0b8cd963"
           scanUrl="https://polygonscan.com/address/0x5eff66487f9d33465baf1ebd4cfa991f0b8cd963"
