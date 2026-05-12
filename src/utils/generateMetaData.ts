@@ -4,8 +4,8 @@ import type { Metadata } from "next";
 
 export const DEFAULT_URL =
   typeof window !== "undefined" &&
-  window.location.hostname === "dv.felysyum.com"
-    ? "https://dv.felysyum.com"
+    window.location.hostname === "dv.felysyum.com"
+    ? "https://felysyum.com"
     : "https://felysyum.com";
 
 export const DEFAULT_TITLE = "Felysyum : Elysium's Digital Gold";
@@ -15,7 +15,7 @@ export const DEFAULT_IMAGE_URL = "/images/shared/felysyum-logo.png";
 
 export const BASE_URL =
   typeof window !== "undefined" &&
-  window.location.hostname === "dv.felysyum.com"
+    window.location.hostname === "dv.felysyum.com"
     ? "https://dev.felysyum.cloud/api"
     : "https://felysyum.cloud/api";
 

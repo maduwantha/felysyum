@@ -24,10 +24,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
             ...defaultMetadata.openGraph,
             title: `${blogContent.data.title} - Felysyum`,
             description: blogContent.data.description,
-            url: `https://dv.felysyum.com/announcement/${slug}`,
+            url: `https://felysyum.com/announcement/${slug}`,
             images: [
                 {
-                    url: `https://dv.felysyum.com${blogContent.data.thumbnail}`,
+                    url: `https://felysyum.com${blogContent.data.thumbnail}`,
                     width: 1200,
                     height: 600,
                     alt: blogContent.data.title,

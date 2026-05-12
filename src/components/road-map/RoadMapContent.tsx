@@ -23,14 +23,15 @@ const milestones = [
     },
     {
         status: 'future',
-        title: 'Staking Stars',
-        desc: 'Launch the FELY staking option for rewarding opportunities.',
+        title: 'FELY Wallet Unleashed',
+        desc: 'Roll out the Fely Wallet, the secure crypto wallet.',
     },
     {
         status: 'future',
         title: 'Felyzone Debut',
         desc: 'Kickstart product sales in the innovative Felyzone.',
     },
+
     {
         status: 'future',
         title: 'Fuel for Innovators',
@@ -41,21 +42,13 @@ const milestones = [
         title: 'Olympus Gathering',
         desc: 'Strengthen the community ties within Olympus Community.',
     },
-    {
-        status: 'future',
-        title: 'Zephyr Unleashed',
-        desc: 'Roll out the Fely Wallet, the secure crypto wallet.',
-    },
+
     {
         status: 'future',
         title: 'Polygon Dispatch',
         desc: 'Provide essential information to the Polygon network.',
     },
-    {
-        status: 'future',
-        title: 'Major Listings',
-        desc: 'Ensure FELY is featured on prominent listing sites.',
-    },
+
     {
         status: 'active',
         type: 'rolling_out',
@@ -67,6 +60,31 @@ const milestones = [
         type: 'in_motion',
         title: "We're in motion, making things happen",
         desc: ''
+    },
+    {
+        status: 'completed',
+        title: 'March 17, 2026',
+        desc: "Felysyum launched the FELY Staking platform, introducing rewarding opportunities for holders and expanding the utility of the FELY ecosystem. ",
+    },
+    {
+        status: 'completed',
+        title: 'October 2025',
+        desc: "Felysyum achieved a “Neutral” reputation status on PolygonScan, recognizing the project’s verified smart contract, transparency, active ecosystem, and listings on major crypto aggregation platforms. ",
+    },
+    {
+        status: 'completed',
+        title: 'September 29,  2025',
+        desc: "Felysyum officially launched on Biconomy CEX, marking the project’s first centralized exchange listing and opening a new chapter for global trading and ecosystem growth. ",
+    },
+    {
+        status: 'completed',
+        title: 'September 09,  2025',
+        desc: "Felysyum was officially listed on CoinMarketCap, the world’s #1 crypto aggregation platform, expanding global exposure and strengthening the presence of the FELY ecosystem in the crypto market.",
+    },
+    {
+        status: 'completed',
+        title: 'July 02, 2025',
+        desc: "Felysyum was officially listed on CoinGecko, the world’s #2 crypto aggregation platform, marking a major milestone in expanding global visibility and strengthening the FELY ecosystem.",
     },
     {
         status: 'completed',
@@ -102,11 +120,6 @@ const milestones = [
         status: 'completed',
         title: 'June 2024',
         desc: 'A partnership was forged with a renowned U.S. promotion team, tasked with building a global community and spreading the Felysyum vision worldwide.',
-    },
-    {
-        status: 'completed',
-        title: 'March 20, 2024',
-        desc: 'The Feliciamatrix Educational Token (FET) was launched, opening the door to a new era of crypto-focused learning. Community members could now access a wide range of courses on SkillfulHub.com using FET.',
     },
     {
         status: 'completed',
@@ -217,7 +230,7 @@ const RoadMapContent = () => {
                                                                 <span className="text-gray-200 font-medium text-sm md:text-base">Developing SkillfulHub to educate community members</span>
                                                             </div>
                                                             <div className="p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-[#E08E27]/20 hover:border-[#E08E27]/50 transition-all flex items-center gap-4 group/card">
-                                                                <span className="text-gray-200 font-medium text-sm md:text-base">Listing the Felysyum token on major crypto platforms</span>
+                                                                <span className="text-gray-200 font-medium text-sm md:text-base">Development is underway for “Olympus Honor Group” — the official community platform of the Felysyum ecosystem, designed to unite and strengthen the global FELY community.</span>
                                                             </div>
                                                         </div>
                                                     )}

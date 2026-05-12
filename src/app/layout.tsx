@@ -11,7 +11,7 @@ import "./globals.css";
 
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://dv.felysyum.com'),
+  metadataBase: new URL('https://felysyum.com'),
   title: "Felysyum : Elysium's Digital Gold",
   description: "Discover your digital elysium at The Oasis of Legends, a vibrant ecosystem fueled by Felysyum (FELY) cryptocurrency.",
   icons: {
