@@ -1,4 +1,5 @@
 import StakeFelySection from "@/components/buy/StakeFelySection";
+import StakeVideoTutorial from "@/components/buy/StakeVideoTutorial";
 import { defaultMetadata } from "@/utils/generateMetaData";
 import { Metadata } from "next";
 
@@ -17,7 +18,12 @@ const Page = () => {
             STAKE FELYSYUM
           </h1>
         </div>
+        
+        {/* Core Staking System */}
         <StakeFelySection />
+
+        {/* Analytics Stats & Custom Video Player Section */}
+        <StakeVideoTutorial />
       </div>
     </main>
   );

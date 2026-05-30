@@ -1565,7 +1565,7 @@ const StakeFelySection = () => {
             Choose a staking option and participate in the reward program.
           </span>
           <span className="text-primary-500 font-bold block my-4 text-base md:text-lg">
-            During this limited bonus period, all staking amounts receive the highest reward tier available in each plan — Whale up to 20%, Shark up to 9%, Dolphin up to 4%.
+            During this limited bonus period, valid until June 13, 2026, all staking amounts will receive the highest reward tier available in each plan — Whale 20%, Shark 18%, and Dolphin 16%.
           </span>
         </p>
       </div>
