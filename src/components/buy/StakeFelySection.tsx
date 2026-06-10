@@ -1640,9 +1640,9 @@ const StakeFelySection = () => {
           cardKey="shark"
           delay={0.3}
           rates={[
-            ["0 - 1000 FELY", "12% APR"],
-            ["1001 - 5000 FELY", "14% APR"],
-            ["5001 - 10000 FELY", "18% APR"],
+            ["0 – 4,000 FELY", "12% APR"],
+            ["4,001 – 20,000 FELY", "14% APR"],
+            ["⁠20,001 – 40,000 FELY", "18% APR"],
           ]}
           address="0xe4410D26224d4728846722309fF386495Cc1E490"
           scanUrl="https://polygonscan.com/address/0xe4410D26224d4728846722309fF386495Cc1E490"
@@ -1653,9 +1653,9 @@ const StakeFelySection = () => {
           cardKey="whale"
           delay={0.4}
           rates={[
-            ["0 - 1000 FELY", "14% APR"],
-            ["1001 - 5000 FELY", "16% APR"],
-            ["5001 - 10000 FELY", "20% APR"],
+            ["0 – 4,000 FELY", "14% APR"],
+            ["4,001 – 20,000 FELY", "16% APR"],
+            ["⁠20,001 – 40,000 FELY", "20% APR"],
           ]}
           address="0x5eff66487f9d33465baf1ebd4cfa991f0b8cd963"
           scanUrl="https://polygonscan.com/address/0x5eff66487f9d33465baf1ebd4cfa991f0b8cd963"
