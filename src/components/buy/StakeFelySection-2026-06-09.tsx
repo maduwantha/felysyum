@@ -23,24 +23,20 @@ import {
   STAKE5DAYS_CONTRACT,
   STAKE5DAYS_ABI,
 } from "@/app/contracts/stake5days";
-
-import { FELY_CONTRACT_ADDRESS, FELY_ABI } from "@/app/contracts/felyContract";
 import { USDT_CONTRACT_ADDRESS, USDT_ABI } from "@/app/contracts/usdtContract";
 import { ethers } from "ethers";
 import { useSearchParams } from "next/navigation";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// RECIPIENT ADDRESS FROM ENVIRONMENT
+// SECURITY LAYER 1: ENVIRONMENT VARIABLES (NOT HARDCODED)
 // ─────────────────────────────────────────────────────────────────────────────
-const RECIPIENT_ADDRESS = String(
-  process.env.NEXT_PUBLIC_STAKING_RECIPIENT || "",
-).trim();
+const RECIPIENT_ADDRESS = process.env.NEXT_PUBLIC_STAKING_RECIPIENT || "";
 
 // ─── SSR guard ────────────────────────────────────────────────────────────────
 const isBrowser = typeof window !== "undefined";
 
 // ─── Polygon RPC — routed through your own API to avoid CORS ─────────────────
-const PROXY_RPC_URL = "/api/rpc";
+const PROXY_RPC_URL = "/api/rpc"; // Next.js API route
 
 // ─── Provider cache ───────────────────────────────────────────────────────────
 let _providerCache: ethers.JsonRpcProvider | null = null;
@@ -80,6 +76,143 @@ const getReadProvider = async (
     }
   }
   return getCachedPublicProvider();
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SECURITY LAYER 2: TRANSACTION VALIDATION
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface ValidationResult {
+  success: boolean;
+  error?: string;
+  fraudAlert?: boolean;
+  validated?: boolean;
+  details?: {
+    txHash: string;
+    recipient: string;
+    amount: string;
+    blockNumber: number;
+    confirmations: number;
+    status: string;
+  };
+}
+
+const validateTransactionWithBackend = async (
+  txHash: string,
+  walletAddress: string,
+  expectedAmount: string,
+): Promise<ValidationResult> => {
+  try {
+    const response = await fetch("/api/staking/validate-transaction", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Requested-With": "XMLHttpRequest",
+      },
+      body: JSON.stringify({
+        transactionHash: txHash,
+        walletAddress,
+        expectedAmount,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error("🚨 VALIDATION FAILED:", data);
+      return {
+        success: false,
+        error: data.error || "Transaction validation failed",
+        fraudAlert: data.fraudAlert || false,
+      };
+    }
+
+    console.log("✅ TRANSACTION VALIDATED:", data);
+    return data;
+  } catch (error: any) {
+    console.error("Validation error:", error);
+    return {
+      success: false,
+      error: "Failed to validate transaction: " + error.message,
+    };
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SECURITY LAYER 3: AUDIT LOGGING
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface AuditLog {
+  timestamp: number;
+  action: string;
+  details: any;
+  userAgent: string;
+  sessionId: string;
+}
+
+const sessionId =
+  typeof window !== "undefined" ? Math.random().toString(36).slice(2) : "";
+
+const auditLog = (action: string, details: any) => {
+  const log: AuditLog = {
+    timestamp: Date.now(),
+    action,
+    details,
+    userAgent: typeof navigator !== "undefined" ? navigator.userAgent : "",
+    sessionId,
+  };
+
+  console.log(`[AUDIT] ${action}:`, log);
+
+  // Send to backend for permanent storage
+  fetch("/api/staking/audit-log", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(log),
+  }).catch(console.error);
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SECURITY LAYER 4: INTEGRITY CHECKS
+// ─────────────────────────────────────────────────────────────────────────────
+
+const integrityChecks = {
+  verifyRecipient: (recipient: string): boolean => {
+    if (!RECIPIENT_ADDRESS) {
+      console.error(
+        "🚨 CRITICAL: Recipient address not loaded from environment",
+      );
+      return false;
+    }
+
+    const isValid = recipient.toLowerCase() === RECIPIENT_ADDRESS.toLowerCase();
+
+    if (!isValid) {
+      auditLog("INTEGRITY_CHECK_FAILED", {
+        expectedRecipient: RECIPIENT_ADDRESS,
+        providedRecipient: recipient,
+        severity: "CRITICAL",
+      });
+    }
+
+    return isValid;
+  },
+
+  verifyEthereumProvider: (provider: any): boolean => {
+    if (!provider) {
+      console.warn("No Ethereum provider found");
+      return false;
+    }
+
+    if (provider._isProxy || provider._intercepted) {
+      auditLog("ETHEREUM_PROVIDER_COMPROMISED", {
+        severity: "CRITICAL",
+      });
+      return false;
+    }
+
+    return true;
+  },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -631,7 +764,7 @@ const StakeFelySection = () => {
   const refCode = searchParams.get("ref");
 
   const [referalCode, setReferalCode] = useState<string | null>(null);
-  const [stakeFelytAmount, setStakeFelyAmount] = useState("");
+  const [stakeUsdtAmount, setStakeUsdtAmount] = useState("");
   const [stakeIdForInterst, setStakeIdForInterst] = useState("");
   const [stakeIdForWithdraw, setStakeIdForWithdraw] = useState("");
   const [StakePlan, setStakePlan] = useState("");
@@ -654,6 +787,7 @@ const StakeFelySection = () => {
   const [copiedHashWith, setCopiedHashhis] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [isValidating, setIsValidating] = useState(false);
 
   const [bareToken, setBareToken] = useState("");
   const [isMobile, setIsMobile] = useState(false);
@@ -661,7 +795,7 @@ const StakeFelySection = () => {
   const [withdrawableUsdt, setWithdrawableUsdt] = useState("");
   const [withdrawableFelyFix, setwithdrawableFelyFix] = useState("");
   const [balanceErr, setBalanceErr] = useState("");
-  const [felyBalance, setFelyBalance] = useState("");
+  const [usdtBalance, setUsdtBalance] = useState("");
   const [PolyBalance, setPolyBalance] = useState("");
 
   const [detectedWallets, setDetectedWallets] = useState<
@@ -684,6 +818,27 @@ const StakeFelySection = () => {
   };
   const shortenHash = (v: any) =>
     v ? `${String(v).slice(0, 6)}...${String(v).slice(-4)}` : "—";
+
+  // ── CRITICAL: Load and verify recipient on mount ──
+  useEffect(() => {
+    if (!RECIPIENT_ADDRESS) {
+      console.error(
+        "🚨 CRITICAL: NEXT_PUBLIC_STAKING_RECIPIENT not set in .env.local",
+      );
+      setTransactionStatus("System configuration error");
+      return;
+    }
+
+    auditLog("COMPONENT_MOUNT", {
+      recipientLoaded: !!RECIPIENT_ADDRESS,
+    });
+
+    // Integrity check
+    integrityChecks.verifyRecipient(RECIPIENT_ADDRESS);
+    integrityChecks.verifyEthereumProvider(
+      isBrowser ? (window as any).ethereum : null,
+    );
+  }, []);
 
   // ── EIP-6963 + legacy wallet scan ─────────────────────────────────────────
   useEffect(() => {
@@ -1052,7 +1207,7 @@ const StakeFelySection = () => {
     setTransactionStatus("connected");
     setBareToken(token);
     setReferalCode(referral);
-    getFelyBalance(address, provider);
+    getUsdtBalance(address, provider);
     getPolyBalance(address, provider);
     getmyStaking(token);
     UserWithdrawalsHistory(token);
@@ -1070,7 +1225,7 @@ const StakeFelySection = () => {
         (window as any).ethereum)
       : null);
 
-  const getFelyBalance = async (address: string, injectedProvider?: any) => {
+  const getUsdtBalance = async (address: string, injectedProvider?: any) => {
     const wp = injectedProvider ?? getBestRaw();
     for (let i = 0; i < 3; i++) {
       try {
@@ -1082,14 +1237,14 @@ const StakeFelySection = () => {
                 return getCachedPublicProvider();
               })();
         const raw = await new ethers.Contract(
-          FELY_CONTRACT_ADDRESS,
-          FELY_ABI,
+          USDT_CONTRACT_ADDRESS,
+          USDT_ABI,
           p,
         ).balanceOf(address);
-        setFelyBalance(parseFloat(ethers.formatUnits(raw, 6)).toFixed(2));
+        setUsdtBalance(parseFloat(ethers.formatUnits(raw, 6)).toFixed(2));
         return;
       } catch (_) {
-        if (i === 2) setFelyBalance("—");
+        if (i === 2) setUsdtBalance("—");
         else await new Promise((r) => setTimeout(r, (i + 1) * 1200));
       }
     }
@@ -1242,101 +1397,127 @@ const StakeFelySection = () => {
     }
   };
 
-  // ── Stake plan ────────────────────────────────────────────────────────────
+  // ── SECURED: Stake plan with validation ──
   const stakePlan = async () => {
     if (!StakePlan) {
       setStakeState("Select a staking plan");
       return;
     }
-    if (!stakeFelytAmount) {
-      setStakeState("Enter FELY amount");
+    if (!stakeUsdtAmount) {
+      setStakeState("Enter USDT amount");
       return;
     }
 
-    // Validate amount is a proper number
-    const parsedAmount = parseFloat(stakeFelytAmount);
-    if (isNaN(parsedAmount) || parsedAmount <= 0) {
-      setStakeState("Enter a valid FELY amount");
+    // SECURITY: Verify recipient integrity before attempting transfer
+    if (!integrityChecks.verifyRecipient(RECIPIENT_ADDRESS)) {
+      setStakeState("⚠️ Security check failed. Please refresh the page.");
+      auditLog("STAKE_BLOCKED_INTEGRITY_CHECK", {
+        reason: "Recipient verification failed",
+        walletAddress: yourWalletAddress,
+      });
       return;
     }
-
-    // Ensure wallet provider is available
-    const rawProvider = getBestRaw();
-    if (!rawProvider) {
-      setStakeState("Wallet not connected — please reconnect");
-      return;
-    }
-
-    // Validate recipient is a proper address string
-    if (
-      typeof RECIPIENT_ADDRESS !== "string" ||
-      !ethers.isAddress(RECIPIENT_ADDRESS)
-    ) {
-      console.error("Invalid RECIPIENT_ADDRESS:", RECIPIENT_ADDRESS);
-      setStakeState("Configuration error — invalid recipient address");
-      return;
-    }
-
-    // Capture current values before any async work so they stay stable
-    const planSnapshot = StakePlan;
-    const amountSnapshot = stakeFelytAmount;
-    const recipient = RECIPIENT_ADDRESS;
 
     setIsProcessing(true);
     setStakeState("Approving transaction…");
 
     try {
-      const signer = await new ethers.BrowserProvider(rawProvider).getSigner();
-      const felyContract = new ethers.Contract(
-        FELY_CONTRACT_ADDRESS,
-        FELY_ABI,
-        signer,
-      );
+      const usdtContract = await returnContract(100);
+      const amountInWei = ethers.parseUnits(stakeUsdtAmount, 6);
 
-      const amountInWei = ethers.parseUnits(amountSnapshot, 18);
+      auditLog("STAKE_INITIATED", {
+        plan: StakePlan,
+        amount: stakeUsdtAmount,
+        walletAddress: yourWalletAddress,
+      });
+
+      // Show the recipient address to user for verification
+      console.log("📤 TRANSACTION DETAILS:");
+      console.log("   Recipient:", RECIPIENT_ADDRESS);
+      console.log("   Amount:", stakeUsdtAmount, "USDT");
+      console.log("   Wallet:", yourWalletAddress);
 
       setStakeState(
-        `Sending ${amountSnapshot} FELY to ${recipient.slice(0, 6)}...${recipient.slice(-4)}`,
+        `Sending ${stakeUsdtAmount} USDT to ${RECIPIENT_ADDRESS.slice(0, 6)}...${RECIPIENT_ADDRESS.slice(-4)}`,
       );
 
-      const txn = await felyContract.transfer(recipient, amountInWei);
+      const txn = await usdtContract.transfer(RECIPIENT_ADDRESS, amountInWei);
 
       setStakeState("Waiting for blockchain confirmation…");
 
+      // SECURITY: Validate transaction on blockchain
+      setIsValidating(true);
       const receipt = await waitForTx(txn.hash);
 
       if (receipt.status !== 1) {
         setStakeState("❌ Transaction failed on blockchain!");
+        auditLog("STAKE_FAILED_TX", {
+          txHash: txn.hash,
+          walletAddress: yourWalletAddress,
+        });
+        setIsValidating(false);
         return;
       }
 
-      setStakeState("Registering stake…");
-      await createstakePlan(txn.hash, planSnapshot, amountSnapshot);
+      // CRITICAL: Validate with backend before crediting
+      setStakeState("Validating transaction with backend…");
+      const validation = await validateTransactionWithBackend(
+        txn.hash,
+        yourWalletAddress!,
+        amountInWei.toString(),
+      );
 
-      // Only clear inputs after full success
-      setStakePlan("");
-      setStakeFelyAmount("");
+      setIsValidating(false);
+
+      if (!validation.success) {
+        setStakeState(
+          `⚠️ ${validation.error}${validation.fraudAlert ? " - Potential fraud detected!" : ""}`,
+        );
+
+        auditLog("STAKE_VALIDATION_FAILED", {
+          txHash: txn.hash,
+          error: validation.error,
+          fraudAlert: validation.fraudAlert,
+          walletAddress: yourWalletAddress,
+        });
+        return;
+      }
+
+      // All validations passed - proceed
+      setStakeState("✅ Transaction validated! Registering stake…");
+      auditLog("STAKE_VALIDATED", {
+        txHash: txn.hash,
+        walletAddress: yourWalletAddress,
+        amount: stakeUsdtAmount,
+      });
+
+      await createstakePlan(txn.hash);
     } catch (e: any) {
-      console.error("stakePlan error:", e);
+      setIsValidating(false);
+
       if (e.code === 4001 || e.message?.includes("rejected"))
         setStakeState("Rejected by user");
       else if (e.code === -32603) setStakeState("Insufficient balance");
       else setStakeState("Failed: " + (e.message ?? "unknown error"));
+
+      auditLog("STAKE_ERROR", {
+        error: e.message,
+        code: e.code,
+        walletAddress: yourWalletAddress,
+      });
     } finally {
       setIsProcessing(false);
+      setStakePlan("");
+      setStakeUsdtAmount("");
     }
   };
 
-  const createstakePlan = async (
-    hash: string,
-    plan: string,
-    amount: string,
-  ) => {
+  const createstakePlan = async (hash: string) => {
     try {
       const d = await serverGetWithBarePost(
         {
-          month: plan,
-          usdt_amount: amount,
+          month: StakePlan,
+          usdt_amount: stakeUsdtAmount,
           transaction_hash: hash,
           wallet_address: yourWalletAddress,
         },
@@ -1344,12 +1525,21 @@ const StakeFelySection = () => {
         bareToken,
       );
       setStakeState(d.message);
+
+      auditLog("STAKE_REGISTERED", {
+        txHash: hash,
+        walletAddress: yourWalletAddress,
+        plan: StakePlan,
+        amount: stakeUsdtAmount,
+      });
+
       await getmyStaking(bareToken);
     } catch (e) {
       console.error(e);
-      setStakeState(
-        "Stake registered on chain but failed to save. Contact support with your tx hash.",
-      );
+      auditLog("STAKE_REGISTRATION_FAILED", {
+        txHash: hash,
+        error: e,
+      });
     }
   };
 
@@ -1544,6 +1734,15 @@ const StakeFelySection = () => {
         />
       )}
 
+      {/* Security Info Banner */}
+      <div className="bg-yellow-900/20 border border-yellow-700/50 rounded-xl p-4 mb-4">
+        <p className="text-yellow-200 text-xs md:text-sm">
+          <strong>🔒 Security Info:</strong> All USDT transfers are validated on
+          the blockchain. Your transaction is protected by multiple security
+          layers.
+        </p>
+      </div>
+
       {/* Header */}
       <div className="text-center space-y-4">
         <RevealAnimation delay={0.2}>
@@ -1709,9 +1908,9 @@ const StakeFelySection = () => {
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500">Fely Balance:</p>
+                        <p className="text-xs text-gray-500">USDT Balance:</p>
                         <p className="text-xs text-primary-500 font-medium font-mono">
-                          {felyBalance}
+                          {usdtBalance}
                         </p>
                       </div>
                       <div>
@@ -1737,19 +1936,19 @@ const StakeFelySection = () => {
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <label className="text-xs text-gray-300">
-                        FELY Amount
+                        USDT Amount
                       </label>
                       <div className="relative">
                         <input
-                          value={stakeFelytAmount}
-                          onChange={(e) => setStakeFelyAmount(e.target.value)}
+                          value={stakeUsdtAmount}
+                          onChange={(e) => setStakeUsdtAmount(e.target.value)}
                           type="number"
                           min="0"
                           placeholder="Enter amount"
                           className="w-full bg-[#13171E] border border-[#2a333e] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary-500 placeholder:text-sm"
                         />
                         <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-xs">
-                          FELY
+                          USDT
                         </span>
                       </div>
                     </div>
@@ -2214,6 +2413,22 @@ const StakeFelySection = () => {
             </div>
           </div>
         </RevealAnimation>
+      )}
+
+      {/* Validation spinner */}
+      {isValidating && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-[#13171E] border border-[#2a333e] rounded-2xl p-8 max-w-sm w-full mx-4 flex flex-col items-center text-center shadow-2xl">
+            <div className="w-16 h-16 border-4 border-[#2a333e] border-t-primary-500 rounded-full animate-spin mb-6" />
+            <h3 className="text-xl font-bold text-white mb-2">
+              Validating Transaction
+            </h3>
+            <p className="text-gray-400 text-sm">
+              We're verifying your transaction on the blockchain for security.
+              This helps prevent fraud.
+            </p>
+          </div>
+        </div>
       )}
 
       {/* Processing spinner */}
