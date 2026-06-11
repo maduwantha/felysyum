@@ -1086,7 +1086,7 @@ const StakeFelySection = () => {
           FELY_ABI,
           p,
         ).balanceOf(address);
-        setFelyBalance(parseFloat(ethers.formatUnits(raw, 6)).toFixed(2));
+        setFelyBalance(parseFloat(ethers.formatUnits(raw, 18)).toFixed(2));
         return;
       } catch (_) {
         if (i === 2) setFelyBalance("—");
@@ -1675,8 +1675,7 @@ const StakeFelySection = () => {
 
                 <div className="bg-[#13171E] rounded-xl p-4 border border-[#2a333e] space-y-3">
                   <h4 className="text-white text-sm font-medium">
-                    Use Polygon Network – keep Polygon USDT and a little POL for
-                    gas.
+                    Use Polygon Network – Keep some POL for gas fees.
                   </h4>
                   <button
                     className="btn btn-primary btn-sm w-auto px-6 disabled:opacity-60 disabled:cursor-not-allowed"
