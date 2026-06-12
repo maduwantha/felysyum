@@ -98,7 +98,7 @@ const Footer = () => {
           <FooterDivider className="bg-stroke-2 dark:bg-accent/5" />
           <RevealAnimation delay={0.7} offset={10} start="top 105%">
             <p className="text-secondary dark:text-accent/60">
-              Copyright &copy; {new Date().getFullYear()} Felysyum. All rights reserved.
+              Copyright &copy; {new Date().getFullYear()} Felysyum LLC. All rights reserved.
             </p>
           </RevealAnimation>
         </div>
