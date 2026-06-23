@@ -128,21 +128,21 @@ const StakeVideoTutorial = () => {
           </div>
 
           {/* Video Player */}
-          <div className="max-w-4xl mx-auto relative group/player rounded-2xl overflow-hidden border border-stroke-2 dark:border-[#202731] bg-[#070b10] shadow-2xl transition-all duration-500 hover:border-primary-500/30">
+          <div className="max-w-[280px] md:max-w-[320px] mx-auto relative group/player rounded-2xl overflow-hidden border border-stroke-2 dark:border-[#202731] bg-[#070b10] shadow-2xl transition-all duration-500 hover:border-primary-500/30">
             {/* Golden Ambient Blur Backdrop */}
             <div className="absolute -inset-1 bg-gradient-to-r from-primary-500/10 to-ns-yellow/10 rounded-2xl blur-xl opacity-40 group-hover/player:opacity-70 transition duration-500" />
             
             {/* Aspect Ratio Container for Video */}
             <div 
-              className="relative aspect-video w-full h-full bg-black z-10 flex items-center justify-center cursor-pointer"
+              className="relative w-full bg-black z-10 flex items-center justify-center cursor-pointer"
               onMouseMove={handleMouseMove}
               onMouseLeave={() => isPlaying && setShowControls(false)}
               onClick={togglePlay}
             >
               <video
                 ref={videoRef}
-                src="/assets/staking-guide.mp4"
-                className="w-full h-full object-cover"
+                src="/assets/fely-video.mp4"
+                className="w-full h-auto"
                 loop
                 playsInline
                 onTimeUpdate={handleTimeUpdate}
