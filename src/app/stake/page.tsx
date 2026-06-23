@@ -18,11 +18,11 @@ const Page = () => {
             STAKE FELYSYUM
           </h1>
         </div>
-        
+
         {/* Core Staking System */}
         <StakeFelySection />
-
-        {/* Analytics Stats & Custom Video Player Section */}
+        
+        {/* Footer Video */}
         <StakeVideoTutorial />
       </div>
     </main>
