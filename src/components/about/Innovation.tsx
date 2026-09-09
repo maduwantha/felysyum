@@ -77,9 +77,9 @@ const Innovation = () => {
       tagColor: "bg-cyan-400 text-black"
     },
     {
-      title: "Olympus Community",
+      title: "Felysyum Community",
       subtitle: "BUILDING A DIGITAL SOCIETY",
-      description: "All these future platforms will be powered by the Olympus Community—a future global network of educated, empowered, and prosperous individuals leading the way into the digital world.",
+      description: "All these future platforms will be powered by the Felysyum Community—a future global network of educated, empowered, and prosperous individuals leading the way into the digital world.",
       icon: <CommunityIcon />,
       gradient: gradient16,
       rotation: "rotate-[175deg]",

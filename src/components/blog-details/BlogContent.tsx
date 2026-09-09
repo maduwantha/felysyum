@@ -61,7 +61,15 @@ const BlogContent = ({ blog }: { blog: matter.GrayMatterFile<string> }) => {
 
         <RevealAnimation delay={0.5}>
           <article className="details-body">
-            <ReactMarkdown rehypePlugins={[[rehypeSlug]]} remarkPlugins={[remarkGfm]}>{blog.content}</ReactMarkdown>
+            <ReactMarkdown 
+              rehypePlugins={[[rehypeSlug]]} 
+              remarkPlugins={[remarkGfm]}
+              components={{
+                a: ({ node, ...props }) => <a {...props} target="_blank" rel="noopener noreferrer" />
+              }}
+            >
+              {blog.content}
+            </ReactMarkdown>
           </article>
         </RevealAnimation>
         {/* details-footer */}
