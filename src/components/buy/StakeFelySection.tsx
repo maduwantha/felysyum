@@ -1479,7 +1479,7 @@ const StakeFelySection = () => {
         <div className="flex-grow space-y-4 mb-6 text-sm">
           <div className="flex justify-between border-b border-[#2a333e] pb-2 text-gray-400 font-medium">
             <span>Staked Amount</span>
-            <span>Interest Rate</span>
+            <span>Bonus Rate</span>
           </div>
           {rates.map(([range, rate]) => (
             <div key={range} className="flex justify-between text-white">
