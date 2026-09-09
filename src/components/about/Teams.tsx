@@ -12,7 +12,7 @@ const Teams = () => {
       <div className="main-container space-y-10 md:space-y-[70px]">
         <div className="space-y-5 text-center">
           <RevealAnimation delay={0.1}>
-            <span className="badge badge-cyan">Olympus Community</span>
+            <span className="badge badge-cyan">Felysyum Community</span>
           </RevealAnimation>
           <div className="mx-auto max-w-[620px] space-y-3">
             <RevealAnimation delay={0.2}>

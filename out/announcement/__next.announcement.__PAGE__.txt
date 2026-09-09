@@ -1,9 +1,34 @@
 1:"$Sreact.fragment"
 2:I[90546,["/_next/static/chunks/09606bcda1fecc31.js","/_next/static/chunks/81b71b9cbce31f9a.js","/_next/static/chunks/579c1b6eb5da68c7.js","/_next/static/chunks/87ac893edb270e8a.js","/_next/static/chunks/4285de377cd1fddc.js","/_next/static/chunks/4d69a3e392ca933c.js"],"default"]
 3:I[46676,["/_next/static/chunks/09606bcda1fecc31.js","/_next/static/chunks/81b71b9cbce31f9a.js","/_next/static/chunks/579c1b6eb5da68c7.js","/_next/static/chunks/87ac893edb270e8a.js","/_next/static/chunks/4285de377cd1fddc.js","/_next/static/chunks/4d69a3e392ca933c.js"],"default"]
-12:I[97367,["/_next/static/chunks/ff1a16fafef87110.js","/_next/static/chunks/a2dfb6fc5208ab9b.js"],"OutletBoundary"]
-13:"$Sreact.suspense"
-4:T714,
+13:I[97367,["/_next/static/chunks/ff1a16fafef87110.js","/_next/static/chunks/a2dfb6fc5208ab9b.js"],"OutletBoundary"]
+14:"$Sreact.suspense"
+4:T5a4,
+### Empowering the Felysyum Community with True On-Chain Transparency
+
+At Felysyum, transparency isn't just a promise—it is built directly into our ecosystem on the blockchain. We are thrilled to announce that $FELY is now officially integrated with Bubblemaps, one of the crypto space’s leading visual data platforms for on-chain analysis!
+
+### What This Means for $FELY Holders & Traders
+
+Through this integration, anyone in our community or prospective investors can inspect and analyze $FELY token metrics with total clarity:
+
+🔍 **True On-Chain Transparency:** 
+Instantly verify token holding distributions, wallet clusters, and top holder percentages in real-time.
+
+🌐 **Visual Wallet Connections:** 
+Map out ecosystem transactions and transfers between wallets through intuitive, interactive bubble graphics.
+
+⚡ **Explore Network Dynamics:** 
+See the real power, decentralization, and organic growth behind the Felysyum community.
+
+### Building Trust, Step-by-Step
+
+We believe that long-term utility and community strength are rooted in trust and verifiable data. Integrating with Bubblemaps is another key step forward in our commitment to maintaining complete clarity as we expand the Felysyum ecosystem.
+
+Don't just take our word for it—go check out the on-chain data for yourself!
+
+👉 **[Explore $FELY on Bubblemaps Now](https://v2.bubblemaps.io/map?address=0xee997788f625809332baabb3110bcf1ba7400824&chain=polygon)**
+5:T714,
 The Felysyum ecosystem is proud to announce the official launch of the **$FELY Staking Program**, introducing a new opportunity for holders to earn rewards while supporting the long-term growth and stability of the network.
 
 Participants can select from three staking tiers designed to suit different commitment periods:
@@ -29,7 +54,7 @@ Once connected to the platform, a unique referral link is generated automaticall
 | Whale | 10% | 5% | 3% |
 
 The **$FELY Staking Program** marks another step forward in expanding the Felysyum ecosystem, providing a transparent and secure mechanism for participants to earn rewards while contributing to the long-term sustainability of the network.
-5:T49c4,
+6:T49c4,
 The crypto sector's market value reached a staggering $4 trillion in 2025, making cryptocurrency predictions more crucial than ever. Bitcoin broke records and crossed the $120,000 threshold earlier this week after a remarkable 150% rise at the start of 2024. These numbers are impressive, yet they might just be the beginning.
 
 Our latest crypto predictions for 2025 point to Bitcoin trading between $80,440 and $151,200. Some analysts believe Bitcoin could reach $200,000 by the end of the year. These predictions aren't just educated guesses—they're supported by significant investment activity. The first quarter of 2025 saw venture capital funding in crypto startups hit $4.9 billion, the highest in two years. The total venture funding could reach $18 billion this year.
@@ -207,7 +232,7 @@ The GENIUS Act framework has cleared regulatory hurdles and removed major barrie
 Ecosystems that deliver real-life value will shape cryptocurrency's future relevance. Felysyum shows this through its multi-layered structure that connects education via SkillFullHub, commerce through Felyzone, and innovation with Felynova—all powered by the FELY token. Their 10% charitable allocation proves how crypto projects now build social responsibility into their core.
 
 Cryptocurrency predictions remain uncertain. The foundations built in 2025 point to a fundamentally different era. Institutional adoption, technological innovation, regulatory clarity, and real-life utility have created unprecedented resilience in crypto markets.
-6:T27cd,
+7:T27cd,
 Despite the popularity of cryptocurrencies, fiat currency still maintains its leading position worldwide. It is understandable, as fiat has a history lasting for centuries, and humanity is not yet ready to address its objective shortcomings. The following text discusses the pros and cons of fiat money. Moreover, we'll teach you all its other nuances, down to its origins.
 
 ### What is Fiat Money?
@@ -283,7 +308,7 @@ However, one cannot ignore some of the cryptocurrency's drawbacks, namely its vo
 ### Examples of Fiat Currencies
 
 As mentioned earlier, the US was the first to introduce and secure its fiat currency position. It led to all currencies of other countries being valued against the dollar. Now there are more than one hundred and fifty different currencies in addition to the dollar. They include the euro, the yuan, the rouble, the pound sterling and the Japanese yen. Essentially, anything you can pay with in any shop in any country can also be considered an example of fiat money.
-7:T2b24,
+8:T2b24,
 Did you know that fiat currency first appeared in China in the 10th century when demand for metal currency exceeded the available supply of precious metals? Today, every major economy runs on fiat money – the US Dollar, Euro, and Japanese Yen all share this foundation!
 
 Fiat money gains its power through government decree, not physical backing. Unlike commodity money tied to gold or silver, fiat currency derives value from public trust and legal mandate. The shift from gold-backed currency accelerated dramatically in the 20th century, reaching its climax after 1971 when the U.S. abandoned the gold standard that had pegged gold at $35 per ounce. This decision reshaped global finance forever.
@@ -388,7 +413,7 @@ Digital innovations challenge fiat's supremacy. Cryptocurrencies promise decentr
 Fiat currency remains vulnerable to mismanagement and inflation, but provides economic flexibility that previous systems lacked. Future monetary systems may blend fiat principles with alternative model elements – a question that will shape our economic landscape for generations.
 
 The digital gold rush continues – and knowledge remains your most valuable asset.
-8:T58f,
+9:T58f,
 # Felysyum Officially Listed on CoinGecko: A Major Step Forward
 
 We are thrilled to share a significant milestone in our journey — **Felysyum ($FELY)** is now officially listed on [CoinGecko](https://www.coingecko.com/en/coins/felysyum), one of the most trusted and widely used cryptocurrency data platforms in the world.
@@ -405,7 +430,7 @@ CoinGecko serves millions of users globally, offering real-time information on t
 We thank our growing community for their unwavering support, and this is just the beginning. As we continue to expand the Felysyum ecosystem, this listing marks a key step in our mission to make crypto more accessible, usable, and impactful.
 
 Stay tuned — more major announcements are on the horizon!
-9:T48a,
+a:T48a,
 
 
 We're excited to announce that Felysyum is now officially listed and trackable on [LiveCoinWatch](https://www.livecoinwatch.com/price/Felysyum-FELY), one of the world's top-ranking cryptocurrency data platforms!
@@ -424,7 +449,7 @@ LiveCoinWatch is a top-tier crypto tracking site, trusted by millions of users w
 
 ### 🔗 Check it Out
 Ready to follow Felysyum live? 👉 [View Felysyum on LiveCoinWatch](https://www.livecoinwatch.com/price/Felysyum-FELY)
-a:T74e,
+b:T74e,
 # Felysyum's Information Successfully Updated on CoinGecko Terminal
 
 Exciting news for the Felysyum community! The request to update Felysyum's information on [CoinGecko Terminal](https://www.geckoterminal.com/polygon_pos/pools/0xc810868393de87e0daa3b1f4e90c6738192d2a06?utm_source=coingecko&utm_medium=referral&utm_campaign=searchresults) has been officially approved. This marks another important step in strengthening Felysyum's presence in the cryptocurrency ecosystem, ensuring accurate and up-to-date data for traders, investors, and enthusiasts.
@@ -442,7 +467,7 @@ The approved request ensures that all critical details related to Felysyum are n
 - **Project Overview:** A clearer, more detailed description of Felysyum's mission and ecosystem.
 
 This update ensures that new and existing users have an improved experience while researching or trading Felysyum.
-b:T727,
+c:T727,
 
 
 Exciting news for the Felysyum community! Felysyum is now officially listed on [CoinPaprika](https://coinpaprika.com), one of the leading cryptocurrency data aggregation platforms. This marks a significant milestone for the project, further enhancing its visibility and accessibility for crypto traders, investors, and enthusiasts worldwide.
@@ -461,7 +486,7 @@ Having Felysyum listed on CoinPaprika ensures that investors and traders can acc
 
 ### Felysyum's Growing Presence in the Crypto Space
 The listing on CoinPaprika is another major step in Felysyum's journey toward mass adoption. The project is actively expanding its presence across key platforms, making it easier for users to track, trade, and engage with the ecosystem.
-c:T78b,
+d:T78b,
 
 
 At Felysyum, we take pride in the success of our cryptocurrency projects. However, with growth comes challenges, and one of the biggest issues we face is the rise of scam and fake tokens across multiple networks.
@@ -489,7 +514,7 @@ We are actively working to report and take down these scam tokens from the netwo
 Do not be misled by fake tokens. Only trust the official Felysyum currency on the Polygon network (Contract: `0xee997788f625809332baabb3110bcf1ba7400824`). Your security is our priority, and together, we can eliminate fraudulent activities from the crypto space.
 
 Stay informed. Stay safe. Stay with Felysyum.
-d:T486,
+e:T486,
 
 
 This is a major achievement for our project and community! [Coinranking](https://coinranking.com) is a top-tier cryptocurrency ranking platform that provides real-time data on thousands of digital assets. Being listed here is a testament to our growth, credibility, and commitment to making FELY a trusted and recognized name in the crypto space.
@@ -508,7 +533,7 @@ This is a major achievement for our project and community! [Coinranking](https:/
 Together, we're making FELY stronger than ever! Thank you for being part of this journey! 💙
 
 🔗 **Check out our listing:** [https://coinranking.com/coin/QJdG9_s9S+felysyum-fely](https://coinranking.com/coin/QJdG9_s9S+felysyum-fely)
-e:T441,
+f:T441,
 
 
 We're thrilled to announce that Felysyum (FELY) is officially listed on [MintMe.com](https://mintme.com)! 🚀 This marks a major milestone for the Felysyum ecosystem, providing a new way for users to trade, exchange, and grow with FELY.
@@ -524,8 +549,8 @@ We're thrilled to announce that Felysyum (FELY) is officially listed on [MintMe.
 - **Start Trading** – Buy, sell, and explore new opportunities!
 
 This is just the beginning! We appreciate your continued support and can't wait to see the Felysyum community thrive on MintMe. Stay tuned for more updates and exciting developments ahead.
-0:{"buildId":"WCvensajtE_fxSubK_Wd7","rsc":["$","$1","c",{"children":[["$","main",null,{"className":"bg-[#181D26]","children":[["$","section",null,{"className":"pt-32 pb-14 sm:pt-36 md:pt-42 md:pb-16 lg:pb-[88px] xl:pt-[180px] xl:pb-[100px]","children":["$","div",null,{"className":"main-container","children":["$","div",null,{"className":"mx-auto max-w-[700px] space-y-3 text-center","children":[["$","$L2",null,{"delay":0.1,"children":["$","h1",null,{"className":"text-4xl md:text-5xl font-bold","children":"Announcements"}]}],["$","$L2",null,{"delay":0.3,"children":["$","p",null,{"className":"text-secondary dark:text-gray-400","children":"Keep up with the latest updates from the Felysyum ecosystem."}]}]]}]}]}],["$","section",null,{"className":"py-14 md:py-16 lg:py-[88px] xl:py-[100px]","children":["$","div",null,{"className":"main-container","children":["$undefined",["$","$L3",null,{"blogs":[{"tag":"Staking","author":"Team Felysyum","authorImage":"/images/blog/admin-logo.png","publishDate":"2026-03-23","title":"$$FELY Staking Program Now Live","description":"The Felysyum ecosystem is proud to announce the official launch of the $FELY Staking Program, introducing a new opportunity for holders to earn rewards while supporting the long-term growth and stability of the network.","thumbnail":"/images/blog/staking-program.jpg","slug":"fely-staking-program","content":"$4"},{"title":"Cryptocurrency Predictions 2025: What Expert Traders Won't Tell You","description":"Discover hidden factors behind crypto predictions that expert traders keep secret. Learn about Bitcoin's potential $200K target, AI-crypto convergence, asset tokenization, and real utility ecosystems shaping 2025.","publishDate":"2025-07-28","thumbnail":"/images/blog/cryptocurrency-predictions-2025.jpg","author":"Team Felysyum","authorImage":"/images/blog/admin-logo.png","tag":"Listing","slug":"cryptocurrency-predictions-2025","content":"$5"},{"title":"What is Fiat Money? Understanding Modern Currency Systems","description":"Learn everything about fiat money - from its history and advantages to comparisons with cryptocurrency and gold standard. Complete guide to modern currency systems.","publishDate":"2025-07-27","thumbnail":"/images/blog/what-is-fiat-money.jpg","author":"Team Felysyum","authorImage":"/images/blog/admin-logo.png","tag":"Listing","slug":"what-is-fiat-money","content":"$6"},{"title":"Fiat Currency Explained: From Gold Standard to Digital Age","description":"Discover the evolution of fiat currency from the gold standard to today's digital economy. Learn about central banks, inflation risks, and the future of money in our comprehensive guide.","publishDate":"2025-07-27","thumbnail":"/images/blog/fiat-currency-explained.jpg","author":"Team Felysyum","authorImage":"/images/blog/admin-logo.png","tag":"Listing","slug":"fiat-currency-explained","content":"$7"},{"tag":"Listing","author":"Team Felysyum","authorImage":"/images/blog/admin-logo.png","publishDate":"2025-07-01","title":"Felysyum Officially Listed on CoinGecko: A Major Step Forward","description":"We are thrilled to share a significant milestone in our journey — Felysyum ($FELY) is now officially listed on CoinGecko, one of the most trusted and widely used cryptocurrency data platforms in the world.","thumbnail":"/images/blog/coingecko-listing.jpg","slug":"coingecko-listing","content":"$8"},{"tag":"Listing","author":"Team Felysyum","authorImage":"/images/blog/admin-logo.png","publishDate":"2025-04-10","title":"Felysyum Now Live on LiveCoinWatch – Track Real-Time Data Anytime!","description":"We're excited to announce that Felysyum is now officially listed and trackable on LiveCoinWatch, one of the world's top-ranking cryptocurrency data platforms!","thumbnail":"/images/blog/livecoinwatch.jpg","slug":"livecoinwatch-listing","content":"$9"},{"tag":"Approval","author":"Team Felysyum","authorImage":"/images/blog/admin-logo.png","publishDate":"2025-04-03","title":"Felysyum's Information Successfully Updated on CoinGecko Terminal","description":"Exciting news for the Felysyum community! The request to update Felysyum's information on CoinGecko Terminal has been officially approved.","thumbnail":"/images/blog/coingekco.jpg","slug":"coingecko-terminal","content":"$a"},{"tag":"Listing","author":"Team Felysyum","authorImage":"/images/blog/admin-logo.png","publishDate":"2025-03-31","title":"Felysyum is Now Live on CoinPaprika!","description":"Exciting news for the Felysyum community! Felysyum is now officially listed on CoinPaprika, one of the leading cryptocurrency data aggregation platforms.","thumbnail":"/images/blog/coinpaprika.png","slug":"coin-paprika","content":"$b"},{"tag":"Security","author":"Team Felysyum","authorImage":"/images/blog/admin-logo.png","publishDate":"2025-03-25","title":"Beware of Fake Tokens – Protect Your Felysyum","description":"At Felysyum, we take pride in the success of our cryptocurrency projects. However, with growth comes challenges, and one of the biggest issues we face is the rise of scam and fake tokens.","thumbnail":"/images/blog/fake-token-aleart.jpg","slug":"protect-your-felysyum","content":"$c"},{"tag":"Audit","author":"Team Felysyum","authorImage":"/images/blog/admin-logo.png","publishDate":"2025-03-05","title":"Exciting News for the Felysyum Community!","description":"We are proud to announce that Felysyum has been officially audited by Cyberscope, achieving an impressive 80% High Score!","thumbnail":"/images/blog/cyberscope.png","slug":"cyberscope","content":"\n\n\nWe are proud to announce that Felysyum has been officially audited by Cyberscope, achieving an impressive **80% High Score!** ✅\n\nThis milestone reflects our dedication to transparency, security, and continuous improvement. With each step, we aim higher and higher, ensuring a stronger and more trusted ecosystem for our community.\n\n### 🔍 Check out the full audit details here:\n[Click Here to View Audit](https://www.cyberscope.io/audits/1-fely)\n\nThank you for your unwavering support—the best is yet to come!\n"},{"tag":"Listing","author":"Team Felysyum","authorImage":"/images/blog/admin-logo.png","publishDate":"2025-02-06","title":"We are beyond excited to announce that Felysyum (FELY) is now officially listed on Coinranking! 🎉","description":"Exciting news! Felysyum (FELY) is now officially listed on Coinranking, marking a major milestone for our growing ecosystem!","thumbnail":"/images/blog/coinranking.png","slug":"coinranking","content":"$d"},{"tag":"Listing","author":"Team Felysyum","authorImage":"/images/blog/admin-logo.png","publishDate":"2025-01-31","title":"Exciting News! Felysyum is Now Live on MintMe.com!","description":"We're thrilled to announce that Felysyum (FELY) is officially listed on MintMe.com! 🚀 This marks a major milestone for the Felysyum ecosystem.","thumbnail":"/images/blog/mintme.png","slug":"mintme","content":"$e"}],"baseUrl":"/announcement","cardType":"announcement"}]]}]}]]}],["$Lf","$L10"],"$L11"]}],"loading":null,"isPartial":false}
-f:["$","script","script-0",{"src":"/_next/static/chunks/4285de377cd1fddc.js","async":true}]
-10:["$","script","script-1",{"src":"/_next/static/chunks/4d69a3e392ca933c.js","async":true}]
-11:["$","$L12",null,{"children":["$","$13",null,{"name":"Next.MetadataOutlet","children":"$@14"}]}]
-14:null
+0:{"buildId":"IoWTZH9ElCxkD0eiNyime","rsc":["$","$1","c",{"children":[["$","main",null,{"className":"bg-[#181D26]","children":[["$","section",null,{"className":"pt-32 pb-14 sm:pt-36 md:pt-42 md:pb-16 lg:pb-[88px] xl:pt-[180px] xl:pb-[100px]","children":["$","div",null,{"className":"main-container","children":["$","div",null,{"className":"mx-auto max-w-[700px] space-y-3 text-center","children":[["$","$L2",null,{"delay":0.1,"children":["$","h1",null,{"className":"text-4xl md:text-5xl font-bold","children":"Announcements"}]}],["$","$L2",null,{"delay":0.3,"children":["$","p",null,{"className":"text-secondary dark:text-gray-400","children":"Keep up with the latest updates from the Felysyum ecosystem."}]}]]}]}]}],["$","section",null,{"className":"py-14 md:py-16 lg:py-[88px] xl:py-[100px]","children":["$","div",null,{"className":"main-container","children":["$undefined",["$","$L3",null,{"blogs":[{"tag":"Announcement","author":"Team Felysyum","authorImage":"/images/blog/admin-logo.png","publishDate":"2026-08-13","title":"$$FELY is Officially Live on Bubblemaps!","description":"Empowering the Felysyum Community with True On-Chain Transparency","thumbnail":"/images/blog/bubblemaps.jpg","slug":"bubblemaps","content":"$4"},{"tag":"Staking","author":"Team Felysyum","authorImage":"/images/blog/admin-logo.png","publishDate":"2026-03-23","title":"$$FELY Staking Program Now Live","description":"The Felysyum ecosystem is proud to announce the official launch of the $FELY Staking Program, introducing a new opportunity for holders to earn rewards while supporting the long-term growth and stability of the network.","thumbnail":"/images/blog/staking-program.jpg","slug":"fely-staking-program","content":"$5"},{"title":"Cryptocurrency Predictions 2025: What Expert Traders Won't Tell You","description":"Discover hidden factors behind crypto predictions that expert traders keep secret. Learn about Bitcoin's potential $200K target, AI-crypto convergence, asset tokenization, and real utility ecosystems shaping 2025.","publishDate":"2025-07-28","thumbnail":"/images/blog/cryptocurrency-predictions-2025.jpg","author":"Team Felysyum","authorImage":"/images/blog/admin-logo.png","tag":"Listing","slug":"cryptocurrency-predictions-2025","content":"$6"},{"title":"What is Fiat Money? Understanding Modern Currency Systems","description":"Learn everything about fiat money - from its history and advantages to comparisons with cryptocurrency and gold standard. Complete guide to modern currency systems.","publishDate":"2025-07-27","thumbnail":"/images/blog/what-is-fiat-money.jpg","author":"Team Felysyum","authorImage":"/images/blog/admin-logo.png","tag":"Listing","slug":"what-is-fiat-money","content":"$7"},{"title":"Fiat Currency Explained: From Gold Standard to Digital Age","description":"Discover the evolution of fiat currency from the gold standard to today's digital economy. Learn about central banks, inflation risks, and the future of money in our comprehensive guide.","publishDate":"2025-07-27","thumbnail":"/images/blog/fiat-currency-explained.jpg","author":"Team Felysyum","authorImage":"/images/blog/admin-logo.png","tag":"Listing","slug":"fiat-currency-explained","content":"$8"},{"tag":"Listing","author":"Team Felysyum","authorImage":"/images/blog/admin-logo.png","publishDate":"2025-07-01","title":"Felysyum Officially Listed on CoinGecko: A Major Step Forward","description":"We are thrilled to share a significant milestone in our journey — Felysyum ($FELY) is now officially listed on CoinGecko, one of the most trusted and widely used cryptocurrency data platforms in the world.","thumbnail":"/images/blog/coingecko-listing.jpg","slug":"coingecko-listing","content":"$9"},{"tag":"Listing","author":"Team Felysyum","authorImage":"/images/blog/admin-logo.png","publishDate":"2025-04-10","title":"Felysyum Now Live on LiveCoinWatch – Track Real-Time Data Anytime!","description":"We're excited to announce that Felysyum is now officially listed and trackable on LiveCoinWatch, one of the world's top-ranking cryptocurrency data platforms!","thumbnail":"/images/blog/livecoinwatch.jpg","slug":"livecoinwatch-listing","content":"$a"},{"tag":"Approval","author":"Team Felysyum","authorImage":"/images/blog/admin-logo.png","publishDate":"2025-04-03","title":"Felysyum's Information Successfully Updated on CoinGecko Terminal","description":"Exciting news for the Felysyum community! The request to update Felysyum's information on CoinGecko Terminal has been officially approved.","thumbnail":"/images/blog/coingekco.jpg","slug":"coingecko-terminal","content":"$b"},{"tag":"Listing","author":"Team Felysyum","authorImage":"/images/blog/admin-logo.png","publishDate":"2025-03-31","title":"Felysyum is Now Live on CoinPaprika!","description":"Exciting news for the Felysyum community! Felysyum is now officially listed on CoinPaprika, one of the leading cryptocurrency data aggregation platforms.","thumbnail":"/images/blog/coinpaprika.png","slug":"coin-paprika","content":"$c"},{"tag":"Security","author":"Team Felysyum","authorImage":"/images/blog/admin-logo.png","publishDate":"2025-03-25","title":"Beware of Fake Tokens – Protect Your Felysyum","description":"At Felysyum, we take pride in the success of our cryptocurrency projects. However, with growth comes challenges, and one of the biggest issues we face is the rise of scam and fake tokens.","thumbnail":"/images/blog/fake-token-aleart.jpg","slug":"protect-your-felysyum","content":"$d"},{"tag":"Audit","author":"Team Felysyum","authorImage":"/images/blog/admin-logo.png","publishDate":"2025-03-05","title":"Exciting News for the Felysyum Community!","description":"We are proud to announce that Felysyum has been officially audited by Cyberscope, achieving an impressive 80% High Score!","thumbnail":"/images/blog/cyberscope.png","slug":"cyberscope","content":"\n\n\nWe are proud to announce that Felysyum has been officially audited by Cyberscope, achieving an impressive **80% High Score!** ✅\n\nThis milestone reflects our dedication to transparency, security, and continuous improvement. With each step, we aim higher and higher, ensuring a stronger and more trusted ecosystem for our community.\n\n### 🔍 Check out the full audit details here:\n[Click Here to View Audit](https://www.cyberscope.io/audits/1-fely)\n\nThank you for your unwavering support—the best is yet to come!\n"},{"tag":"Listing","author":"Team Felysyum","authorImage":"/images/blog/admin-logo.png","publishDate":"2025-02-06","title":"We are beyond excited to announce that Felysyum (FELY) is now officially listed on Coinranking! 🎉","description":"Exciting news! Felysyum (FELY) is now officially listed on Coinranking, marking a major milestone for our growing ecosystem!","thumbnail":"/images/blog/coinranking.png","slug":"coinranking","content":"$e"},{"tag":"Listing","author":"Team Felysyum","authorImage":"/images/blog/admin-logo.png","publishDate":"2025-01-31","title":"Exciting News! Felysyum is Now Live on MintMe.com!","description":"We're thrilled to announce that Felysyum (FELY) is officially listed on MintMe.com! 🚀 This marks a major milestone for the Felysyum ecosystem.","thumbnail":"/images/blog/mintme.png","slug":"mintme","content":"$f"}],"baseUrl":"/announcement","cardType":"announcement"}]]}]}]]}],["$L10","$L11"],"$L12"]}],"loading":null,"isPartial":false}
+10:["$","script","script-0",{"src":"/_next/static/chunks/4285de377cd1fddc.js","async":true}]
+11:["$","script","script-1",{"src":"/_next/static/chunks/4d69a3e392ca933c.js","async":true}]
+12:["$","$L13",null,{"children":["$","$14",null,{"name":"Next.MetadataOutlet","children":"$@15"}]}]
+15:null

@@ -39,8 +39,8 @@ const milestones = [
     },
     {
         status: 'future',
-        title: 'Olympus Gathering',
-        desc: 'Strengthen the community ties within Olympus Community.',
+        title: 'Felysyum Gathering',
+        desc: 'Strengthen the community ties within Felysyum Community.',
     },
 
     {
@@ -230,7 +230,7 @@ const RoadMapContent = () => {
                                                                 <span className="text-gray-200 font-medium text-sm md:text-base">Developing SkillfulHub to educate community members</span>
                                                             </div>
                                                             <div className="p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-[#E08E27]/20 hover:border-[#E08E27]/50 transition-all flex items-center gap-4 group/card">
-                                                                <span className="text-gray-200 font-medium text-sm md:text-base">Development is underway for “Olympus Honor Group” — the official community platform of the Felysyum ecosystem, designed to unite and strengthen the global FELY community.</span>
+                                                                <span className="text-gray-200 font-medium text-sm md:text-base">Development is underway for “Felysyum Honor Group” — the official community platform of the Felysyum ecosystem, designed to unite and strengthen the global FELY community.</span>
                                                             </div>
                                                         </div>
                                                     )}
