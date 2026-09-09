@@ -39,8 +39,8 @@ const milestones = [
     },
     {
         status: 'future',
-        title: 'Felysyum Gathering',
-        desc: 'Strengthen the community ties within Felysyum Community.',
+        title: 'Olympus Gathering',
+        desc: 'Strengthen the community ties within Olympus Community.',
     },
 
     {
