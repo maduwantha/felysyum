@@ -144,7 +144,7 @@ Common Styles all over the sites
 
 /* ==========BLOG DETAILS========== */
 .details-body {
-  @apply mx-auto max-w-[950px];
+  @apply mx-auto max-w-[950px] text-white;
   h3 {
     @apply text-heading-6 md:text-heading-5 mb-3 font-normal not-first:mt-5 lg:not-first:mt-12;
   }
