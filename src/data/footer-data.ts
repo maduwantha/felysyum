@@ -23,6 +23,7 @@ export const footerLinks: FooterData[] = [
   {
     title: 'Products',
     links: [
+      { label: 'Olympus', target: '_blank', href: 'https://olympus.felysyum.com/' },
       { label: 'Skillfullhub', target: '_blank', href: 'https://skillfullhub.com/' },
       { label: 'Felyzone', target: '_blank', href: 'http://felyzone.com/' },
       { label: 'Felynova', target: '_blank', href: 'https://felynova.com/' },

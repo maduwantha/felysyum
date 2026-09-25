@@ -3,6 +3,7 @@ import { ThemeProvider } from "@/components/shared/ThemeProvider";
 import DemoShowcase from "@/components/shared/demo-showcase";
 import Footer from "@/components/shared/footer/Footer";
 import Navbar from "@/components/shared/navbar/Navbar";
+import TopBanner from "@/components/shared/TopBanner";
 import { interTight } from "@/utils/font";
 import { generateMetadata } from "@/utils/generateMetaData";
 import { Metadata } from "next";
@@ -42,8 +43,11 @@ export default function RootLayout({
         >
           <Suspense>
             <SmoothScrollProvider>
+              <TopBanner />
               <Navbar />
-              {children}
+              <main className="pt-[44px]">
+                {children}
+              </main>
               <Footer />
             </SmoothScrollProvider>
           </Suspense>

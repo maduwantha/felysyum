@@ -177,8 +177,8 @@ const Navbar = () => {
       <header
         onMouseLeave={() => handleMenuHover(null)}
         className={cn(
-          "lp:!max-w-[1290px] bg-background-2 dark:bg-background-6 fixed top-5 left-1/2 z-50 mx-auto w-full max-w-[350px] -translate-x-1/2 rounded-full transition-all duration-500 ease-in-out min-[425px]:max-w-[375px] min-[500px]:max-w-[450px] sm:max-w-[540px] md:max-w-[720px] lg:max-w-[960px] xl:max-w-[1140px]",
-          isScrolled && "top-2",
+          "lp:!max-w-[1290px] bg-background-2 dark:bg-background-6 fixed top-[60px] left-1/2 z-50 mx-auto w-full max-w-[350px] -translate-x-1/2 rounded-full transition-all duration-500 ease-in-out min-[425px]:max-w-[375px] min-[500px]:max-w-[450px] sm:max-w-[540px] md:max-w-[720px] lg:max-w-[960px] xl:max-w-[1140px]",
+          isScrolled && "top-[48px]",
         )}
       >
         <RevealAnimation direction="up" offset={100} delay={0.1} instant>
@@ -315,11 +315,21 @@ const Navbar = () => {
                       Contact
                     </Link>
                   </li>
+                  <li className="py-2.5 ml-2">
+                    <a
+                      href="https://olympus.felysyum.com/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 rounded-full border border-[#FFD700]/40 bg-[#FFD700]/10 px-5 py-2 font-medium text-[#FFD700] transition-all duration-200 hover:bg-[#FFD700] hover:text-black shadow-[0_0_10px_rgba(255,215,0,0.15)]"
+                    >
+                      Olympus
+                    </a>
+                  </li>
                 </ul>
               </nav>
 
               {/* Wallet Button */}
-              <div className="hidden items-center justify-center xl:flex">
+              <div className="hidden items-center justify-center xl:flex xl:ml-6">
                 {isConnected && yourWalletAddress ? (
                   <button
                     onClick={disconnectWallet}

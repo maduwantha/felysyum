@@ -7,60 +7,25 @@ import heroImg02DarkImage from '@public/images/ns-img-dark-60.png';
 import heroImg03DarkImage from '@public/images/ns-img-dark-61.png';
 import heroImg04DarkImage from '@public/images/ns-img-dark-62.png';
 import Image from 'next/image';
+import { LuGlobe, LuGraduationCap, LuLandmark } from 'react-icons/lu';
 import RevealAnimation from '../animation/RevealAnimation';
 import LinkButton from '../ui/button/LinkButton';
 import AvatarGroup from './AvatarGroup';
-
+import HeroTextSlider from './HeroTextSlider';
 const Hero = () => {
   return (
     <section
-      className="bg-[url('/images/ns-img-85.png')] bg-left bg-no-repeat pt-[140px] pb-[120px] md:pt-[160px] lg:bg-top-right lg:pt-[200px] lg:pb-[150px] xl:pt-[230px] xl:pb-[200px]"
+      className="bg-[url('/images/ns-img-85.png')] bg-left bg-no-repeat pt-[140px] pb-[120px] md:pt-[160px] lg:bg-top-right lg:pt-[200px] lg:pb-[150px] xl:pb-[200px]"
       aria-label="Hero section">
       <div className="main-container">
-        <div className="flex flex-col gap-10 sm:flex-row 2xl:gap-[100px]">
+        <div className="flex flex-col gap-10 lg:flex-row 2xl:gap-[100px]">
           {/* hero text  */}
           <div className="text-center md:w-full lg:max-w-[570px] lg:text-left xl:max-w-[595px]">
 
 
             <RevealAnimation delay={0.1}>
-              <span className="badge badge-white mb-5">Felysyum: Smart Money for a New Era</span>
+              <HeroTextSlider />
             </RevealAnimation>
-
-
-            <RevealAnimation delay={0.2}>
-              <h1 className="mb-4 !text-[32px] sm:!text-[40px] md:!text-[48px] lg:!text-[56px] xl:!text-[60px] !leading-tight">We're shifting
-                Crypto from digital assets to everyday currency</h1>
-
-
-            </RevealAnimation>
-
-            <RevealAnimation delay={0.3}>
-              <p className="mb-10 md:mb-14 lg:max-w-[440px] xl:max-w-[570px]">
-                A complete ecosystem where innovation, education, commerce, and charity come together.
-              </p>
-            </RevealAnimation>
-
-            {/* hero btns */}
-            <ul className="mb-9 flex flex-col items-center gap-4 md:flex-row md:justify-center lg:justify-start">
-              <li className="w-full sm:w-auto">
-                <RevealAnimation delay={0.3} direction="left" offset={50}>
-                  <LinkButton
-                    href="/buy"
-                    className="btn btn-primary btn-xl hover:btn-secondary dark:hover:btn-white w-[90%] md:w-auto">
-                    Buy FELY
-                  </LinkButton>
-                </RevealAnimation>
-              </li>
-              <li className="w-full sm:w-auto">
-                <RevealAnimation delay={0.4} direction="left" offset={50}>
-                  <LinkButton
-                    href="/stake"
-                    className="btn btn-white dark:btn-transparent btn-xl hover:btn-primary w-[90%] md:w-auto">
-                    Stake FELY
-                  </LinkButton>
-                </RevealAnimation>
-              </li>
-            </ul>
 
           </div>
 

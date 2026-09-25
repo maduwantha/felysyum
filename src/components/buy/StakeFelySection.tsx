@@ -1031,11 +1031,11 @@ const StakeFelySection = () => {
         }
       }
     } catch (e: any) {
-      console.error("Auth error:", e);
+      console.error("Auth error:", e?.response?.data || e.message || e);
       setTransactionStatus(
-        e.code === 4001
+        e.code === 4001 || e?.info?.error?.code === 4001
           ? "Signature rejected"
-          : "Authentication failed: " + (e.message || ""),
+          : "Authentication failed: " + (e?.response?.data?.message || e.message || "Unknown error"),
       );
       setTimeout(() => setTransactionStatus(null), 4000);
     }

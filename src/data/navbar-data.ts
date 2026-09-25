@@ -56,7 +56,11 @@ export const mobileMenuData: MobileMenuGroup[] = [
     title: 'Contact',
     href: '/contact-us',
   },
-
+  {
+    id: 'olympus',
+    title: 'Olympus',
+    href: 'https://olympus.felysyum.com/',
+  },
 ];
 
 export const footerData: FooterOneData[] = [
